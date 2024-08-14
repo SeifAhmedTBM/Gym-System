@@ -1,0 +1,151 @@
+@extends('layouts.admin')
+@section('styles')
+<style>
+.dark-theme .card{
+    transition: all .1s ease-in-out; 
+    --cui-card-bg: #515050;
+    --cui-card-border-color: rgb(47 47 47);
+    --cui-card-cap-bg: #414244;
+    border-radius: 11px;
+  }
+
+  .dark-theme .card:hover{
+    transform: scale(1.01);
+    --cui-card-bg: #1dadeb99;
+    box-shadow: inset 0 0 10px #fff
+    border: 2px solid #c0c0c0c7;
+  }
+  </style>
+@endsection
+@section('content')
+    <?php
+    $menuItems = [
+        [
+            'label' => 'Hotkeys',
+            'items' => [
+                [
+                    'title' => 'Leads List',
+                    'imageUrl' => '1.png',
+                    'linkUrl' => 'admin.leads.index',
+                    'type' => '' ,
+                ],
+    
+                [
+                    'title' => 'Members List',
+                    'imageUrl' => '2.png',
+                    'linkUrl' => 'admin.members.index',
+                    'type'  => ''
+                ],
+    
+                [
+                    'title' => 'Memberships List',
+                    'imageUrl' => '3.png',
+                    'linkUrl' => 'admin.memberships.index',
+                    'type'  => ''
+                ],
+                [
+                    'title' => 'Gym Memberships List',
+                    'imageUrl' => '4.png',
+                    'linkUrl' => 'admin.memberships.index',
+                    'type'  => ''
+                ],
+                [
+                    'title' => 'PT Membership List',
+                    'imageUrl' => '5.png',
+                    'linkUrl' => 'admin.memberships.index',
+                    'type'  => ''
+                ],
+                [
+                    'title' => 'Outsider  Membership List',
+                    'imageUrl' => '6.png',
+                    'linkUrl' => 'admin.memberships.index',
+                    'type'  => ''
+                ],
+                //
+                [
+                    'title' => 'Memberships Attendance List',
+                    'imageUrl' => '8.png',
+                    'linkUrl' => 'admin.membership-attendances.index',
+                    'type'  => ''
+                ],
+                //
+                [
+                    'title' => 'Freez List',
+                    'imageUrl' => '7.png',
+                    'linkUrl' => 'admin.freeze.index',
+                    'type'  => ''
+                ],
+                //
+                [
+                    'title' => 'Invoices List',
+                    'imageUrl' => '9.png',
+                    'linkUrl' => 'admin.invoices.index',
+                    'type'  => ''
+                ],
+                [
+                    'title' => 'Payments List',
+                    'imageUrl' => '10.png',
+                    'linkUrl' => 'admin.payments.index',
+                    'type'  => ''
+                ],
+                [
+                    'title' => 'Refunds List',
+                    'imageUrl' => '11.png',
+                    'linkUrl' => 'admin.refunds.index',
+                    'type'  => ''
+                ],
+                [
+                    'title' => 'Settellements List',
+                    'imageUrl' => '12.png',
+                    'linkUrl' => 'admin.invoices.settlement',
+                    'type'  => ''
+                ],
+                [
+                    'title' => 'Other Payments List',
+                    'imageUrl' => '13.png',
+                    'linkUrl' => 'admin.payments.index',
+                    'type'  => ''
+                ],
+                [
+                    'title' => 'Other Payments List',
+                    'imageUrl' => '14.png',
+                    'linkUrl' => 'admin.external-payments.index',
+                    'type'  => ''
+                ],
+                [
+                    'title' => 'Expenses List',
+                    'imageUrl' => '15.png',
+                    'linkUrl' => 'admin.expenses.index',
+                    'type'  => ''
+                ],
+
+
+            ],
+        ]    
+    ];
+    ?>
+
+
+<div class="row">
+    <div class="col-md-12">
+        @foreach ($menuItems as $section)
+        <div class="row">
+            @foreach ($section['items'] as $item)
+                <div class="col-md-3">
+                    <div class="card">
+                        <a class="text-decoration-none text-success" href="{{route($item['linkUrl'])}}">
+                            <center>
+                                <img src="{{ asset('images/dashboard/' . $item['imageUrl']) }}" width="120" height="120"
+                                    alt="" style="padding: 16px;">
+                                <br>
+                                <h6 style="color:#dadada;font-weight:bold;">{{ $item['title'] }}</h6>
+                            </center>
+                        </a>
+                    </div>
+                </div>
+            @endforeach
+        </div>
+    @endforeach
+    </div> 
+</div>
+@endsection

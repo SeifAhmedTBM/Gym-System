@@ -1,0 +1,28 @@
+<?php
+
+namespace App\Http\Controllers\Admin;
+
+use App\Http\Controllers\Controller;
+use Illuminate\Http\Request;
+
+class ControlPanelController extends Controller
+{
+    public function operations()
+    {
+        return view('partials.operations');
+    }
+
+
+    public function hot_keys()
+    {
+        return view('partials.hot_keys');
+    }
+}
+
+
+
+
+   //control 
+    Route::get('hot-keys','ControlPanelController@hot_keys')->name('hot-keys');
+    Route::get('operations','ControlPanelController@operations')->name('operations');
+});

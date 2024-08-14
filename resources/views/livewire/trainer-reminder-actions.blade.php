@@ -1,0 +1,37 @@
+<div>
+    @if (Auth()->user()->roles[0]->title == 'Trainer')
+        <input type="hidden" name="trainer_id" value="{{ auth()->id() }}">
+    @else
+        <div class="form-group">
+            <label for="trainer_id">Trainer</label>
+            <select name="trainer_id"  class="form-control">
+                <option value="{{ null }}">Select Trainer</option>
+                @foreach (App\Models\User::whereRelation('roles','title','Trainer')->orderBy('name')->pluck('name','id') as $trainer_id => $trainer_name)
+                    <option value="{{ $trainer_id }}">{{ $trainer_name }}</option>
+                @endforeach
+            </select>
+        </div>
+    @endif
+    <div class="form-group">
+        <label for="action">Action</label>
+        <select name="action" id="action" class="form-control" wire:model.live="action">
+            <option value="{{ null }}">Select Action</option>
+            @foreach (App\Models\Reminder::ACTION as $key => $value)
+                @if (auth()->user()->roles[0]->title == 'Trainer')
+                    @if ($key == 'done' || $key == 'appointment' || $key == 'not_interested')
+                        <option value="{{ $key }}">{{ $value }}</option>
+                    @endif
+                @else
+                    <option value="{{ $key }}">{{ $value }}</option>
+                @endif
+            @endforeach
+
+        </select>
+    </div>
+    @if ($due_date_active == true)
+        <div class="form-group">
+            <label for="due_date">{{ trans('cruds.reminder.fields.next_due_date') }}</label>
+            <input type="date" name="due_date" id="due_date" class="form-control" value="{{ $due_date }}">
+        </div>
+    @endif
+</div>
