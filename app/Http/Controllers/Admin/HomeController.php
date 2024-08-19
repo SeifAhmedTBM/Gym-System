@@ -193,14 +193,34 @@ class HomeController
     {
         $date = isset($request['date']) ? $request['date'] : date('Y-m');
 
+        $today = Carbon::now('UTC');
+        $today2 = Carbon::now('UTC');
+        
+        $startOfLastMonth = $today->subMonth()->startOfMonth();
+       
+        $endOfLastMonth = $today2->subMonth();
+    
+
         $branches = Branch::with([
             'accounts',
             'transactions' => fn ($q) => $q->whereYear('transactions.created_at', date('Y', strtotime($date)))
                 ->whereMonth('transactions.created_at', date('m', strtotime($date)))
-        ])
-            ->get();
+        ])->get();
 
-        return view('home', compact('branches'));
+       
+        $lastMonthBranchesTransactions = Branch::with(['transactions' => function($query) use ($startOfLastMonth, $endOfLastMonth, $today ,$today2) {
+            $query->whereDate('transactions.created_at', '>=', $startOfLastMonth)->whereDate('transactions.created_at', '<=', $endOfLastMonth);
+        }])->get();
+
+        // $accounts = Account::whereManager(false)
+        // ->when($branch_id, fn ($x) => $x->whereBranchId($branch_id))
+        // ->with(['transactions' => fn ($q) => $q->whereDate('created_at', '>=', $from)->whereDate('created_at', '<=', $to)])
+        // ->orderBy('name')
+        // ->get();
+
+
+
+        return view('home', compact('branches' ,'lastMonthBranchesTransactions'));
     }
 
     public function admin()
@@ -1460,4 +1480,7 @@ class HomeController
     {
         return 'fix Sales';
     }
+
+
+    
 }

@@ -83,6 +83,9 @@ return [
     'reply'                          => 'الرد',
     'body'                           => 'المحتوى',
     'discard'                        => 'تجاهل',
+    'previous_month_report'          => 'تقارير الشهر السابق' ,
+    'branches'                       => 'فروع' ,
+
     'datatables'                     => [
         'copy'          => 'نسخ',
         'csv'           => 'CSV',
