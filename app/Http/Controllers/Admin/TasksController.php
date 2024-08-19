@@ -7,6 +7,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Role;
 use App\Models\Task;
 use App\Models\User;
+use App\Models\Employee;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
 use Symfony\Component\HttpFoundation\Response;
@@ -16,6 +17,7 @@ class TasksController extends Controller
 {
     public function index(Request $request)
     {
+       
         abort_if(Gate::denies('task_access'), Response::HTTP_FORBIDDEN, '403 Forbidden');
 
         $employee = Auth()->user()->employee;
@@ -35,6 +37,9 @@ class TasksController extends Controller
                     ->orWhere('to_user_id',Auth()->id())
                     ->orWhere('created_by_id',Auth()->id())
                     ->select(sprintf('%s.*', (new Task())->table));
+            }
+            if ($request->has('employee_id')) {
+                $query->where('to_user_id', $request->employee_id);
             }
 
             $table = DataTables::eloquent($query);
@@ -103,7 +108,9 @@ class TasksController extends Controller
             return $table->make(true);
         }
 
-        return view('admin.tasks.index');
+        $employees = Employee::where('status' ,'active')->get();
+
+        return view('admin.tasks.index' , compact('employees'));
     }
 
     public function create()
@@ -378,5 +385,34 @@ class TasksController extends Controller
         }
 
         return view('admin.tasks.created_tasks');
+    }
+
+    public function filter(Request $request) {
+        $employee = Auth()->user()->employee;
+    
+        // Start building the query
+        $query = Task::with(['to_user', 'created_by', 'to_role', 'supervisor']);
+    
+        if (Auth()->user()->roles[0]->title == 'Super Admin') {
+            $query = Task::with(['to_user', 'created_by', 'to_role', 'supervisor']);
+        } elseif (Auth()->user()->roles[0]->title == 'Admin') {
+            $query->whereHas('created_by', fn($q) => $q->whereHas('employee', fn($x) => $x->whereBranchId($employee->branch_id)))
+                ->orWhere('supervisor_id', Auth()->id());
+        } else {
+            $query->whereSupervisorId(Auth()->id())
+                ->orWhere('to_user_id', Auth()->id())
+                ->orWhere('created_by_id', Auth()->id());
+        }
+    
+        // Apply filtering based on employee_id
+        if ($request->has('employee_id')) {
+            $query->where('to_user_id', $request->employee_id);
+        }
+      
+        $employees = Employee::where('status' ,'active')->get();
+        // Fetch the filtered tasks
+        $tasks = $query->get();
+    
+        return view('admin.tasks.filter', compact('tasks' ,'employees'));
     }
 }

@@ -1,4 +1,10 @@
 @extends('layouts.admin')
+<link rel="stylesheet" href="https://cdn.datatables.net/2.1.4/css/dataTables.dataTables.css" />
+<style>
+    .dataTables_wrapper .dataTables_paginate .paginate_button{
+        padding:0px !important;
+    }
+</style>
 @section('content')
     @can('task_create')
         <div style="margin-bottom: 10px;" class="row">
@@ -44,12 +50,9 @@
         </div>
 
         <div class="card-body">
-            <table class=" table table-bordered table-striped table-hover ajaxTable datatable datatable-Task">
+            <table class="table table-bordered table-striped table-hover ajaxTable datatable datatable-Task" id="myTable">
                 <thead>
                     <tr>
-                        <th width="10">
-
-                        </th>
                         <th>
                             {{ trans('cruds.source.fields.id') }}
                         </th>
@@ -89,90 +92,58 @@
                         </th>
                     </tr>
                 </thead>
+                <tbody>
+                    
+                    @foreach($tasks as $task)
+                    <tr>
+                        <td>{{$task->id}}</td>
+                        <td>{{$task->title}}</td>
+                        <td>{{$task->description}}</td>
+                        <td>{{$task->created_by?->name}}</td>
+                        <td>{{$task->to_user?->name}}</td>
+                        <td>{{$task->to_role?->name}}</td>
+                        <td> <span class="badge">{{ $task->status }}</span></td>
+                        <td>{{$task->created_at->toFormattedDateString() , $task->created_at->format('g:i A')}}</td>
+                        <td>{{$task->supervisor?->name}}</td>
+                        <td>{{$task->done_at}}</td>
+                        <td>{{$task->confirmation_at}}</td>
+                        <td>
+
+                        <div class="dropdown">
+                            <a class="btn btn-primary dropdown-toggle" href="#" role="button" id="dropdownMenuLink" data-toggle="dropdown" aria-expanded="false">
+                                Action
+                            </a>
+                            <div class="dropdown-menu" aria-labelledby="dropdownMenuLink">
+                                <a class="dropdown-item" href="/admin/tasks/{{$task->id}}" target="__blank">
+                                    <i class="fa fa-eye"></i> &nbsp; View
+                                </a>
+                                <a class="dropdown-item" href="/admin/tasks/{{$task->id}}/edit" target="__blank">
+                                    <i class="fa fa-edit"></i> &nbsp; Edit
+                                </a>                
+                                <form action="/admin/tasks/{{$task->id}}" method="POST" onsubmit="return confirm('Are you sure?');" style="display: inline-block;">
+                                    <input type="hidden" name="_method" value="DELETE">
+                                    <input type="hidden" name="_token" value="Qlfpnuhvr1qwGs37Vy5YHIDYK3MHLelVOW1oTKu4">
+                                    <button type="submit" class="dropdown-item">
+                                        <i class="fa fa-trash"></i> &nbsp; Delete
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                        </td>
+                    </tr>
+                    @endforeach
+                </tbody>
             </table>
+         
         </div>
     </div>
-@endsection
-@section('scripts')
-    @parent
-    <script>
-        $(function() {
-            let dtButtons = $.extend(true, [], $.fn.dataTable.defaults.buttons)
-          
+    <script src="https://cdn.datatables.net/2.1.4/js/dataTables.js"></script>
 
-            let dtOverrideGlobals = {
-                buttons: [dtButtons],
-                processing: true,
-                serverSide: true,
-                retrieve: true,
-                searching: true,
-                aaSorting: [],
-                ajax: "{{ route('admin.tasks.index') }}",
-                columns: [{
-                        data: 'placeholder',
-                        name: 'placeholder'
-                    },
-                    {
-                        data: 'id',
-                        name: 'id'
-                    },
-                    {
-                        data: 'title',
-                        name: 'title'
-                    },
-                    {
-                        data: 'description',
-                        name: 'description'
-                    },
-                    {
-                        data: 'created_by',
-                        name: 'created_by'
-                    },
-                    {
-                        data: 'to_user',
-                        name: 'to_user'
-                    },
-                    {
-                        data: 'to_role',
-                        name: 'to_role'
-                    },
-                    {
-                        data: 'status',
-                        name: 'status'
-                    },
-                    {
-                        data: 'task_date',
-                        name: 'task_date'
-                    },
-                    {
-                        data: 'supervisor_name',
-                        name: 'supervisor_name'
-                    },
-                    {
-                        data: 'done_at',
-                        name: 'done_at'
-                    },
-                    {
-                        data: 'confirmation_at',
-                        name: 'confirmation_at'
-                    },
-                    {
-                        data: 'actions',
-                        name: '{{ trans('global.actions') }}'
-                    }
-                ],
-                orderCellsTop: true,
-                order: [
-                    [1, 'desc']
-                ],
-                pageLength: 50,
-            };
-            let table = $('.datatable-Task').DataTable(dtOverrideGlobals);
-            $('a[data-toggle="tab"]').on('shown.bs.tab click', function(e) {
-                $($.fn.dataTable.tables(true)).DataTable()
-                    .columns.adjust();
-            });
-
-        });
-    </script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+    $(document).ready( function () {
+    $('#myTable').DataTable();
+} );
+</script>
 @endsection
+

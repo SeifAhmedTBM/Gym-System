@@ -93,6 +93,8 @@ return [
     'reply'                          => 'Reply',
     'body'                           => 'Body',
     'discard'                        => 'Discard',
+    'employee'                       => 'Employee' ,
+    'select_employee'                => 'Select Employee' ,
     'datatables'                     => [
         'copy'          => 'Copy',
         'csv'           => 'CSV',
