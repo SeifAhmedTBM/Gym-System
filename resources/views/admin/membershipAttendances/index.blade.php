@@ -27,9 +27,10 @@
             </div>
             <div class="col-lg-3 col-md-3 col-sm-12 col-xs-12">
                 <div class="card">
-                    <div class="card-body">
+                    <div class="card-body" style="text-align:center">
                         <h2 class="text-center">{{ trans('global.attendances') }}</h2>
                         <h2 class="text-center">{{ $counter }}</h2>
+                        <small class="text-center text-danger"> Attendance of Current Month</small>
                     </div>
                 </div>
             </div>

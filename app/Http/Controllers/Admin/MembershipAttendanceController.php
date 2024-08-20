@@ -21,7 +21,7 @@ use App\Exports\MembershipAttendanceExport;
 use Symfony\Component\HttpFoundation\Response;
 use App\Http\Controllers\Traits\CsvImportTrait;
 use App\Http\Requests\StoreMembershipAttendanceRequest;
-use App\Http\Requests\UpdateMembershipAttendanceRequest;
+use Carbon\Carbon;
 use App\Http\Requests\MassDestroyMembershipAttendanceRequest;
 
 class MembershipAttendanceController extends Controller
@@ -30,6 +30,8 @@ class MembershipAttendanceController extends Controller
 
     public function index(Request $request)
     {
+        $startOfMonth = Carbon::now()->startOfMonth();
+        $endOfMonth = Carbon::now()->endOfMonth();
         abort_if(Gate::denies('membership_attendance_access'), Response::HTTP_FORBIDDEN, '403 Forbidden');
 
         $data = $request->except(['draw', 'columns', 'order', 'start', 'length', 'search', 'change_language','_']);
@@ -139,19 +141,19 @@ class MembershipAttendanceController extends Controller
         if ($employee && $employee->branch_id != NULL)
         {
             $counter = MembershipAttendance::index($data)
+                                            ->whereBetween('created_at', [$startOfMonth, $endOfMonth])
                                             ->whereHas('membership',function($q) use ($employee){
                                                 $q->whereHas('member',function($y) use ($employee){
                                                     $y->whereBranchId($employee->branch_id);
                                                 });
                                             })
                                             ->with(['membership','membership.member'])
-                                            ->latest()
                                             ->count();
         }else{
             $counter = MembershipAttendance::index($data)
+                                            ->whereBetween('created_at', [$startOfMonth, $endOfMonth])
                                             ->whereHas('membership')
                                             ->with(['membership','membership.member'])
-                                            ->latest()
                                             ->count();
         }
 
