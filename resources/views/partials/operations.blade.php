@@ -63,7 +63,7 @@
                 //
                 [
                     'can' => 'freeze_request_access',
-                    'title' => 'Freez List',
+                    'title' => 'Freeze List',
                     'imageUrl' => '7.png',
                     'linkUrl' => 'admin.freeze-requests.index',
                     'type' => '',
