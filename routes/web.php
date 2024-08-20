@@ -330,7 +330,7 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.', 'namespace' => 'Admin', 'mi
     });
     // Tasks
     Route::resource('tasks', 'TasksController');
-    Route::post('task-filter' , 'TasksController@filter')->name('filter-tasks');
+    //Route::post('task-filter' , 'TasksController@filter')->name('filter-tasks');
     Route::get('my-tasks', 'TasksController@my_tasks')->name('tasks.my-tasks');
     Route::get('created-tasks', 'TasksController@created_tasks')->name('tasks.created-tasks');
     Route::get('done-tasks/{task}', 'TasksController@done_tasks')->name('tasks.done-tasks');
