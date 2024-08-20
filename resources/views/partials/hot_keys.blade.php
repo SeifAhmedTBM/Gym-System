@@ -100,13 +100,13 @@
                     'linkUrl' => 'admin.reports.due-payments-report',
                     'type' => '',
                 ],
-                [
-                    'can' => 'sms_access',
-                    'title' => 'SMS',
-                    'imageUrl' => 'sms.png',
-                    'linkUrl' => 'admin.marketing.sms.index',
-                    'type' => '',
-                ],
+                // [
+                //     'can' => 'sms_access',
+                //     'title' => 'SMS',
+                //     'imageUrl' => 'sms.png',
+                //     'linkUrl' => 'admin.marketing.sms.index',
+                //     'type' => '',
+                // ],
                 [
                     'can' => 'employee_access',
                     'title' => 'Employee Attendance',
