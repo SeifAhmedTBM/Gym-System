@@ -188,7 +188,7 @@ class User extends Authenticatable
         $q=$this->hasMany(Invoice::class, 'sales_by_id')
             ->whereMonth('invoices.created_at', date('m'))
             ->whereYear('invoices.created_at', date('Y'));
-        if (isset($_GET['branch_id'])){
+        if (isset($_GET['branch_id'])&& $_GET['branch_id']!=''){
             $q=$q->where('branch_id',$_GET['branch_id']);
         }
         return $q;
