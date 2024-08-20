@@ -15259,7 +15259,7 @@ html:not([dir="rtl"]) .rounded-start {
   --cui-input-color: rgba(255, 255, 255, 0.87);
   --cui-input-bg: rgba(255, 255, 255, 0.05);
   --cui-input-border-color: rgba(255, 255, 255, 0.09);
-  --cui-input-focus-color: rgba(0, 0, 21, 1);
+  --cui-input-focus-color: rgb(188, 188, 216);
   --cui-input-focus-bg: rgba(255, 255, 255, 0.05);
   --cui-input-focus-border-color: rgba(255, 255, 255, 0.2);
   --cui-input-disabled-bg: rgba(0, 0, 21, 0.1);

@@ -6,7 +6,7 @@
     <h4><i class="fa fa-calendar"></i> {{ trans('global.schedule_timeline') }}</h4>
     @include('partials.schedule')
     @endif
-    {{-- @include('partials.searchMember') --}}
+     @include('partials.searchMember')
 
     @if (config('domains')[config('app.url')]['profile_attendance_dashboard'] == true)
         @include('partials.profile_attendance')

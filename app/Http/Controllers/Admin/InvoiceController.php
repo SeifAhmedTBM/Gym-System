@@ -767,7 +767,7 @@ class InvoiceController extends Controller
 
         $invoice = Invoice::withSum('payments', 'amount')->findOrFail($id);
 
-        // $accounts = Account::pluck('name','id');
+//         $accounts = Account::pluck('name','id');
         $accounts = Account::where('branch_id', $selected_branch->id)->pluck('name', 'id');
 
         $sales_bies = User::whereHas('roles', function ($q) {
