@@ -33,15 +33,16 @@
                     <div class="card">
                         <div class="card-body">
                             <h2 class="text-center">{{ trans('cruds.externalPayment.title_singular') }}</h2>
-                            <h2 class="text-center">{{ $externalPayments->count() }}</h2>
+                            <h2 class="text-center">{{ $monthly_external_payment->count() }}</h2>
                         </div>
                     </div>
                 </div>
+
                 <div class="col-lg-3 col-md-2 col-sm-12">
                     <div class="card">
                         <div class="card-body">
                             <h2 class="text-center">{{ trans('cruds.externalPayment.fields.amount') }}</h2>
-                            <h2 class="text-center">{{ number_format($externalPayments->sum('amount')) ?? 0 }}</h2>
+                            <h2 class="text-center">{{ number_format($monthly_external_payment->sum('amount')) ?? 0 }}</h2>
                         </div>    
                     </div>    
                 </div>    

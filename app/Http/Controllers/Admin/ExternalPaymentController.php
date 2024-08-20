@@ -17,7 +17,7 @@ use App\Http\Controllers\Traits\CsvImportTrait;
 use App\Http\Requests\StoreExternalPaymentRequest;
 use App\Http\Requests\UpdateExternalPaymentRequest;
 use App\Http\Requests\MassDestroyExternalPaymentRequest;
-
+use Carbon\Carbon;
 class ExternalPaymentController extends Controller
 {
     use CsvImportTrait;
@@ -124,7 +124,26 @@ class ExternalPaymentController extends Controller
         }
 
 
-        return view('admin.externalPayments.index',compact('accounts','created_bies','externalPayments','external_payment_categories','branches'));
+        $startOfMonth = Carbon::now()->startOfMonth();
+        $endOfMonth = Carbon::now()->endOfMonth();
+
+        if ($employee && $employee->branch_id != NULL) 
+        {
+            $monthly_external_payment = ExternalPayment::
+                                    with(['account','created_by','external_payment_category'])
+                                    ->whereBetween('created_at', [$startOfMonth, $endOfMonth])
+                                    ->whereHas('account',fn($q) => $q->whereBranchId($employee->branch_id))
+                                    ->get();
+        }else{
+            $monthly_external_payment = ExternalPayment::with(['account', 'created_by','external_payment_category','lead'])
+            ->whereBetween('created_at', [$startOfMonth, $endOfMonth])
+            ->get();
+        }
+
+
+
+
+        return view('admin.externalPayments.index',compact('monthly_external_payment','accounts','created_bies','externalPayments','external_payment_categories','branches'));
     }
 
     public function create()
