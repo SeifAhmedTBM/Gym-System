@@ -20,7 +20,7 @@ use App\Http\Requests\UpdateExpenseRequest;
 use Symfony\Component\HttpFoundation\Response;
 use App\Http\Controllers\Traits\CsvImportTrait;
 use App\Http\Requests\MassDestroyExpenseRequest;
-
+use Carbon\Carbon;
 class ExpensesController extends Controller
 {
     use CsvImportTrait;
@@ -111,14 +111,21 @@ class ExpensesController extends Controller
 
         $branches = Branch::pluck('name','id');
 
+        $startOfMonth = Carbon::now()->startOfMonth();
+        $endOfMonth = Carbon::now()->endOfMonth();
+
         if ($employee && $employee->branch_id != NULL) 
         {
             $expenses = Expense::index($data)->whereHas('account',fn($q) => $q->whereBranchId($employee->branch_id));
+            $monthly_expences = Expense::whereBetween('created_at', [$startOfMonth, $endOfMonth])
+            ->whereHas('account',fn($q) => $q->whereBranchId($employee->branch_id))
+            ->get();
         }else{
             $expenses = Expense::index($data);
+            $monthly_expences = Expense::whereBetween('created_at', [$startOfMonth, $endOfMonth])->get();
         }
         
-        return view('admin.expenses.index',compact('expenses_categories','users','accounts','expenses','branches'));
+        return view('admin.expenses.index',compact('monthly_expences','expenses_categories','users','accounts','expenses','branches'));
     }
 
     public function create()
