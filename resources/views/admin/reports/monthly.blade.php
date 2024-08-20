@@ -17,7 +17,7 @@
                             <input type="date" class="form-control" name="from" value="{{ request('from') ?? date('Y-m-01') }}">
                             <input type="date" class="form-control" name="to" value="{{ request('to') ?? date('Y-m-t') }}">
                             <select name="branch_id" id="branch_id" class="form-control" {{ $employee && $employee->branch_id != NULL ? 'readonly' : '' }}>
-                                <option value="{{ NULL }}" selected hidden disabled>Branch</option>
+                                <option value="{{ NULL }}" selected > All Branches</option>
                                 @foreach (\App\Models\Branch::pluck('name','id') as $id => $name)
                                     <option value="{{ $id }}" {{ $branch_id == $id ? 'selected' : '' }}>{{ $name }}</option>
                                 @endforeach

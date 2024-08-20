@@ -183,6 +183,16 @@ class User extends Authenticatable
         // return $this->hasManyThrough(Invoice::class, Payment::class, 'invoice_id', 'sales_by_id');
         return $this->hasMany(Invoice::class,'sales_by_id');
     }
+    public function invoices_monthly()
+    {
+        $q=$this->hasMany(Invoice::class, 'sales_by_id')
+            ->whereMonth('invoices.created_at', date('m'))
+            ->whereYear('invoices.created_at', date('Y'));
+        if (isset($_GET['branch_id'])){
+            $q=$q->where('branch_id',$_GET['branch_id']);
+        }
+        return $q;
+    }
 
     public function schedules() : HasMany
     {
