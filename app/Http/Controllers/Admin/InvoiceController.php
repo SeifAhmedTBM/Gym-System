@@ -1016,7 +1016,6 @@ class InvoiceController extends Controller
                 $i->where('title', 'sales');
             })
             ->findOrFail($id);
-
         return view('admin.reports.due_payments_invoice', compact('sale'));
     }
 

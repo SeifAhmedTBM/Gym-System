@@ -36,6 +36,7 @@ class LeadsController extends Controller
 {
     use MediaUploadingTrait;
     use CsvImportTrait;
+
     public function index(Request $request)
     {
         abort_if(Gate::denies('lead_access'), Response::HTTP_FORBIDDEN, '403 Forbidden');
@@ -190,12 +191,24 @@ class LeadsController extends Controller
 
         if ($employee && $employee->branch_id != NULL) {
             if ($user->roles[0]->title == 'Sales') {
-                $leads = Lead::index($data)->whereType('lead')->whereSalesById(Auth()->id())->whereBranchId($employee->branch_id)->count();
+                $leads = Lead::index($data)->whereType('lead')
+                    ->whereYear('created_at', date('y'))
+                    ->whereMonth('created_at', date('m'))
+                    ->whereSalesById(Auth()->id())
+                    ->whereBranchId($employee->branch_id)
+                    ->count();
             } else {
-                $leads = Lead::index($data)->whereType('lead')->whereBranchId($employee->branch_id)->count();
+                $leads = Lead::index($data)->whereType('lead')
+                    ->whereYear('created_at', date('y'))
+                    ->whereMonth('created_at', date('m'))
+                    ->whereBranchId($employee->branch_id)
+                    ->count();
             }
         } else {
-            $leads = Lead::index($data)->whereType('lead')->count();
+            $leads = Lead::index($data)->whereType('lead')
+                ->whereYear('created_at', date('y'))
+                ->whereMonth('created_at', date('m'))
+                ->count();
         }
 
         return view('admin.leads.index', compact('statuses', 'sales', 'sources', 'addresses', 'leads', 'branches', 'sports'));
@@ -231,49 +244,49 @@ class LeadsController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'name'                 => 'string|required',
-            'phone'                => 'string|required_unless:minor,yes|min:11|max:11|unique:leads,phone,NULL,id,deleted_at,NULL',
-            'source_id'            => 'required',
-            'gender'               => 'required',
-            'sales_by_id'          => 'required',
-            'trainer_id'           => 'required_if:invitation,true',
+            'name' => 'string|required',
+            'phone' => 'string|required_unless:minor,yes|min:11|max:11|unique:leads,phone,NULL,id,deleted_at,NULL',
+            'source_id' => 'required',
+            'gender' => 'required',
+            'sales_by_id' => 'required',
+            'trainer_id' => 'required_if:invitation,true',
         ]);
 
         DB::transaction(function () use ($request) {
             $selected_branch = Auth()->user()->employee->branch ?? NULL;
 
             $lead = Lead::create([
-                'name'              => $request['name'],
-                'phone'             => isset($request->minor) ? '0x' . random_int(100000000, 999999999) : $request['phone'],
-                'national'          => $request['national'],
-                'status_id'         => Status::first()->id,
-                'source_id'         => $request['source_id'],
-                'address_id'        => $request['address_id'],
-                'dob'               => $request['dob'],
-                'gender'            => $request['gender'],
-                'sales_by_id'       => $request['sales_by_id'],
-                'type'              => 'lead',
-                'referral_member'   => $request['referral_member'],
-                'address_details'   => $request['address_details'],
-                'whatsapp_number'   => $request['whatsapp_number'],
-                'branch_id'         => $selected_branch->id ?? Branch::first()->id,
-                'sport_id'          => $request['sport_id'] ?? NULL,
-                'notes'             => $request['notes'],
-                'created_by_id'     => Auth()->user()->id,
-                'invitation'        => isset($request['invitation']) ? true : false,
-                'trainer_id'        => isset($request['invitation']) == 'true' ? $request['trainer_id'] : NULL,
-                'parent_phone'      => isset($request->minor) ? $request['parent_phone'] : null,
-                'parent_phone_two'  => isset($request->minor) ? $request['parent_phone_two'] : null,
-                'parent_details'    => isset($request->minor) ? $request['parent_details'] : null,
-                'medical_background'    => $request['medical_background']
+                'name' => $request['name'],
+                'phone' => isset($request->minor) ? '0x' . random_int(100000000, 999999999) : $request['phone'],
+                'national' => $request['national'],
+                'status_id' => Status::first()->id,
+                'source_id' => $request['source_id'],
+                'address_id' => $request['address_id'],
+                'dob' => $request['dob'],
+                'gender' => $request['gender'],
+                'sales_by_id' => $request['sales_by_id'],
+                'type' => 'lead',
+                'referral_member' => $request['referral_member'],
+                'address_details' => $request['address_details'],
+                'whatsapp_number' => $request['whatsapp_number'],
+                'branch_id' => $selected_branch->id ?? Branch::first()->id,
+                'sport_id' => $request['sport_id'] ?? NULL,
+                'notes' => $request['notes'],
+                'created_by_id' => Auth()->user()->id,
+                'invitation' => isset($request['invitation']) ? true : false,
+                'trainer_id' => isset($request['invitation']) == 'true' ? $request['trainer_id'] : NULL,
+                'parent_phone' => isset($request->minor) ? $request['parent_phone'] : null,
+                'parent_phone_two' => isset($request->minor) ? $request['parent_phone_two'] : null,
+                'parent_details' => isset($request->minor) ? $request['parent_details'] : null,
+                'medical_background' => $request['medical_background']
             ]);
 
             // reminder
             $reminder = Reminder::create([
-                'type'              => 'sales',
-                'lead_id'           => $lead->id,
-                'due_date'          => $request->followup,
-                'user_id'           => $request->sales_by_id,
+                'type' => 'sales',
+                'lead_id' => $lead->id,
+                'due_date' => $request->followup,
+                'user_id' => $request->sales_by_id,
             ]);
 
             if ($request->input('photo', false)) {
@@ -320,40 +333,40 @@ class LeadsController extends Controller
     public function update(Request $request, Lead $lead)
     {
         $request->validate([
-            "name"                 => "string|required",
-            "phone"                => "required_unless:minor,yes|min:11|max:11|unique:leads,phone,$lead->id",
+            "name" => "string|required",
+            "phone" => "required_unless:minor,yes|min:11|max:11|unique:leads,phone,$lead->id",
             // "national"             => "string|required_unless:minor,yes|min:14|max:14|unique:leads,national,$lead->id",
             // "national"             => "nullable|min:14|max:14|unique:leads,national,$lead->id",
-            "branch_id"            => "required",
-            "source_id"            => "required",
-            "gender"               => "required",
-            "sales_by_id"          => "required",
-            "trainer_id"           => "required_if:invitation,true",
+            "branch_id" => "required",
+            "source_id" => "required",
+            "gender" => "required",
+            "sales_by_id" => "required",
+            "trainer_id" => "required_if:invitation,true",
         ]);
 
         $lead->update([
-            'name'              => $request['name'],
-            'phone'             => isset($request->minor) ? '0x' . random_int(100000000, 999999999) : $request['phone'],
-            'national'          => $request['national'],
-            'status_id'         => $request['status_id'],
-            'source_id'         => $request['source_id'],
-            'address_id'        => $request['address_id'],
-            'dob'               => $request['dob'],
-            'gender'            => $request['gender'],
-            'sales_by_id'       => $request['sales_by_id'],
-            'type'              => 'lead',
-            'referral_member'   => $request['referral_member'],
-            'address_details'   => $request['address_details'],
-            'whatsapp_number'   => $request['whatsapp_number'],
-            'notes'             => $request['notes'],
-            'branch_id'         => $request['branch_id'],
-            'sport_id'          => $request['sport_id'],
-            'invitation'        => isset($request['invitation']) ? true : false,
-            'trainer_id'        => isset($request['invitation']) == 'true' ? $request['trainer_id'] : NULL,
-            'parent_phone'      => isset($request->minor) ? $request['parent_phone'] : null,
-            'parent_phone_two'  => isset($request->minor) ? $request['parent_phone_two'] : null,
-            'parent_details'    => isset($request->minor) ? $request['parent_details'] : null,
-            'medical_background'    => $request['medical_background']
+            'name' => $request['name'],
+            'phone' => isset($request->minor) ? '0x' . random_int(100000000, 999999999) : $request['phone'],
+            'national' => $request['national'],
+            'status_id' => $request['status_id'],
+            'source_id' => $request['source_id'],
+            'address_id' => $request['address_id'],
+            'dob' => $request['dob'],
+            'gender' => $request['gender'],
+            'sales_by_id' => $request['sales_by_id'],
+            'type' => 'lead',
+            'referral_member' => $request['referral_member'],
+            'address_details' => $request['address_details'],
+            'whatsapp_number' => $request['whatsapp_number'],
+            'notes' => $request['notes'],
+            'branch_id' => $request['branch_id'],
+            'sport_id' => $request['sport_id'],
+            'invitation' => isset($request['invitation']) ? true : false,
+            'trainer_id' => isset($request['invitation']) == 'true' ? $request['trainer_id'] : NULL,
+            'parent_phone' => isset($request->minor) ? $request['parent_phone'] : null,
+            'parent_phone_two' => isset($request->minor) ? $request['parent_phone_two'] : null,
+            'parent_details' => isset($request->minor) ? $request['parent_details'] : null,
+            'medical_background' => $request['medical_background']
         ]);
 
         if ($request->input('photo', false)) {
@@ -375,7 +388,7 @@ class LeadsController extends Controller
     {
         abort_if(Gate::denies('lead_show'), Response::HTTP_FORBIDDEN, '403 Forbidden');
 
-        $lead->load(['status', 'source', 'sales_by', 'address', 'reminderHistory' => fn ($q) => $q->latest()]);
+        $lead->load(['status', 'source', 'sales_by', 'address', 'reminderHistory' => fn($q) => $q->latest()]);
 
         $statuses = Status::pluck('name', 'id');
 
@@ -402,10 +415,10 @@ class LeadsController extends Controller
     {
         abort_if(Gate::denies('lead_create') && Gate::denies('lead_edit'), Response::HTTP_FORBIDDEN, '403 Forbidden');
 
-        $model         = new Lead();
-        $model->id     = $request->input('crud_id', 0);
+        $model = new Lead();
+        $model->id = $request->input('crud_id', 0);
         $model->exists = true;
-        $media         = $model->addMediaFromRequest('upload')->toMediaCollection('ck-media');
+        $media = $model->addMediaFromRequest('upload')->toMediaCollection('ck-media');
 
         return response()->json(['id' => $media->id, 'url' => $media->getUrl()], Response::HTTP_CREATED);
     }
@@ -432,7 +445,7 @@ class LeadsController extends Controller
 
     public function addNote($id)
     {
-        $lead = Lead::with(['Notes' => fn ($q) => $q->latest()])->findOrFail($id);
+        $lead = Lead::with(['Notes' => fn($q) => $q->latest()])->findOrFail($id);
 
         return view('admin.leads.notes', compact('lead'));
     }
@@ -442,9 +455,9 @@ class LeadsController extends Controller
         $lead = Lead::findOrFail($id);
 
         $note = Note::create([
-            'lead_id'               => $lead->id,
-            'notes'                 => $request['notes'],
-            'created_by_id'         => Auth()->user()->id,
+            'lead_id' => $lead->id,
+            'notes' => $request['notes'],
+            'created_by_id' => Auth()->user()->id,
         ]);
 
         $this->sent_successfully();

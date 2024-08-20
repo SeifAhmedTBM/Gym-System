@@ -1,3 +1,7 @@
+@php
+    $startOfMonth = now()->startOfMonth()->toDateString();
+    $endOfMonth = now()->endOfMonth()->toDateString();
+@endphp
 @extends('layouts.admin')
 @section('content')
     <div class="modal fade" id="settlement_invoice" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
@@ -26,16 +30,36 @@
             </div>
         </div>
     </div>
-    <div class="form-group row">
-        <div class="col-md-3 offset-9">
+
+
+    <div class="form-group row mt-3">
+        <div class="col-md-9">
+            <form method="GET">
+                <div class="form-group d-flex align-items-end">
+                    <div class="mr-2">
+                        <label for="from_date">{{ trans('global.timeFrom') }}</label>
+                        <input type="date" class="form-control" id="from_date" name="from_date" value="{{ request('from_date')??$startOfMonth}}">
+                    </div>
+                    <div class="mr-2">
+                        <label for="end_date">{{ trans('global.timeTo') }}</label>
+                        <input type="date" class="form-control" id="end_date" name="end_date" value="{{ request('end_date')??$endOfMonth}}">
+                    </div>
+                    <button type="submit" class="btn btn-primary">{{ trans('global.filter') }}</button>
+                </div>
+            </form>
+        </div>
+        <div class="col-md-3">
             <div class="card">
                 <div class="card-body">
                     <h3 class="text-center">{{ trans('global.total') }}</h3>
-                    <h3 class="text-center">{{ number_format($sale->invoices->sum('rest')) }}</h3>
+                    <h3 class="text-center">{{ number_format($sale->invoices_monthly->sum('rest')) }}</h3>
                 </div>
             </div>
         </div>
     </div>
+
+
+
     <div class="card">
         <div class="card-header">
             <h5><i class="fa fa-file"></i> {{ trans('cruds.invoice.title') }} </h5>
@@ -58,7 +82,7 @@
                         </tr>
                     </thead>
                     <tbody>
-                        @forelse ($sale->invoices as $key => $invoice)
+                        @forelse ($sale->invoices_monthly as $key => $invoice)
                             <tr>
                                 <td>{{ $loop->iteration }}</td>
                                 <td>{{ $invoice->id ?? '-' }}</td>

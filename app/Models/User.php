@@ -90,7 +90,7 @@ class User extends Authenticatable
 
     public function logs()
     {
-        return $this->hasMany(AuditLog::class,'user_id');
+        return $this->hasMany(AuditLog::class, 'user_id');
     }
 
     protected function serializeDate(DateTimeInterface $date)
@@ -98,129 +98,168 @@ class User extends Authenticatable
         return $date->format('Y-m-d H:i:s');
     }
 
-    public function memberships() : HasMany
+    public function memberships(): HasMany
     {
         return $this->hasMany(Membership::class, 'sales_by_id', 'id');
     }
 
     public function trackMemberships()
     {
-        return $this->hasManyThrough(TrackMembership::class,Membership::class,'sales_by_id','membership_id');
+        return $this->hasManyThrough(TrackMembership::class, Membership::class, 'sales_by_id', 'membership_id');
     }
 
-    public function sales_tier() : HasOne
+    public function sales_tier(): HasOne
     {
         return $this->hasOne(SalesTiersUser::class, 'user_id', 'id');
     }
 
-    public function trainer_memberships() : HasMany
+    public function trainer_memberships(): HasMany
     {
         return $this->hasMany(Membership::class, 'trainer_id', 'id');
     }
 
-    public function previous_trainer_memberships() : HasMany
+    public function previous_trainer_memberships(): HasMany
     {
         return $this->hasMany(Membership::class, 'trainer_id', 'id');
     }
 
-    public function trainer_invoices() : HasManyThrough
+    public function trainer_invoices(): HasManyThrough
     {
-        return $this->hasManyThrough(Invoice::class,Membership::class, 'trainer_id', 'membership_id');
+        return $this->hasManyThrough(Invoice::class, Membership::class, 'trainer_id', 'membership_id');
     }
 
-    public function sessions() : HasMany
+    public function sessions(): HasMany
     {
         return $this->hasMany(TrainerAttendant::class, 'trainer_id', 'id');
     }
 
-    public function ratings() :HasMany
+    public function ratings(): HasMany
     {
-        return $this->hasMany(Rating::class,'trainer_id');
+        return $this->hasMany(Rating::class, 'trainer_id');
     }
 
     public function countSessions()
     {
         $sessions_count = 0;
 
-        $sessions = $this->sessions()->get()->groupBy(['schedule_id', function($item) {
+        $sessions = $this->sessions()->get()->groupBy(['schedule_id', function ($item) {
             return $item->created_at->format('Y-m-d');
         }]);
-        
-        foreach($sessions as $key => $session) {
+
+        foreach ($sessions as $key => $session) {
             $sessions_count += count($session);
         }
-        
+
         return $sessions_count;
     }
-    
+
     public function scopeIndex($query, $data)
     {
         return ModelScope::filter($data, 'App\\Models\\User');
     }
 
-    public function invoice_refunds() : HasManyThrough
+    public function invoice_refunds(): HasManyThrough
     {
         return $this->hasManyThrough(Refund::class, Invoice::class, 'sale_by_id', 'invoice_id');
     }
 
-    public function lead() : HasOne
+    public function lead(): HasOne
     {
         return $this->hasOne(Lead::class);
     }
 
-    public function employee() : HasOne
+    public function employee(): HasOne
     {
         return $this->hasOne(Employee::class, 'user_id', 'id');
     }
 
     public function payments()
     {
-        return $this->hasMany(Payment::class,'sales_by_id');
+        return $this->hasMany(Payment::class, 'sales_by_id');
     }
 
     public function invoices()
     {
         // return $this->hasManyThrough(Invoice::class, Payment::class, 'invoice_id', 'sales_by_id');
-        return $this->hasMany(Invoice::class,'sales_by_id');
+        return $this->hasMany(Invoice::class, 'sales_by_id');
     }
+
+//    public function invoices_monthly()
+//    {
+//        $q = $this->hasMany(Invoice::class, 'sales_by_id')
+//
+//        if (isset($_GET['branch_id']) && $_GET['branch_id'] != '') {
+//            $q = $q->where('branch_id', $_GET['branch_id']);
+//        }
+//        if ((isset($_GET['date_from']) && $_GET['date_from'] != '') || (isset($_GET['date_to']) && $_GET['date_to'] != '')) {
+//            $dateFrom = $_GET['date_from'] ?? null;
+//            $dateTo = $_GET['date_to'] ?? null;
+//
+//            if ($dateFrom && $dateTo) {
+//                $q = $q->whereBetween('invoices.created_at', [$dateFrom, $dateTo]);
+//            } elseif ($dateFrom) {
+//                $q = $q->where('invoices.created_at', '>=', $dateFrom);
+//            } elseif ($dateTo) {
+//                $q = $q->where('invoices.created_at', '<=', $dateTo);
+//            }
+//        }
+//        return $q;
+//    }
+
     public function invoices_monthly()
     {
-        $q=$this->hasMany(Invoice::class, 'sales_by_id')
-            ->whereMonth('invoices.created_at', date('m'))
-            ->whereYear('invoices.created_at', date('Y'));
-        if (isset($_GET['branch_id'])&& $_GET['branch_id']!=''){
-            $q=$q->where('branch_id',$_GET['branch_id']);
+        $q = $this->hasMany(Invoice::class, 'sales_by_id');
+        if (isset($_GET['branch_id']) && $_GET['branch_id'] != '') {
+            $q = $q->where('branch_id', $_GET['branch_id']);
+        }
+//        dd($_GET);
+        if (isset($_GET['from_date']) || isset($_GET['end_date'])) {
+            $dateFrom = $_GET['from_date'] ?? null;
+            $dateTo = $_GET['end_date'] ?? null;
+
+            if ($dateFrom && $dateTo) {
+                $q = $q->whereBetween('invoices.created_at', [$dateFrom, $dateTo]);
+            } elseif ($dateFrom) {
+                $q = $q->where('invoices.created_at', '>=', $dateFrom);
+            } elseif ($dateTo) {
+                $q = $q->where('invoices.created_at', '<=', $dateTo);
+            }
+        } else {
+            $q = $q->whereMonth('invoices.created_at', date('m'))
+                ->whereYear('invoices.created_at', date('Y'));
         }
         return $q;
     }
 
-    public function schedules() : HasMany
+    public function schedules(): HasMany
     {
         return $this->hasMany(Schedule::class, 'trainer_id', 'id');
     }
 
     public function reminders()
     {
-        return $this->hasMany(Reminder::class,'user_id');
+        return $this->hasMany(Reminder::class, 'user_id');
     }
 
     public function reminders_histories()
     {
-        return $this->hasMany(LeadRemindersHistory::class,'user_id');
+        return $this->hasMany(LeadRemindersHistory::class, 'user_id');
     }
 
     public function overdueReminders()
     {
-        return $this->hasMany(Reminder::class,'user_id')->whereDate('due_date','<',date('Y-m-d'));
+        return $this->hasMany(Reminder::class, 'user_id')->whereDate('due_date', '<', date('Y-m-d'));
     }
+
     public function todayReminders()
     {
-        return $this->hasMany(Reminder::class,'user_id')->whereDate('due_date',date('Y-m-d'));
+        return $this->hasMany(Reminder::class, 'user_id')->whereDate('due_date', date('Y-m-d'));
     }
+
     public function upcommingReminders()
     {
-        return $this->hasMany(Reminder::class,'user_id')
-                    ->whereDate('due_date','>',date('Y-m-d'))
-                    ->whereBetween('due_date',[date('Y-m-01'),date('Y-m-d',strtotime(date('Y-m-t').'+1 Day'))]);
+        return $this->hasMany(Reminder::class, 'user_id')
+            ->whereDate('due_date', '>', date('Y-m-d'))
+            ->whereBetween('due_date', [date('Y-m-01'), date('Y-m-d', strtotime(date('Y-m-t') . '+1 Day'))]);
     }
 }

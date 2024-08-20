@@ -744,14 +744,34 @@ class ReportController extends Controller
                     ->when($branch_id, fn($y) => $y->whereBranchId($branch_id));
             })
             ->withCount([
-                'invoices' => fn($q) => $q->whereMonth('invoices.created_at', date('m'))
-                    ->whereYear('invoices.created_at', date('Y'))->whereStatus('partial')->when($branch_id, fn($y) => $y->whereBranchId($branch_id))
+                'invoices' => fn($q) => $q
+                    ->when(isset($_GET['from_date']) || isset($_GET['end_date']), function($q) {
+                        $dateFrom = $_GET['from_date'] ?? null;
+                        $dateTo = $_GET['end_date'] ?? null;
+
+                        if ($dateFrom && $dateTo) {
+                            // Both dates are provided
+                            $q->whereBetween('invoices.created_at', [$dateFrom, $dateTo]);
+                        } elseif ($dateFrom) {
+                            // Only the from date is provided
+                            $q->where('invoices.created_at', '>=', $dateFrom);
+                        } elseif ($dateTo) {
+                            // Only the to date is provided
+                            $q->where('invoices.created_at', '<=', $dateTo);
+                        }
+                    }, function($q) {
+                        // Default to current month if no dates are provided
+                        $q->whereMonth('invoices.created_at', date('m'))
+                            ->whereYear('invoices.created_at', date('Y'));
+                    })
+                    ->where('status', 'partial')
+                    ->when($branch_id, fn($q) => $q->where('branch_id', $branch_id))
+
             ])
             ->whereRelation('roles', 'title', 'Sales')
             ->get();
 
         $counter = 0;
-//        dd($sales);
         foreach ($sales as $sale) {
             $counter += $sale->invoices_monthly->where('status','partial')->sum('rest');
         }
