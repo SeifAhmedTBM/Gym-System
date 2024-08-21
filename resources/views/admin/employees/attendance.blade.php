@@ -1,3 +1,7 @@
+@php
+    $startOfMonth = now()->startOfMonth()->toDateString();
+    $endOfMonth = now()->endOfMonth()->toDateString();
+@endphp
 @extends('layouts.admin')
 @section('content')
     <div class="form-group">
@@ -6,8 +10,8 @@
                 <div class="col-md-12">
                     <label for="date">{{ trans('global.date') }}</label>
                     <div class="input-group">
-                        <input type="date" class="form-control" name="from" value="{{ request('from') }}">
-                        <input type="date" class="form-control" name="to" value="{{ request('to')}}">
+                        <input type="date" class="form-control" name="from" value="{{ request('from')??$startOfMonth }}">
+                        <input type="date" class="form-control" name="to" value="{{ request('to')??$endOfMonth }}">
                         <select name="employee_id" class="form-control">
                             <option value="{{ NULL }}" selected>All Employees</option>
                             @foreach ($employees as $employee_id => $employee_name)

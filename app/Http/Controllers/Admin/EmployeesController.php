@@ -403,6 +403,7 @@ class EmployeesController extends Controller
         $from = $request->input('from') ?? null;
         $to = $request->input('to') ?? null;
 
+
         $branch_id = ($employee && $employee->branch_id != null)
             ? $employee->branch_id
             : ($request->input('branch_id') ?? '');
@@ -419,6 +420,16 @@ class EmployeesController extends Controller
 
         if ($from && $to) {
             $attendancesQuery->whereBetween('created_at', [$from, $to]);
+        }
+        elseif ($from) {
+            // Only the from date is provided
+            $attendancesQuery->where('created_at', '>=', $from);
+        } elseif ($to) {
+            // Only the to date is provided
+            $attendancesQuery->where('created_at', '<=', $to);
+        }else{
+            $attendancesQuery->whereMonth('created_at', date('m'))
+                ->whereYear('created_at', date('Y'));
         }
 
         $attendances = $attendancesQuery->latest()->get();
