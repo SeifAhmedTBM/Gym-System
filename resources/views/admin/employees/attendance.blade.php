@@ -1,3 +1,7 @@
+@php
+    $startOfMonth = now()->startOfMonth()->toDateString();
+    $endOfMonth = now()->endOfMonth()->toDateString();
+@endphp
 @extends('layouts.admin')
 @section('content')
     <div class="form-group">
@@ -6,22 +10,22 @@
                 <div class="col-md-12">
                     <label for="date">{{ trans('global.date') }}</label>
                     <div class="input-group">
-                        <input type="date" class="form-control" name="from" value="{{ request('from') ?? date('Y-m-01') }}">
-                        <input type="date" class="form-control" name="to" value="{{ request('to') ?? date('Y-m-t') }}">
+                        <input type="date" class="form-control" name="from" value="{{ request('from')??$startOfMonth }}">
+                        <input type="date" class="form-control" name="to" value="{{ request('to')??$endOfMonth }}">
                         <select name="employee_id" class="form-control">
-                            <option value="{{ NULL }}" selected>Employee</option>
+                            <option value="{{ NULL }}" selected>All Employees</option>
                             @foreach ($employees as $employee_id => $employee_name)
                                 <option value="{{ $employee_id }}" {{ $employee_id == request('employee_id') ? 'selected' : '' }}>{{ $employee_name }}</option>
                             @endforeach
                         </select>
                         <select name="branch_id" class="form-control" {{ $employee && $employee->branch_id != NULL ? 'readonly' : '' }}>
-                            <option value="{{ NULL }}" selected>Branch</option>
+                            <option value="{{ NULL }}" selected>All Branches</option>
                             @foreach ($branches as $branch_id => $branch_name)
                                 <option value="{{ $branch_id }}" {{ $branch_id == request('branch_id') ? 'selected' : '' }}>{{ $branch_name }}</option>
                             @endforeach
                         </select>
                         <select name="role_id" class="form-control">
-                            <option value="{{ NULL }}" selected>Role</option>
+                            <option value="{{ NULL }}" selected>All Roles</option>
                             @foreach ($roles as $role_id => $role_name)
                                 <option value="{{ $role_id }}" {{ $role_id == request('role_id') ? 'selected' : '' }}>{{ $role_name }}</option>
                             @endforeach

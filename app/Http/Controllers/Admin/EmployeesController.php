@@ -363,36 +363,82 @@ class EmployeesController extends Controller
 
     }
 
+//    public function employee_attendances(Request $request)
+//    {
+//        $employee = Auth()->user()->employee;
+//        $from = $request->input('from')??null;
+//        $to = $request->input('to')??null;
+//
+//        if ($employee && $employee->branch_id != NULL) {
+//            $branch_id = $employee->branch_id;
+//        } else {
+//            $branch_id = $request['branch_id'] != NULL ? $request['branch_id'] : '';
+//        }
+//
+//        $attendances = EmployeeAttendance::with('employee')
+//                    ->whereHas(
+//                        'employee',fn($q) => $q->whereHas(
+//                                'user',fn($x) => $x
+//                                        ->when($request['role_id'],fn($x) => $x->whereRelation('roles','id',$request['role_id']))
+//                            )
+//                            ->when($branch_id,fn($x) => $x->whereBranchId($branch_id))
+//                            ->when($request['employee_id'],fn($x) => $x->whereId($request['employee_id'])
+//                        )
+//                    )
+//            ->whereBetween('created_at', [$from, $to])
+//            ->latest()
+//            ->get();
+//
+//        $employees = Employee::whereHas('attendances')->orderBy('name')->pluck('name','id');
+//
+//        $roles = Role::orderBy('title')->pluck('title','id');
+//
+//        $branches = Branch::orderBy('name')->pluck('name','id');
+//
+//        return view('admin.employees.attendance', compact('attendances','employees','roles','branches','employee','branch_id'));
+//    }
     public function employee_attendances(Request $request)
     {
         $employee = Auth()->user()->employee;
+        $from = $request->input('from') ?? null;
+        $to = $request->input('to') ?? null;
 
-        if ($employee && $employee->branch_id != NULL) {
-            $branch_id = $employee->branch_id;
-        } else {
-            $branch_id = $request['branch_id'] != NULL ? $request['branch_id'] : '';
+
+        $branch_id = ($employee && $employee->branch_id != null)
+            ? $employee->branch_id
+            : ($request->input('branch_id') ?? '');
+
+        $attendancesQuery = EmployeeAttendance::with('employee')
+            ->whereHas(
+                'employee', fn($q) => $q->whereHas(
+                'user', fn($x) => $x
+                ->when($request->input('role_id'), fn($x) => $x->whereRelation('roles', 'id', $request->input('role_id')))
+            )
+                ->when($branch_id, fn($x) => $x->whereBranchId($branch_id))
+                ->when($request->input('employee_id'), fn($x) => $x->whereId($request->input('employee_id')))
+            );
+
+        if ($from && $to) {
+            $attendancesQuery->whereBetween('created_at', [$from, $to]);
+        }
+        elseif ($from) {
+            // Only the from date is provided
+            $attendancesQuery->where('created_at', '>=', $from);
+        } elseif ($to) {
+            // Only the to date is provided
+            $attendancesQuery->where('created_at', '<=', $to);
+        }else{
+            $attendancesQuery->whereMonth('created_at', date('m'))
+                ->whereYear('created_at', date('Y'));
         }
 
-        $attendances = EmployeeAttendance::with('employee')
-                    ->whereHas(
-                        'employee',fn($q) => $q->whereHas(
-                                'user',fn($x) => $x
-                                        ->when($request['role_id'],fn($x) => $x->whereRelation('roles','id',$request['role_id']))
-                            )        
-                            ->when($branch_id,fn($x) => $x->whereBranchId($branch_id))
-                            ->when($request['employee_id'],fn($x) => $x->whereId($request['employee_id'])
-                        )
-                    )
-                    ->latest()
-                    ->get();
+        $attendances = $attendancesQuery->latest()->get();
 
-        $employees = Employee::whereHas('attendances')->orderBy('name')->pluck('name','id');
+        $employees = Employee::whereHas('attendances')->orderBy('name')->pluck('name', 'id');
+        $roles = Role::orderBy('title')->pluck('title', 'id');
+        $branches = Branch::orderBy('name')->pluck('name', 'id');
 
-        $roles = Role::orderBy('title')->pluck('title','id');
-
-        $branches = Branch::orderBy('name')->pluck('name','id');
-
-        return view('admin.employees.attendance', compact('attendances','employees','roles','branches','employee','branch_id'));
+        return view('admin.employees.attendance', compact('attendances', 'employees', 'roles', 'branches', 'employee', 'branch_id'));
     }
 
     public function take_employee_attendance(Request $request)
