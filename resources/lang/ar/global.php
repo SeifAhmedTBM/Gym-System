@@ -83,6 +83,8 @@ return [
     'reply'                          => 'الرد',
     'body'                           => 'المحتوى',
     'discard'                        => 'تجاهل',
+    'employee'                       => 'الموظفين',
+    'select_employee'                => 'اختر الموظف',
     'datatables'                     => [
         'copy'          => 'نسخ',
         'csv'           => 'CSV',
