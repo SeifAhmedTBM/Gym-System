@@ -212,3 +212,13 @@ table.dataTable thead .sorting_desc {
     justify-content: right;
     align-items: center;
 }
+
+.form-group select,
+select.form-control {
+    color: white !important;
+}
+
+.form-group select option,
+select.form-control option {
+    color: black !important;
+}
