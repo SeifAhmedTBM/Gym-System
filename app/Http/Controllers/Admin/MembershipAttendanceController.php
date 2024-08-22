@@ -21,7 +21,7 @@ use App\Exports\MembershipAttendanceExport;
 use Symfony\Component\HttpFoundation\Response;
 use App\Http\Controllers\Traits\CsvImportTrait;
 use App\Http\Requests\StoreMembershipAttendanceRequest;
-use App\Http\Requests\UpdateMembershipAttendanceRequest;
+use Carbon\Carbon;
 use App\Http\Requests\MassDestroyMembershipAttendanceRequest;
 
 class MembershipAttendanceController extends Controller
@@ -30,10 +30,17 @@ class MembershipAttendanceController extends Controller
 
     public function index(Request $request)
     {
+        $startOfMonth = Carbon::now()->startOfMonth();
+        $endOfMonth = Carbon::now()->endOfMonth();
+        
+
         abort_if(Gate::denies('membership_attendance_access'), Response::HTTP_FORBIDDEN, '403 Forbidden');
 
         $data = $request->except(['draw', 'columns', 'order', 'start', 'length', 'search', 'change_language','_']);
-        
+
+        $data['created_at']['from'] = isset($data['created_at']['from']) ? $data['created_at']['from'] : $startOfMonth;
+        $data['created_at']['to'] = isset($data['created_at']['to']) ? $data['created_at']['to'] : $endOfMonth;
+
         $settings = Setting::first();
 
         $employee = Auth()->user()->employee;
@@ -145,13 +152,11 @@ class MembershipAttendanceController extends Controller
                                                 });
                                             })
                                             ->with(['membership','membership.member'])
-                                            ->latest()
                                             ->count();
         }else{
             $counter = MembershipAttendance::index($data)
                                             ->whereHas('membership')
                                             ->with(['membership','membership.member'])
-                                            ->latest()
                                             ->count();
         }
 
