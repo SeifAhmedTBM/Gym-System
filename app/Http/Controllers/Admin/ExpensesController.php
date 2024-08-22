@@ -20,7 +20,7 @@ use App\Http\Requests\UpdateExpenseRequest;
 use Symfony\Component\HttpFoundation\Response;
 use App\Http\Controllers\Traits\CsvImportTrait;
 use App\Http\Requests\MassDestroyExpenseRequest;
-
+use Carbon\Carbon;
 class ExpensesController extends Controller
 {
     use CsvImportTrait;
@@ -32,6 +32,11 @@ class ExpensesController extends Controller
         $data = $request->except(['draw', 'columns', 'order', 'start', 'length', 'search', 'change_language','_']);
 
         $employee = Auth()->user()->employee;
+
+        $startOfMonth = Carbon::now()->startOfMonth();
+        $endOfMonth = Carbon::now()->endOfMonth();
+        $data['date']['from'] = isset($data['date']['from']) ? $data['date']['from'] : $startOfMonth;
+        $data['date']['to'] = isset($data['date']['to']) ? $data['date']['to'] : $endOfMonth ;
 
         if ($request->ajax()) {
             if ($employee && $employee->branch_id != NULL) 
@@ -111,11 +116,15 @@ class ExpensesController extends Controller
 
         $branches = Branch::pluck('name','id');
 
+
+        
         if ($employee && $employee->branch_id != NULL) 
         {
             $expenses = Expense::index($data)->whereHas('account',fn($q) => $q->whereBranchId($employee->branch_id));
+          
         }else{
             $expenses = Expense::index($data);
+
         }
         
         return view('admin.expenses.index',compact('expenses_categories','users','accounts','expenses','branches'));
