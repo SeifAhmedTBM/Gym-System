@@ -33,6 +33,11 @@ class ExpensesController extends Controller
 
         $employee = Auth()->user()->employee;
 
+        $startOfMonth = Carbon::now()->startOfMonth();
+        $endOfMonth = Carbon::now()->endOfMonth();
+        $data['date']['from'] = isset($data['date']['from']) ? $data['date']['from'] : $startOfMonth;
+        $data['date']['to'] = isset($data['date']['to']) ? $data['date']['to'] : $endOfMonth ;
+
         if ($request->ajax()) {
             if ($employee && $employee->branch_id != NULL) 
             {
@@ -111,21 +116,18 @@ class ExpensesController extends Controller
 
         $branches = Branch::pluck('name','id');
 
-        $startOfMonth = Carbon::now()->startOfMonth();
-        $endOfMonth = Carbon::now()->endOfMonth();
 
+        
         if ($employee && $employee->branch_id != NULL) 
         {
             $expenses = Expense::index($data)->whereHas('account',fn($q) => $q->whereBranchId($employee->branch_id));
-            $monthly_expences = Expense::whereBetween('created_at', [$startOfMonth, $endOfMonth])
-            ->whereHas('account',fn($q) => $q->whereBranchId($employee->branch_id))
-            ->get();
+          
         }else{
             $expenses = Expense::index($data);
-            $monthly_expences = Expense::whereBetween('created_at', [$startOfMonth, $endOfMonth])->get();
+
         }
         
-        return view('admin.expenses.index',compact('monthly_expences','expenses_categories','users','accounts','expenses','branches'));
+        return view('admin.expenses.index',compact('expenses_categories','users','accounts','expenses','branches'));
     }
 
     public function create()
