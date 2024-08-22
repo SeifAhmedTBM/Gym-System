@@ -32,10 +32,15 @@ class MembershipAttendanceController extends Controller
     {
         $startOfMonth = Carbon::now()->startOfMonth();
         $endOfMonth = Carbon::now()->endOfMonth();
+        
+
         abort_if(Gate::denies('membership_attendance_access'), Response::HTTP_FORBIDDEN, '403 Forbidden');
 
         $data = $request->except(['draw', 'columns', 'order', 'start', 'length', 'search', 'change_language','_']);
-        
+
+        $data['created_at']['from'] = isset($data['created_at']['from']) ? $data['created_at']['from'] : $startOfMonth;
+        $data['created_at']['to'] = isset($data['created_at']['to']) ? $data['created_at']['to'] : $endOfMonth;
+
         $settings = Setting::first();
 
         $employee = Auth()->user()->employee;
@@ -141,7 +146,6 @@ class MembershipAttendanceController extends Controller
         if ($employee && $employee->branch_id != NULL)
         {
             $counter = MembershipAttendance::index($data)
-                                            ->whereBetween('created_at', [$startOfMonth, $endOfMonth])
                                             ->whereHas('membership',function($q) use ($employee){
                                                 $q->whereHas('member',function($y) use ($employee){
                                                     $y->whereBranchId($employee->branch_id);
@@ -151,7 +155,6 @@ class MembershipAttendanceController extends Controller
                                             ->count();
         }else{
             $counter = MembershipAttendance::index($data)
-                                            ->whereBetween('created_at', [$startOfMonth, $endOfMonth])
                                             ->whereHas('membership')
                                             ->with(['membership','membership.member'])
                                             ->count();
