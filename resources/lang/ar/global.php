@@ -85,7 +85,8 @@ return [
     'discard'                        => 'تجاهل',
     'previous_month_report'          => 'تقارير الشهر السابق' ,
     'branches'                       => 'فروع' ,
-
+    'employee'                       => 'الموظفين',
+    'select_employee'                => 'اختر الموظف',
     'datatables'                     => [
         'copy'          => 'نسخ',
         'csv'           => 'CSV',
