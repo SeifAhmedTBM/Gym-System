@@ -1,5 +1,5 @@
 @if (config('domains')[config('app.url')]['profile_attendance_dashboard'] == true)
-    @include('partials.profile_attendance')
+    <!-- @include('partials.profile_attendance') -->
 @endif
 <div class="form-group">
     <form action="{{ route('admin.home') }}" method="get">
