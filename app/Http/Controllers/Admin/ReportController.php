@@ -738,17 +738,42 @@ class ReportController extends Controller
             $branch_id = $request['branch_id'] != NULL ? $request['branch_id'] : '';
         }
 
-        $sales = User::with(['invoices' => fn ($q) => $q->withSum('payments', 'amount')])
-            ->whereHas('invoices', function ($x) use ($branch_id) {
+        $from = $request->from_date;
+        $to = $request->end_date;
+
+        if ($from && !$to) {
+            $to = now()->toDateString();
+        }
+
+        if ($to && !$from) {
+            $from = '1970-01-01';
+        }
+
+        if (!$from && !$to) {
+            $from = now()->startOfMonth()->toDateString();
+            $to = now()->endOfMonth()->toDateString();
+        }
+
+        $sales = User::with(['invoices' => fn ($q) => $q
+            ->where('created_at', '>=', $from)
+            ->where('created_at', '<=', $to)
+            ->withSum('payments', 'amount')])
+            ->whereHas('invoices', function ($x) use ($to, $from, $branch_id) {
                 $x->whereStatus('partial')
+                    ->where('created_at', '>=', $from)
+                    ->where('created_at', '<=', $to)
                     ->whereHas('membership')
                     ->when($branch_id, fn ($y) => $y->whereBranchId($branch_id));
             })
             ->withCount([
-                'invoices' => fn ($q) => $q->whereStatus('partial')->when($branch_id, fn ($y) => $y->whereBranchId($branch_id))
+                'invoices' => fn ($q) => $q->whereStatus('partial')
+                    ->where('created_at', '>=', $from)
+                    ->where('created_at', '<=', $to)
+                    ->when($branch_id, fn ($y) => $y->whereBranchId($branch_id))
             ])
             ->whereRelation('roles', 'title', 'Sales')
             ->get();
+
 
         $counter = 0;
         foreach ($sales as $sale) {

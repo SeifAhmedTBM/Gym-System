@@ -135,7 +135,7 @@
                                     $total = ($tran_payments + $tran_externalPayments) - ($tran_refunds + $tran_expenses + $tran_loans); 
                                 @endphp
             
-                                <div class="col-sm col-lg">
+                                <div class="col-12 col-lg-4 col-xl-3">
                                     <div class="card mb-2">
                                         <div class="card-body text-center  bg-secondary">
                                             <div>

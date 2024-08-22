@@ -13,11 +13,40 @@ class EmployeesAttendancesExport implements FromCollection,WithHeadings
 
     public function collection()
     {
-        $attendances = EmployeeAttendance::index(request()->all())
-                                            ->with(['employee' => fn($q) => $q->with('user')])
-                                            ->whereHas('employee')
-                                            ->latest()
-                                            ->get();
+        $employee = Auth()->user()->employee;
+        $from = request()->input('from') ?? null;
+        $to = request()->input('to') ?? null;
+
+
+        $branch_id = ($employee && $employee->branch_id != null)
+            ? $employee->branch_id
+            : (request()->input('branch_id') ?? '');
+
+        $attendancesQuery = EmployeeAttendance::with('employee')
+            ->whereHas(
+                'employee', fn($q) => $q->whereHas(
+                'user', fn($x) => $x
+                ->when(request()->input('role_id'), fn($x) => $x->whereRelation('roles', 'id', request()->input('role_id')))
+            )
+                ->when($branch_id, fn($x) => $x->whereBranchId($branch_id))
+                ->when(request()->input('employee_id'), fn($x) => $x->whereId(request()->input('employee_id')))
+            );
+
+        if ($from && $to) {
+            $attendancesQuery->whereBetween('created_at', [$from, $to]);
+        }
+        elseif ($from) {
+            // Only the from date is provided
+            $attendancesQuery->where('created_at', '>=', $from);
+        } elseif ($to) {
+            // Only the to date is provided
+            $attendancesQuery->where('created_at', '<=', $to);
+        }else{
+            $attendancesQuery->whereMonth('created_at', date('m'))
+                ->whereYear('created_at', date('Y'));
+        }
+
+        $attendances = $attendancesQuery->latest()->get();
                                         
         $attendances = $attendances->map(function ($attend) {
             return [
