@@ -93,6 +93,8 @@ return [
     'reply'                          => 'Reply',
     'body'                           => 'Body',
     'discard'                        => 'Discard',
+    'previous_month_report'          =>  'Previous Month Reports' ,
+    'branches'                       => 'branches' ,
     'employee'                       => 'Employee' ,
     'select_employee'                => 'Select Employee' ,
     'datatables'                     => [
