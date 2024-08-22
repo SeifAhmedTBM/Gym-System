@@ -70,7 +70,7 @@
                 ],
                 //
                 [
-                    'title' => 'Freez List',
+                    'title' => 'Freeze List',
                     'imageUrl' => '7.png',
                     'linkUrl' => 'admin.freeze.index',
                     'type'  => ''

@@ -81,7 +81,7 @@
                 ],
                 [
                     'can' => 'view_daily_report',
-                    'title' => 'daily report',
+                    'title' => 'Daily Report',
                     'imageUrl' => 'daily-report_icon.png',
                     'linkUrl' => 'admin.reports.daily.report',
                     'type' => '',
@@ -95,7 +95,7 @@
                 ],
                 [
                     'can' => 'due_payments_report',
-                    'title' => 'due payments report',
+                    'title' => 'Due Payments Report',
                     'imageUrl' => 'due.png',
                     'linkUrl' => 'admin.reports.due-payments-report',
                     'type' => '',

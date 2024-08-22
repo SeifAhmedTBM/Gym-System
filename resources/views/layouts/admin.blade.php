@@ -303,7 +303,7 @@
                 <li class="c-header-nav-item dropdown ">
                     <a class="c-header-nav-link" data-toggle="dropdown" href="#" role="button"
                         aria-haspopup="true" aria-expanded="false">
-                        <i class="fa fa-user"></i>&nbsp; {{ Auth()->user()->name }}
+                        <i class="fa fa-user"></i>&nbsp; {{ ucwords(Auth()->user()->name) }}
                     </a>
                     <div class="dropdown-menu dropdown-menu-right">
                         <a href='{{ route('profile.password.edit') }}' class="dropdown-item">
