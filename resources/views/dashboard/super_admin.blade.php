@@ -87,7 +87,7 @@
     </div>
     <div class="card">
         <div class="card-header">
-            Last Month Stat 
+            Last Month Stat Start from {{$startOfLastMonth->format('Y-m-d')}} To : {{$endOfLastMonth->format('Y-m-d')}}
         </div>
         <div class="card-body">
             <table class="table table-striped table-hover table-bordered zero-configuration">

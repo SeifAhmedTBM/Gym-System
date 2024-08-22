@@ -220,7 +220,7 @@ class HomeController
 
 
 
-        return view('home', compact('branches' ,'lastMonthBranchesTransactions'));
+        return view('home', compact('branches' ,'lastMonthBranchesTransactions' ,'startOfLastMonth' ,'endOfLastMonth'));
     }
 
     public function admin()
