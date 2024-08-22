@@ -377,10 +377,10 @@ return [
         'add_to_class_in_invoice'       => true,
     ],
     "http://localhost" => [
-        "employees_schedule"            => true,
-        "timeline_schedule"             => true,
+        "employees_schedule"            => false,
+        "timeline_schedule"             => false,
         "due_payment"                   => true,
-        "sessions_count"                => true,
+        "sessions_count"                => false,
         "national_id"                   => false,
         "email"                         => false,
         "vat"                           => false,
@@ -392,9 +392,10 @@ return [
         'is_reviewed_invoices'          => false,
         'trainer_services_option'       => false,
         'sports_option'                 => false,
-        'minor'                         => true,
+        'minor'                         => false,
         'short_reports'                 => false,
-        'add_to_class_in_invoice'       => true,
+        'add_to_class_in_invoice'       => false,
+        'settlement_invoices'           => false
     ],
     "http://127.0.0.1:8000" => [
         "employees_schedule"            => true,
