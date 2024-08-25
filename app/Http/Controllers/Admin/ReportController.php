@@ -54,6 +54,7 @@ use App\Exports\ExportSessionAttendancesReport;
 use App\Exports\ExportSessionsInstructedReport;
 use App\Exports\ExportExpiredMembershipAttendancesReport;
 use App\Exports\GuestLogExport;
+use Carbon\Carbon;
 use App\Services\SalesService;
 
 class ReportController extends Controller
@@ -737,17 +738,42 @@ class ReportController extends Controller
             $branch_id = $request['branch_id'] != NULL ? $request['branch_id'] : '';
         }
 
-        $sales = User::with(['invoices' => fn ($q) => $q->withSum('payments', 'amount')])
-            ->whereHas('invoices', function ($x) use ($branch_id) {
+        $from = $request->from_date;
+        $to = $request->end_date;
+
+        if ($from && !$to) {
+            $to = now()->toDateString();
+        }
+
+        if ($to && !$from) {
+            $from = '1970-01-01';
+        }
+
+        if (!$from && !$to) {
+            $from = now()->startOfMonth()->toDateString();
+            $to = now()->endOfMonth()->toDateString();
+        }
+
+        $sales = User::with(['invoices' => fn ($q) => $q
+            ->where('created_at', '>=', $from)
+            ->where('created_at', '<=', $to)
+            ->withSum('payments', 'amount')])
+            ->whereHas('invoices', function ($x) use ($to, $from, $branch_id) {
                 $x->whereStatus('partial')
+                    ->where('created_at', '>=', $from)
+                    ->where('created_at', '<=', $to)
                     ->whereHas('membership')
                     ->when($branch_id, fn ($y) => $y->whereBranchId($branch_id));
             })
             ->withCount([
-                'invoices' => fn ($q) => $q->whereStatus('partial')->when($branch_id, fn ($y) => $y->whereBranchId($branch_id))
+                'invoices' => fn ($q) => $q->whereStatus('partial')
+                    ->where('created_at', '>=', $from)
+                    ->where('created_at', '<=', $to)
+                    ->when($branch_id, fn ($y) => $y->whereBranchId($branch_id))
             ])
             ->whereRelation('roles', 'title', 'Sales')
             ->get();
+
 
         $counter = 0;
         foreach ($sales as $sale) {
@@ -922,6 +948,7 @@ class ReportController extends Controller
 
     public function dailyReport(Request $request)
     {
+        
         $date = isset($request->date) ? $request->date : date('Y-m-d');
 
         $employee = Auth()->user()->employee;
@@ -1244,6 +1271,7 @@ class ReportController extends Controller
 
     public function monthlyReport(Request $request)
     {
+        
         $from = isset($request['from']) ? $request['from'] : date('Y-m-01');
         $to = isset($request['to']) ? $request['to'] : date('Y-m-t');
 
@@ -3120,6 +3148,7 @@ class ReportController extends Controller
 
     public function sales_daily(Request $request)
     {
+ 
         $from   = isset($request['from']) ? $request['from'] : date('Y-m-01');
         $to     = isset($request['to']) ? $request['to'] : date('Y-m-t');
 
@@ -3169,4 +3198,77 @@ class ReportController extends Controller
 
         return view('admin.reports.trainer_daily',compact('employee','branch_id','invoices','payments_sum_amount','refunds','pending','payments','service_payments','service_refunds'));
     }
+
+
+    public function previous_month_report(Request $request){
+        $date =  date('Y-m');
+
+        $from   =  date('Y-m-01');
+        $to     =  date('Y-m-t');
+
+        $today = Carbon::now('UTC');
+        $today2 = Carbon::now('UTC');   
+        $startOfLastMonth = $today->subMonth()->startOfMonth()->toDateString(); 
+        $endOfLastMonth = $today2->subMonth()->toDateString(); 
+
+        
+        $employee = Auth()->user()->employee;
+
+        if ($employee && $employee->branch_id != NULL) 
+        {
+            $branch_id = $employee->branch_id;
+        } 
+        else 
+        {
+            $branch_id = $request['branch_id'] != NULL ? $request['branch_id'] : '';
+        }
+
+        $branches = Branch::with([
+            'accounts',
+            'transactions' => fn ($q) => $q->whereYear('transactions.created_at', date('Y', strtotime($date)))
+                ->whereMonth('transactions.created_at', date('m', strtotime($date)))
+        ])->get();
+
+        //Over All Report
+        $lastMonthBranchesTransactions = Branch::with(['transactions' => function($query) use ($startOfLastMonth, $endOfLastMonth, $today ,$today2) {
+            $query->whereDate('transactions.created_at', '>=', $startOfLastMonth)->whereDate('transactions.created_at', '<=', $endOfLastMonth);
+        }])->get();
+
+
+        //Sales Report
+        $sales_service          = new SalesService;
+        $invoices               = $sales_service->invoices($startOfLastMonth,$endOfLastMonth,$branch_id)->sum('net_amount');
+        $payments_sum_amount    = $sales_service->invoices($startOfLastMonth,$endOfLastMonth,$branch_id)->sum('payments_sum_amount');
+        $refunds                = $sales_service->refunds($startOfLastMonth,$endOfLastMonth,$branch_id)->sum('amount');
+        $pending                = $invoices - $payments_sum_amount;
+        $payments               = $sales_service->payments($startOfLastMonth,$endOfLastMonth,$branch_id)->sum('amount');
+
+        $current_month_sales_service          = new SalesService;
+        $current_month_invoices               = $current_month_sales_service->invoices($from,$to,$branch_id)->sum('net_amount');
+        $current_month_payments_sum_amount    = $current_month_sales_service->invoices($from,$to,$branch_id)->sum('payments_sum_amount');
+        $current_month_refunds                = $current_month_sales_service->refunds($from,$to,$branch_id)->sum('amount');
+        $current_month_pending                = $current_month_invoices - $current_month_payments_sum_amount;
+        $current_month_payments               = $current_month_sales_service->payments($from,$to,$branch_id)->sum('amount');
+     
+        //Traineer Reports
+        $trainer_service = new TrainerService;
+        $trainer_invoices               = $trainer_service->invoices($startOfLastMonth,$endOfLastMonth,$branch_id)->sum('net_amount');
+        $trainer_payments_sum_amount    = $trainer_service->invoices($startOfLastMonth,$endOfLastMonth,$branch_id)->sum('payments_sum_amount');
+        $trainer_refunds                = $trainer_service->refunds($startOfLastMonth,$endOfLastMonth,$branch_id)->sum('amount');
+        $trainer_pending                = $trainer_invoices - $trainer_payments_sum_amount;
+        $trainer_payments               = $trainer_service->payments($startOfLastMonth,$endOfLastMonth,$branch_id)->sum('amount');
+
+        $current_month_trainer_service = new TrainerService;
+        $current_month_trainer_invoices               = $current_month_trainer_service->invoices($from,$to,$branch_id)->sum('net_amount');
+        $current_month_trainer_payments_sum_amount    = $current_month_trainer_service->invoices($from,$to,$branch_id)->sum('payments_sum_amount');
+        $current_month_trainer_refunds                = $current_month_trainer_service->refunds($from,$to,$branch_id)->sum('amount');
+        $current_month_trainer_pending                = $current_month_trainer_invoices - $current_month_trainer_payments_sum_amount;
+        $current_month_trainer_payments               = $trainer_service->payments($from,$to,$branch_id)->sum('amount');
+
+        
+
+       
+        return view('admin.reports.prev_month_report', compact('branches','lastMonthBranchesTransactions','startOfLastMonth','endOfLastMonth' ,'employee','branch_id','invoices','payments_sum_amount','refunds','pending','payments','current_month_invoices','current_month_payments_sum_amount','current_month_refunds','current_month_pending','current_month_payments' ,'trainer_invoices','trainer_payments_sum_amount','trainer_refunds','trainer_pending','trainer_payments'   ,'current_month_trainer_invoices','current_month_trainer_payments_sum_amount','current_month_trainer_refunds','current_month_trainer_pending','current_month_trainer_payments'));
+    }
+
 }

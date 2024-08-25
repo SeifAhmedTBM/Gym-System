@@ -327,9 +327,13 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.', 'namespace' => 'Admin', 'mi
 
         // Trainer Daily report 29/11/2023
         Route::get('trainer-daily-report','ReportController@trainer_daily')->name('trainer-daily-report');
+
+
+        Route::get('previous-month-report' ,'ReportController@previous_month_report')->name('previous-month-reports');
     });
     // Tasks
     Route::resource('tasks', 'TasksController');
+    //Route::post('task-filter' , 'TasksController@filter')->name('filter-tasks');
     Route::get('my-tasks', 'TasksController@my_tasks')->name('tasks.my-tasks');
     Route::get('created-tasks', 'TasksController@created_tasks')->name('tasks.created-tasks');
     Route::get('done-tasks/{task}', 'TasksController@done_tasks')->name('tasks.done-tasks');

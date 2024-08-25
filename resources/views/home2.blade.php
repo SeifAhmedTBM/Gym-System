@@ -68,13 +68,13 @@
                     'type'  => ''
                 ],
                 [
-                    'title' => 'daily report',
+                    'title' => 'Daily Report',
                     'imageUrl' => 'daily-report_icon.png',
                     'linkUrl' => 'admin.external-payments.create',
                     'type'  => ''
                 ],
                 [
-                    'title' => 'due payments report',
+                    'title' => 'Due Payments Report',
                     'imageUrl' => 'due.png',
                     'linkUrl' => 'admin.external-payments.create',
                     'type'  => ''

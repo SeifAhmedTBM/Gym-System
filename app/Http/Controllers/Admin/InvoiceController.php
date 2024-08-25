@@ -1000,23 +1000,43 @@ class InvoiceController extends Controller
         return $invoice->stream();
     }
 
-    public function duePaymentsInvoices($id)
+    public function duePaymentsInvoices(Request $request , $id)
     {
+        $from = $request->from_date;
+        $to = $request->end_date;
+
+        if ($from && !$to) {
+            $to = now()->toDateString();
+        }
+
+        if ($to && !$from) {
+            $from = '1970-01-01';
+        }
+
+        if (!$from && !$to) {
+            $from = now()->startOfMonth()->toDateString();
+            $to = now()->endOfMonth()->toDateString();
+        }
+
         $sale = User::with([
-            'invoices' => fn ($q) => $q->withSum('payments', 'amount')
+            'invoices' => fn ($q) => $q
+                ->where('created_at', '>=', $from)
+                ->where('created_at', '<=', $to)
+                ->withSum('payments', 'amount')
                 ->whereStatus('partial')
                 ->whereHas('membership')
                 ->latest()
         ])
-            ->whereHas('invoices', function ($x) {
+            ->whereHas('invoices', function ($x) use ($from, $to) {
                 $x->whereStatus('partial')
+                    ->where('created_at', '>=', $from)
+                    ->where('created_at', '<=', $to)
                     ->whereHas('membership');
             })
             ->whereHas('roles', function ($i) {
                 $i->where('title', 'sales');
             })
-            ->findOrFail($id);
-
+            ->find($id);
         return view('admin.reports.due_payments_invoice', compact('sale'));
     }
 

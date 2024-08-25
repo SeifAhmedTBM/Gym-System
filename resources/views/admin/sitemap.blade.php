@@ -137,6 +137,13 @@
                                         </a>
                                     </li>
                                 @endcan
+                                @can('view_sales_report')
+                                    <li>
+                                        <a href="{{ route('admin.reports.previous-month-reports') }}">{{ trans('global.previous_month_report') }}
+                                        </a>
+                                        <span class="badge badge-danger">NEW</span>
+                                    </li>
+                                @endcan
                                 @can('view_guest_log_report')
                                     <li>
                                         <a href="{{ route('admin.reports.guest-log-report') }}">Guest Log Report</a>
