@@ -21,7 +21,7 @@
 
             <div class="input-group align-items-end">
                 <div class=" col">
-                    <label for="yearInput">Date</label>
+                    <label for="month">Date</label>
                     <input type="month" class="form-control" name="month" value="{{ request()->month  ?? date('Y-m') }}">
                 </div>
                 <div class=" col">
