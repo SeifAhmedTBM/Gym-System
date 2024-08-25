@@ -1,26 +1,40 @@
+@php
+    $requestedMonth = request()->input('month');
+    $dateToDisplay = $requestedMonth ? \Carbon\Carbon::parse($requestedMonth) : \Carbon\Carbon::now();
+@endphp
+
 @extends('layouts.admin')
 @section('content')
     <div class="row">
         <div class="col-md-12">
             <div class="card">
                 <div class="card-header">
-                    <h5 class="text-center">{{ trans('global.monthly_finance_report') }} - {{ date('F Y') }}</h5>
-                </div>
+                    <h5 class="text-center">
+                        {{ trans('global.monthly_finance_report') }} - {{ $dateToDisplay->format('F Y') }}
+                    </h5>                </div>
             </div>
         </div>
     </div>
 
     <form action="{{ route('admin.reports.monthlyFinance.report') }}" method="get">
         <div class="form-group row">
-            <label for="date">{{ trans('cruds.branch.title_singular') }}</label>
-            <div class="input-group">
-                <input type="month" class="form-control" name="month" value="{{ request()->month  ?? date('Y-m') }}">
-                <select name="branch_id" id="branch_id" class="form-control" {{ $employee && $employee->branch_id != NULL ? 'readonly' : '' }}>
-                    <option value="{{ NULL }}" selected hidden disabled>Branch</option>
-                    @foreach (\App\Models\Branch::pluck('name','id') as $id => $name)
-                        <option value="{{ $id }}" {{ $branch_id == $id ? 'selected' : '' }}>{{ $name }}</option>
-                    @endforeach
-                </select>
+
+            <div class="input-group align-items-end">
+                <div class=" col">
+                    <label for="yearInput">Date</label>
+                    <input type="month" class="form-control" name="month" value="{{ request()->month  ?? date('Y-m') }}">
+                </div>
+                <div class=" col">
+                    <label for="date">{{ trans('cruds.branch.title_singular') }}</label>
+                    <select name="branch_id" id="branch_id" class="form-control" {{ $employee && $employee->branch_id != NULL ? 'readonly' : '' }}>
+                        <option value="{{ NULL }}" selected >Branch</option>
+                        @foreach (\App\Models\Branch::pluck('name','id') as $id => $name)
+                            <option value="{{ $id }}" {{ $branch_id == $id ? 'selected' : '' }}>{{ $name }}</option>
+                        @endforeach
+                    </select>
+                </div>
+
+
                 <div class="input-group-prepend">
                     <button class="btn btn-primary" type="submit" >{{ trans('global.submit') }}</button>
                 </div>
