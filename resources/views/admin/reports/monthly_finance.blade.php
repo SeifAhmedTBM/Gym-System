@@ -27,7 +27,7 @@
                 <div class=" col">
                     <label for="date">{{ trans('cruds.branch.title_singular') }}</label>
                     <select name="branch_id" id="branch_id" class="form-control" {{ $employee && $employee->branch_id != NULL ? 'readonly' : '' }}>
-                        <option value="{{ NULL }}" selected >Branch</option>
+                        <option value="{{ NULL }}" selected >All Branch</option>
                         @foreach (\App\Models\Branch::pluck('name','id') as $id => $name)
                             <option value="{{ $id }}" {{ $branch_id == $id ? 'selected' : '' }}>{{ $name }}</option>
                         @endforeach
