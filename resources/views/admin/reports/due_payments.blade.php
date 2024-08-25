@@ -83,6 +83,7 @@
                 </table>
             </div>
         </div>
+
         <div class="card-footer">
             {{-- {{ $sales->links() }} --}}
         </div>
