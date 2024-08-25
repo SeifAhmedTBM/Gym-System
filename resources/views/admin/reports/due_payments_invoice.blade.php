@@ -31,18 +31,17 @@
         </div>
     </div>
 
-
     <div class="form-group row mt-3">
         <div class="col-md-9">
             <form method="GET">
                 <div class="form-group d-flex align-items-end">
                     <div class="mr-2">
                         <label for="from_date">{{ trans('global.timeFrom') }}</label>
-                        <input type="date" class="form-control" id="from_date" name="from_date" value="{{ request('from_date')??$startOfMonth}}">
+                        <input type="date" class="form-control" id="from_date" name="from_date" value="{{ request('from_date') ?? $startOfMonth }}">
                     </div>
                     <div class="mr-2">
                         <label for="end_date">{{ trans('global.timeTo') }}</label>
-                        <input type="date" class="form-control" id="end_date" name="end_date" value="{{ request('end_date')??$endOfMonth}}">
+                        <input type="date" class="form-control" id="end_date" name="end_date" value="{{ request('end_date') ?? $endOfMonth }}">
                     </div>
                     <button type="submit" class="btn btn-primary">{{ trans('global.filter') }}</button>
                 </div>
@@ -52,13 +51,17 @@
             <div class="card">
                 <div class="card-body">
                     <h3 class="text-center">{{ trans('global.total') }}</h3>
-                    <h3 class="text-center">{{ number_format($sale->invoices->sum('rest')) }}</h3>
+                    <h3 class="text-center">
+                        @if ($sale)
+                            {{ number_format($sale->invoices->sum('rest')) }}
+                        @else
+                            {{ number_format(0) }}
+                        @endif
+                    </h3>
                 </div>
             </div>
         </div>
     </div>
-
-
 
     <div class="card">
         <div class="card-header">
@@ -82,48 +85,53 @@
                     </tr>
                     </thead>
                     <tbody>
-                    @forelse ($sale->invoices as $key => $invoice)
-                        <tr>
-                            <td>{{ $loop->iteration }}</td>
-                            <td>{{ $invoice->id ?? '-' }}</td>
-                            <td>
-                                <a href="{{ route('admin.members.show', $invoice->membership->member_id) }}"
-                                   target="_blank">
-                                    {{ $invoice->membership->member->member_code ?? '-' }}
-                                    <br>
-                                    {{ $invoice->membership->member->name ?? '-' }}
-                                    <br>
-                                    {{ $invoice->membership->member->phone ?? '-' }}
-                                </a>
-                            </td>
-                            <td>{{ $invoice->membership->service_pricelist->name ?? '-' }} </td>
-                            <td>{{ number_format($invoice->net_amount) ?? '-' }} EGP</td>
-                            <td>{{ number_format($invoice->payments_sum_amount) ?? '-' }} EGP</td>
-                            <td>{{ number_format($invoice->rest) ?? '-' }} EGP</td>
-                            <td>{{ $invoice->created_at ?? '-' }}</td>
-                            <td>
-                                <div class="btn-group">
-                                    <a href="{{ route('admin.invoice.payments', $invoice->id) }}"
-                                       class="btn btn-info btn-sm"><i class="fa fa-eye"></i>
-                                        {{ trans('cruds.payment.title') }}</a>
-
-                                    <a href="{{ route('admin.invoice.payment', $invoice->id) }}"
-                                       class="btn btn-success btn-sm"><i class="fa fa-plus-circle"></i>
-                                        {{ trans('cruds.payment.title_singular') }}
+                    @if ($sale)
+                        @forelse ($sale->invoices as $key => $invoice)
+                            <tr>
+                                <td>{{ $loop->iteration }}</td>
+                                <td>{{ $invoice->id ?? '-' }}</td>
+                                <td>
+                                    <a href="{{ route('admin.members.show', $invoice->membership->member_id) }}" target="_blank">
+                                        {{ $invoice->membership->member->member_code ?? '-' }}
+                                        <br>
+                                        {{ $invoice->membership->member->name ?? '-' }}
+                                        <br>
+                                        {{ $invoice->membership->member->phone ?? '-' }}
                                     </a>
-                                    @if (config('domains')[config('app.url')]['settlement_invoices'] == true)
-                                        <a href="javascript:void(0)" onclick="setSettlementInvoice(this)"
-                                           data-toggle="modal" data-target="#settlement_invoice"
-                                           data-url="{{ route('admin.settlement.invoice', $invoice->id) }}"
-                                           class="btn btn-info"><i class="fas fa-check-circle"></i> &nbsp;
-                                            {{ trans('global.settlement') }}</a>
-                                    @endif
-                                </div>
-                            </td>
+                                </td>
+                                <td>{{ $invoice->membership->service_pricelist->name ?? '-' }} </td>
+                                <td>{{ number_format($invoice->net_amount) ?? '-' }} EGP</td>
+                                <td>{{ number_format($invoice->payments_sum_amount) ?? '-' }} EGP</td>
+                                <td>{{ number_format($invoice->rest) ?? '-' }} EGP</td>
+                                <td>{{ $invoice->created_at ?? '-' }}</td>
+                                <td>
+                                    <div class="btn-group">
+                                        <a href="{{ route('admin.invoice.payments', $invoice->id) }}" class="btn btn-info btn-sm"><i class="fa fa-eye"></i>
+                                            {{ trans('cruds.payment.title') }}</a>
+
+                                        <a href="{{ route('admin.invoice.payment', $invoice->id) }}" class="btn btn-success btn-sm"><i class="fa fa-plus-circle"></i>
+                                            {{ trans('cruds.payment.title_singular') }}
+                                        </a>
+                                        @if (config('domains')[config('app.url')]['settlement_invoices'] == true)
+                                            <a href="javascript:void(0)" onclick="setSettlementInvoice(this)"
+                                               data-toggle="modal" data-target="#settlement_invoice"
+                                               data-url="{{ route('admin.settlement.invoice', $invoice->id) }}"
+                                               class="btn btn-info"><i class="fas fa-check-circle"></i> &nbsp;
+                                                {{ trans('global.settlement') }}</a>
+                                        @endif
+                                    </div>
+                                </td>
+                            </tr>
+                        @empty
+                            <tr>
+                                <td colspan="9" class="text-center">{{ trans('global.no_data_available') }}</td>
+                            </tr>
+                        @endforelse
+                    @else
+                        <tr>
+                            <td colspan="9" class="text-center">{{ trans('global.no_data_available') }}</td>
                         </tr>
-                    @empty
-                        <td colspan="8" class="text-center">{{ trans('global.no_data_available') }}</td>
-                    @endforelse
+                    @endif
                     </tbody>
                 </table>
             </div>

@@ -1036,9 +1036,7 @@ class InvoiceController extends Controller
             ->whereHas('roles', function ($i) {
                 $i->where('title', 'sales');
             })
-            ->findOrFail($id);
-
-
+            ->find($id);
         return view('admin.reports.due_payments_invoice', compact('sale'));
     }
 
