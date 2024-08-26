@@ -16,10 +16,8 @@
             refreshButton.classList.add('d-none');
             loadingSpinner.classList.remove('d-none');
 
-            setTimeout(() => {
-                const { origin, pathname, search } = new URL(window.location.href);
-                window.location.href = `${origin}${pathname}${search}`;
-            }, 100);
+            const { origin, pathname, search } = new URL(window.location.href);
+            window.location.href = `${origin}${pathname}${search}`;
         });
     });
 </script>
