@@ -125,19 +125,26 @@
                     'type'      => '',
                 ],
                 [
-                    'can'       => 'schedule_main_access',
-                    'title'     => 'Schedule Main Group',
-                    'imageUrl'  => 'roles.png',
-                    'linkUrl'   => 'admin.schedule-main-groups.index',
+                    'can'       => 'timeslot_access',
+                    'title'     => 'TimeSlots',
+                    'imageUrl'  => 'clock.png',
+                    'linkUrl'   => 'admin.timeslots.index',
                     'type'      => '',
                 ],
-                [
-                    'can'       => 'schedule_main_access',
-                    'title'     => 'Schedule Main',
-                    'imageUrl'  => 'roles.png',
-                    'linkUrl'   => 'admin.schedule-mains.index',
-                    'type'      => '',
-                ],
+                // [
+                //     'can'       => 'schedule_main_access',
+                //     'title'     => 'Schedule Main Group',
+                //     'imageUrl'  => 'roles.png',
+                //     'linkUrl'   => 'admin.schedule-main-groups.index',
+                //     'type'      => '',
+                // ],
+                // [
+                //     'can'       => 'schedule_main_access',
+                //     'title'     => 'Schedule Main',
+                //     'imageUrl'  => 'roles.png',
+                //     'linkUrl'   => 'admin.schedule-mains.index',
+                //     'type'      => '',
+                // ],
                 [
                     'can'       => 'schedule_access',
                     'title'     => 'Schedules',
@@ -145,13 +152,7 @@
                     'linkUrl'   => 'admin.schedules.index',
                     'type'      => '',
                 ],
-                [
-                    'can'       => 'timeslot_access',
-                    'title'     => 'TimeSlots',
-                    'imageUrl'  => 'clock.png',
-                    'linkUrl'   => 'admin.timeslots.index',
-                    'type'      => '',
-                ],
+              
                 [
                     'can'       => 'sports_access',
                     'title'     => 'Sports',
