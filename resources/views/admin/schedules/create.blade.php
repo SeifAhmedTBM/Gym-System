@@ -76,7 +76,7 @@
                 @endif
                 <span class="help-block">{{ trans('cruds.schedule.fields.trainer_helper') }}</span>
             </div>
-            <div class="form-group">
+            <div class="form-group" style="display:none">
                 <label class="required" for="comission_type">{{ trans('cruds.schedule.fields.comission_type') }}</label>
                 <select class="form-control select2 {{ $errors->has('comission_type') ? 'is-invalid' : '' }}" name="comission_type" id="comission_type" required>
                     <option value="fixed" >Fixed</option>
@@ -89,7 +89,7 @@
                 @endif
                 <span class="help-block">{{ trans('cruds.schedule.fields.comission_type_helper') }}</span>
             </div>
-            <div class="form-group">
+            <div class="form-group" style="display:none">
                 <label class="required" for="comission_amount">{{ trans('cruds.schedule.fields.comission_amount') }}</label>
                 <input type="number" id="comission_amount" name="comission_amount" value="0" class="form-control">
                 @if($errors->has('comission_amount'))

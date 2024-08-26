@@ -192,6 +192,10 @@ class HomeController
     public function superAdmin(Request $request)
     {
         $date = isset($request['date']) ? $request['date'] : date('Y-m');
+        $dateArray = explode('-', $date);
+        $currentMonth = $dateArray[1];
+        $currentYear = $dateArray[0];
+     
 
         $today = Carbon::now('UTC');
         $today2 = Carbon::now('UTC');
@@ -212,6 +216,20 @@ class HomeController
             $query->whereDate('transactions.created_at', '>=', $startOfLastMonth)->whereDate('transactions.created_at', '<=', $endOfLastMonth);
         }])->get();
 
+
+       $schedules = Schedule::with(['trainer', 'timeslot'])
+        // ->whereHas('schedule_main', function ($q) {
+        //     $q->whereHas('schedule_main_group', fn ($y) => $y->whereStatus('active'));
+        // })
+        ->where(function ($query) use ($currentMonth, $currentYear) {
+            $query->whereRaw("SUBSTR(`date`, 6, 2) = ?", [$currentMonth])
+                ->whereRaw("SUBSTR(`date`, 1, 4) = ?", [$currentYear]);
+        })
+        ->get()
+        ->groupBy('timeslot_id');
+       
+        $timeslots = Timeslot::orderBy('from', 'asc')->get();
+
         // $accounts = Account::whereManager(false)
         // ->when($branch_id, fn ($x) => $x->whereBranchId($branch_id))
         // ->with(['transactions' => fn ($q) => $q->whereDate('created_at', '>=', $from)->whereDate('created_at', '<=', $to)])
@@ -220,7 +238,7 @@ class HomeController
 
 
 
-        return view('home', compact('branches' ,'lastMonthBranchesTransactions' ,'startOfLastMonth' ,'endOfLastMonth'));
+        return view('home', compact('schedules','timeslots','branches' ,'lastMonthBranchesTransactions' ,'startOfLastMonth' ,'endOfLastMonth'));
     }
 
     public function admin()
