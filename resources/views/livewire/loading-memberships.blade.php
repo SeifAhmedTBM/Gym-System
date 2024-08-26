@@ -8,21 +8,17 @@
 </div>
 
 <script>
-    document.addEventListener('DOMContentLoaded', function () {
+    document.addEventListener('DOMContentLoaded', () => {
         const refreshButton = document.getElementById('refreshButton');
         const loadingSpinner = document.getElementById('loadingSpinner');
 
-        refreshButton.addEventListener('click', function () {
+        refreshButton.addEventListener('click', () => {
             refreshButton.classList.add('d-none');
             loadingSpinner.classList.remove('d-none');
-            setTimeout(function () {
-                const currentUrl = new URL(window.location.href);
-                const queryParams = currentUrl.searchParams.toString();
-                if (queryParams) {
-                    window.location.href = `${currentUrl.origin}${currentUrl.pathname}?${queryParams}`;
-                } else {
-                    window.location.href = `${currentUrl.origin}${currentUrl.pathname}`;
-                }
+
+            setTimeout(() => {
+                const { origin, pathname, search } = new URL(window.location.href);
+                window.location.href = `${origin}${pathname}${search}`;
             }, 100);
         });
     });
