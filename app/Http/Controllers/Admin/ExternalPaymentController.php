@@ -113,6 +113,7 @@ class ExternalPaymentController extends Controller
         }
 
         $accounts = [
+            ''=>'All',
             'instapay' => 'Instapay',
             'cash' => 'Cash',
             'visa' => 'Visa',

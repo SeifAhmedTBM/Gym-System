@@ -61,10 +61,13 @@ class ModelScope {
                                         $q = $q->where($field_name, $field_value);
                                     });
                                 }elseif($field_name == 'account_id'){
-                                    $accounts = ['instapay','cash','visa','vodafone','valu','premium','sympl'];
+                                    $accounts = ['','null','instapay','cash','visa','vodafone','valu','premium','sympl'];
                                     if (in_array($field_value[0], array_values($accounts))) {
+                                        if ($field_value[0]==''||$field_value[0]=='null'){
+                                        $field_value = Account::pluck('id');
+                                        }else{
                                         $field_value = Account::where('name','like','%'.$field_value[0].'%')->pluck('id');
-//                                        dd($field_value);
+                                        }
                                     }
                                     $query->whereHas($relation, function($q) use($field_name, $field_value) {
                                         $q = $q->whereIn($field_name,$field_value);
@@ -77,7 +80,6 @@ class ModelScope {
                                                         ->whereDate($field_name,'<=',$field_value['to']);
                                         });
                                     }elseif (gettype($field_value) == 'array' && !isset($field_value['from']) && !isset($field_value['to'])) {
-//                                        dd($relation);
                                         $query->whereHas($relation, function($q) use($field_name, $field_value) {
                                             $q = $q->WhereIn($field_name,$field_value);
                                         });
