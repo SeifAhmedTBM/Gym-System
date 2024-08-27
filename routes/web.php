@@ -580,6 +580,9 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.', 'namespace' => 'Admin', 'mi
     Route::post('expenses/parse-csv-import', 'ExpensesController@parseCsvImport')->name('expenses.parseCsvImport');
     Route::post('expenses/process-csv-import', 'ExpensesController@processCsvImport')->name('expenses.processCsvImport');
     Route::resource('expenses', 'ExpensesController');
+    Route::get('expenses_categories', 'ExpensesController@expenses_categories')->name('expenses_categories');
+    Route::get('expenses_categories_show_by_filter' ,'ExpensesController@expenses_categories_show_by_filter')->name('expenses_categories_show_by_filter');
+
 
     // Invoice
     Route::delete('invoices/destroy', 'InvoiceController@massDestroy')->name('invoices.massDestroy');

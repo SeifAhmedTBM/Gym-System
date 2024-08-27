@@ -76,6 +76,7 @@
                                         </button>
                                     @endcan
 
+                                    
                                     @can('reminder_delete')
                                         <form action="{{ route('admin.reminders.destroy', $sales_reminder->id) }}"
                                             method="POST" onsubmit="return confirm('{{ trans('global.areYouSure') }}');"
