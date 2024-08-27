@@ -24,6 +24,7 @@ class ExternalPaymentController extends Controller
 
     public function index(Request $request)
     {
+//        dd($request->input('relations.account.account_id')[0]);
         abort_if(Gate::denies('external_payment_access'), Response::HTTP_FORBIDDEN, '403 Forbidden');
 
         $data = $request->except(['draw', 'columns', 'order', 'start', 'length', 'search', 'change_language','_']);
@@ -111,7 +112,18 @@ class ExternalPaymentController extends Controller
             return $table->make(true);
         }
 
-        $accounts = Account::pluck('name','id');
+        $accounts = [
+            'instapay' => 'Instapay',
+            'cash' => 'Cash',
+            'visa' => 'Visa',
+            'vodafone' => 'Vodafone',
+            'valu' => 'Valu',
+            'premium' => 'Premium',
+            'sympl' => 'Sympl'
+        ];
+
+        $accounts = $accounts + Account::pluck('name', 'id')->toArray();
+
 
         $branches = Branch::pluck('name','id');
 
@@ -121,20 +133,12 @@ class ExternalPaymentController extends Controller
             $q = $q->whereIn('title',['Admin','Sales','Receptionist']);
         })->pluck('name', 'id');
 
-        if ($employee && $employee->branch_id != NULL) 
+        if ($employee && $employee->branch_id != NULL)
         {
             $externalPayments = ExternalPayment::index($data)->whereHas('account',fn($q) => $q->whereBranchId($employee->branch_id));
         }else{
             $externalPayments = ExternalPayment::index($data);
         }
-
-
-       
-
-    
-
-
-
         return view('admin.externalPayments.index',compact('accounts','created_bies','externalPayments','external_payment_categories','branches'));
     }
 

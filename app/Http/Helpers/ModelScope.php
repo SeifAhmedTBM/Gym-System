@@ -2,6 +2,7 @@
 
 namespace App\Http\Helpers;
 
+use App\Models\Account;
 use Illuminate\Support\Str;
 
 class ModelScope {
@@ -59,6 +60,15 @@ class ModelScope {
                                     $query->whereHas($relation, function($q) use($field_name, $field_value) {
                                         $q = $q->where($field_name, $field_value);
                                     });
+                                }elseif($field_name == 'account_id'){
+                                    $accounts = ['instapay','cash','visa','vodafone','valu','premium','sympl'];
+                                    if (in_array($field_value[0], array_values($accounts))) {
+                                        $field_value = Account::where('name','like','%'.$field_value[0].'%')->pluck('id');
+//                                        dd($field_value);
+                                    }
+                                    $query->whereHas($relation, function($q) use($field_name, $field_value) {
+                                        $q = $q->whereIn($field_name,$field_value);
+                                    });
                                 }else {
                                     if (gettype($field_value) == 'array' && isset($field_value['from']) && isset($field_value['to'])) 
                                     {
@@ -67,6 +77,7 @@ class ModelScope {
                                                         ->whereDate($field_name,'<=',$field_value['to']);
                                         });
                                     }elseif (gettype($field_value) == 'array' && !isset($field_value['from']) && !isset($field_value['to'])) {
+//                                        dd($relation);
                                         $query->whereHas($relation, function($q) use($field_name, $field_value) {
                                             $q = $q->WhereIn($field_name,$field_value);
                                         });
