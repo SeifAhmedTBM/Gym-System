@@ -55,6 +55,13 @@
                 <span class="help-block">{{ trans('cruds.sessionList.fields.max_capacity_helper') }}</span>
             </div>
             <div class="form-group">
+                <label class="required" for="paid">Paid Or Not ?  </label>
+                <select class="form-control  {{ $errors->has('paid') ? 'is-invalid' : '' }}" name="paid" id="paid" required>
+                    <option value="0">Not Paid </option>
+                    <option value="1">Paid</option>
+                </select>
+            </div>
+            <div class="form-group">
                 <button class="btn btn-danger" type="submit">
                     {{ trans('global.save') }}
                 </button>

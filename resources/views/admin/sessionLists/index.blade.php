@@ -39,6 +39,9 @@
                                 {{ trans('cruds.sessionList.fields.max_capacity') }}
                             </th>
                             <th>
+                                Paid ? 
+                            </th>
+                            <th>
                                 &nbsp;
                             </th>
                         </tr>
@@ -63,6 +66,13 @@
                                     {{ $sessionList->max_capacity ?? '' }}
                                 </td>
                                 <td>
+                                   @if($sessionList->paid == 1)
+                                    <button class="btn btn-primary">Yes</button>
+                                   @else
+                                   <button class="btn btn-danger">No</button>
+                                   @endif
+                                </td>
+                                <td>
                                     @can('session_list_show')
                                         <a class="btn btn-xs btn-primary"
                                             href="{{ route('admin.session-lists.show', $sessionList->id) }}">
@@ -76,6 +86,7 @@
                                             {{ trans('global.edit') }}
                                         </a>
                                     @endcan
+                                    
 
                                     @can('session_list_delete')
                                         <form action="{{ route('admin.session-lists.destroy', $sessionList->id) }}"
@@ -89,6 +100,7 @@
                                     @endcan
 
                                 </td>
+                              
 
                             </tr>
                         @endforeach
