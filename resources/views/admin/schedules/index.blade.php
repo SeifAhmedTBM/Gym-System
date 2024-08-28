@@ -51,12 +51,12 @@
                             <th>
                                 {{ trans('cruds.schedule.fields.trainer') }}
                             </th>
-                            <th>
+                            <!-- <th>
                                 {{ trans('cruds.schedule.fields.comission_type') }}
                             </th>
                             <th>
                                 {{ trans('cruds.schedule.fields.comission_amount') }}
-                            </th>
+                            </th> -->
                             <th>
                                 &nbsp;
                             </th>
@@ -89,7 +89,7 @@
                                 <td>
                                     {{ $schedule->trainer->name ?? '' }}
                                 </td>
-                                <td>
+                                <!-- <td>
                                     {{ $schedule->comission_type ?? '' }}
                                 </td>
                                 <td>
@@ -99,7 +99,7 @@
                                     @else
                                         LE
                                     @endif
-                                </td>
+                                </td> -->
                                 <td>
                                     @can('schedule_show')
                                         <a class="btn btn-xs btn-primary"
