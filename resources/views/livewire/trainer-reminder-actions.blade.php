@@ -17,13 +17,13 @@
         <select name="action" id="action" class="form-control" wire:model.live="action">
             <option value="{{ null }}">Select Action</option>
             @foreach (App\Models\Reminder::ACTION as $key => $value)
-                @if (auth()->user()->roles[0]->title == 'Trainer')
-                    @if ($key == 'done' || $key == 'appointment' || $key == 'not_interested')
-                        <option value="{{ $key }}">{{ $value }}</option>
-                    @endif
-                @else
+{{--                @if (auth()->user()->roles[0]->title == 'Trainer')--}}
+{{--                    @if ($key == 'done' || $key == 'appointment' || $key == 'not_interested')--}}
+{{--                        <option value="{{ $key }}">{{ $value }}</option>--}}
+{{--                    @endif--}}
+{{--                @else--}}
+{{--                @endif--}}
                     <option value="{{ $key }}">{{ $value }}</option>
-                @endif
             @endforeach
 
         </select>

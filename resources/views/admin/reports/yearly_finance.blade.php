@@ -3,15 +3,22 @@
     
     <form action="{{ route('admin.reports.yearlyFinance.report') }}" method="get">
         <div class="form-group row">
-            <label for="date">{{ trans('cruds.branch.title_singular') }}</label>
-            <div class="input-group">
-                <input type="text" class="form-control" name="year" value="{{ request()->year ?? date('Y') }}">
-                <select name="branch_id" id="branch_id" class="form-control" {{ $employee && $employee->branch_id != NULL ? 'readonly' : '' }}>
-                    <option value="{{ NULL }}" selected hidden disabled>Branch</option>
-                    @foreach (\App\Models\Branch::pluck('name','id') as $id => $name)
-                        <option value="{{ $id }}" {{ $branch_id == $id ? 'selected' : '' }}>{{ $name }}</option>
-                    @endforeach
-                </select>
+            <div class="input-group align-items-end ">
+                <div class=" col">
+                    <label for="yearInput">Year</label>
+{{--                    <input type="" class="form-control" name="year" value="{{ request()->year ?? date('Y') }}">--}}
+                    <input type="number" id="yearInput" class="form-control" min="1000" max="9999" name="year" value="{{ request()->year ?? date('Y') }}" maxlength="4">
+                </div>
+
+           <div class="col">
+               <label for="branch_id">{{ trans('cruds.branch.title_singular') }}</label>
+               <select name="branch_id" id="branch_id" class="form-control" {{ $employee && $employee->branch_id != NULL ? 'readonly' : '' }}>
+                   <option value="{{ NULL }}" selected>All Branch</option>
+                   @foreach (\App\Models\Branch::pluck('name','id') as $id => $name)
+                       <option value="{{ $id }}" {{ $branch_id == $id ? 'selected' : '' }}>{{ $name }}</option>
+                   @endforeach
+               </select>
+           </div>
                 <div class="input-group-prepend">
                     <button class="btn btn-primary" type="submit" >{{ trans('global.submit') }}</button>
                 </div>
@@ -138,4 +145,19 @@
             }
         });
         </script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const yearInput = document.getElementById('yearInput');
+
+            // Function to limit input to 4 digits
+            function validateYearInput(event) {
+                const inputValue = event.target.value;
+                if (inputValue.length > 4) {
+                    event.target.value = inputValue.slice(0, 4);
+                }
+            }
+
+            yearInput.addEventListener('input', validateYearInput);
+        });
+    </script>
 @endsection
