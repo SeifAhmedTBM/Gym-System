@@ -197,8 +197,8 @@ class HomeController
         $currentYear = $dateArray[0];
      
 
-        $today = Carbon::now('UTC');
-        $today2 = Carbon::now('UTC');
+        $today = Carbon::now();
+        $today2 = Carbon::now();
         
         $startOfLastMonth = $today->subMonth()->startOfMonth();
        
@@ -221,10 +221,8 @@ class HomeController
         // ->whereHas('schedule_main', function ($q) {
         //     $q->whereHas('schedule_main_group', fn ($y) => $y->whereStatus('active'));
         // })
-        ->where(function ($query) use ($currentMonth, $currentYear) {
-            $query->whereRaw("SUBSTR(`date`, 6, 2) = ?", [$currentMonth])
-                ->whereRaw("SUBSTR(`date`, 1, 4) = ?", [$currentYear]);
-        })
+        ->whereYear('date', $currentYear) // Use whereYear for year comparison
+        ->whereMonth('date', $currentMonth) // Use whereMonth for month comparison
         ->get()
         ->groupBy('timeslot_id');
        
