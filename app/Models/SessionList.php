@@ -31,6 +31,7 @@ class SessionList extends Model
         'name',
         'service_id',
         'max_capacity',
+        'paid',
         'color',
         'created_at',
         'updated_at',

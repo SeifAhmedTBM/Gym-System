@@ -1,6 +1,11 @@
-@if (config('domains')[config('app.url')]['profile_attendance_dashboard'] == true)
-    <!-- @include('partials.profile_attendance') -->
+@if (config('domains')[config('app.url')]['profile_attendance_dashboard'] == true)@endif
+@if (config('domains')[config('app.url')]['timeline_schedule'] == true)
+  <h4><i class="fa fa-calendar"></i> {{ trans('global.schedule_timeline') }}</h4>
+@include('partials.schedule')
 @endif
+
+    <!-- @include('partials.profile_attendance') -->
+
 <div class="form-group">
     <form action="{{ route('admin.home') }}" method="get">
         <div class="row">

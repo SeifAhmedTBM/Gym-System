@@ -468,7 +468,7 @@
 
         @livewire('search-global-member')
         {{-- trainer reminder  --}}
-        {{-- <div class="modal fade" id="trainer_reminder" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+        <div class="modal fade" id="trainer_reminder" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
             aria-hidden="true">
             <div class="modal-dialog modal-lg" role="document">
                 <div class="modal-content">
@@ -500,7 +500,7 @@
                     </form>
                 </div>
             </div>
-        </div> --}}
+        </div>
         {{-- trainer reminder  --}}
     @endsection
 
