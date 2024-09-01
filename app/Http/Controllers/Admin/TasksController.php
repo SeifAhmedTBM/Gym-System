@@ -377,7 +377,6 @@ class TasksController extends Controller
             else
             {
                 $query = Task::with(['to_user', 'created_by', 'to_role','supervisor'])
-                ->where('status', 'pending')
                 ->where('to_user_id', Auth()->user()->id)
                 ->orWhere('to_role_id', Auth()->user()->roles[0]->id)->select(sprintf('%s.*', (new Task())->table));
             }
