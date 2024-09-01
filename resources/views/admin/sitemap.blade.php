@@ -116,7 +116,7 @@
                             @endcan
                             @can('view_expired_memberships_attendances')
                                 <li>
-                                    <a href="{{ route('admin.reports.expired-membership-attendances') }}">{{ trans('global.exp_attendances') }}</a> 
+                                    <a href="{{ route('admin.reports.expired-membership-attendances') }}">{{ trans('global.exp_attendances') }}</a>
                                 </li>
                             @endcan --}}
                             </ul>
@@ -174,7 +174,7 @@
                                             href="{{ route('admin.reports.reminders.action') }}">{{ trans('global.reminders_action_report') }}</a>
                                     </li>
                                 @endcan
-                                
+
                                 {{-- <li>
                                     <a href="{{ route('admin.reports.revenue') }}">{{ trans('global.revenue') }}</a>
                                 </li> --}}
@@ -195,11 +195,11 @@
                             @endcan
                             @can('view_current_memberships_report')
                                 <li>
-                                    <a href="{{ route('admin.reports.current-memberships') }}">{{ trans('global.current_memberships') }}</a> 
+                                    <a href="{{ route('admin.reports.current-memberships') }}">{{ trans('global.current_memberships') }}</a>
                                 </li>
                             @endcan
                             <li>
-                                <a href="{{ route('admin.reports.trainerCommissions.report') }}">{{ trans('global.trainer_commissions') }}</a> 
+                                <a href="{{ route('admin.reports.trainerCommissions.report') }}">{{ trans('global.trainer_commissions') }}</a>
                             </li> --}}
 
                             </ul>
@@ -265,7 +265,24 @@
                                     <li>
                                         <a href="{{ route('admin.reports.all-due-payments') }}">All Due Payments</a>
                                     </li>
+
                                 @endcan
+
+                                    @can('view_sales_report')
+                                        <li>
+                                            <a href="{{ route('admin.reports.sales_due_payments') }}">Sales Due Payments</a>
+
+                                            <span class="badge badge-danger">NEW</span>
+                                        </li>
+                                    @endcan
+                                    @can('due_payments_report')
+
+                                        <li>
+                                            <a href="{{ route('admin.reports.trainer_due_payments') }}">Trainer Due Payments</a>
+                                        <span class="badge badge-danger">NEW</span>
+                                        </li>
+                                    @endcan
+
                                 {{-- @can('refund_access')
                                 <li>
                                     <a href="{{ route('admin.refunds.index') }}">{{ trans('cruds.refund.title') }}</a>
@@ -289,7 +306,7 @@
                                         <a href="{{ route('admin.reports.tax-accountant') }}">Tax Accountant</a>
                                     </li>
                                 @endcan
-                                {{-- 
+                                {{--
                                 <li>
                                     <a href="{{ route('admin.reports.assigned-coaches.report') }}">Assigned Coaches </a>
                                 </li>

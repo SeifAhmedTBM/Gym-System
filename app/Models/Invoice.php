@@ -151,4 +151,8 @@ class Invoice extends Model
     {
         return $this->belongsTo(User::class, 'trainer_id', 'id');
     }
+    public function services()
+    {
+        return $this->belongsTo(Service::class);
+    }
 }
