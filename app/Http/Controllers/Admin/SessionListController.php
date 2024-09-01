@@ -42,6 +42,7 @@ class SessionListController extends Controller
         $sessionList = SessionList::create([
             'name' => $request['name'],
             'max_capacity' => $request['max_capacity'],
+            'paid' => $request['paid'],
             'color' => $request['color'],
             'service_id' => Service::first()->id
         ]);

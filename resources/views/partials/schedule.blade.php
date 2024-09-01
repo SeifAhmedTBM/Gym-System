@@ -31,7 +31,7 @@
                                 @forelse ($timeslots as $timeslot)
                                     <tr>
                                         <td class="font-weight-bold">
-                                            {{ date('g:i A', strtotime($timeslot->from)) }}
+                                            {{ date('g:i A', strtotime($timeslot->from)) }}  - {{ date('g:i A', strtotime($timeslot->to))}}
                                         </td>
                                         @foreach (App\Models\Schedule::DAY_SELECT as $k => $d)
                                             @if ($branch_id != NULL)
@@ -41,27 +41,28 @@
                                                 ->where('day', $k)->get())
                                                     <td class="font-weight-bold">
                                                         @forelse ($sch_day as $item)
-                                                            <a href="{{ route('admin.membership-schedule.index',$item->id) }}" target="_blank" rel="noopener noreferrer">
+                                                            <!-- <a href="{{ route('admin.membership-schedule.index',$item->id) }}" target="_blank" rel="noopener noreferrer"> -->
                                                                 <span class="badge d-block mb-1 py-2 px-2 text-white"
                                                                 style="background: {{ $item->session->color }}">
                                                                     {{ $item->session->name }} ( {{ $item->trainer->name }} )
                                                                 </span>
-                                                            </a>
+                                                            <!-- </a> -->
                                                         @empty
                                                             ----
                                                         @endforelse
                                                     </td>
                                                 @endif
                                             @else
-                                                @if ($sch_day = $timeslot->schedules()->whereHas('schedule_main.schedule_main_group',fn($q) => $q->whereStatus('active'))->whereHas('schedule_main',fn($x) => $x->whereStatus('active'))->where('day', $k)->get())
+                                                @if ($sch_day = $timeslot->schedules()->where('day', $k)->get())
+
                                                     <td class="font-weight-bold">
                                                         @forelse ($sch_day as $item)
-                                                            <a href="{{ route('admin.membership-schedule.index',$item->id) }}" target="_blank" rel="noopener noreferrer">
+                                                            <!-- <a href="{{ route('admin.membership-schedule.index',$item->id) }}" target="_blank" rel="noopener noreferrer"> -->
                                                                 <span class="badge d-block mb-1 py-2 px-2 text-white"
                                                                 style="background: {{ $item->session->color }}">
                                                                     {{ $item->session->name }} ( {{ $item->trainer->name }} )
                                                                 </span>
-                                                            </a>
+                                                            <!-- </a> -->
                                                         @empty
                                                             ----
                                                         @endforelse

@@ -111,7 +111,7 @@
             <h6 style="color:white;text-align:center;width: 95%;font-weight: bold;">Reports</h6>
             <br><br>
         @endcan
-        @can('task_access')
+        @canany(['task_access', 'all_tasks_access'])
             <li class="c-sidebar-nav-item {{ request()->is('admin/tasks') ? 'd-active' : '' }}"
                 style="text-align: center;">
                 <a href="{{ route('admin.task-management') }}" data-coreui-toggle="tooltip" data-coreui-placement="top"

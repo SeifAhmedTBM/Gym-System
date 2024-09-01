@@ -12,7 +12,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
 use Symfony\Component\HttpFoundation\Response;
 use Yajra\DataTables\Facades\DataTables;
-
+use Carbon\Carbon;
 class TasksController extends Controller
 {
     public function index(Request $request)
@@ -21,7 +21,10 @@ class TasksController extends Controller
         abort_if(Gate::denies('task_access'), Response::HTTP_FORBIDDEN, '403 Forbidden');
 
         $employee = Auth()->user()->employee;
+        $todayDate = Carbon::today()->toDateString();
+        
         if ($request->ajax()) {
+            
             if (Auth()->user()->roles[0]->title == 'Super Admin') 
             {
                 $query = Task::with(['to_user', 'created_by', 'to_role','supervisor'])
@@ -38,9 +41,38 @@ class TasksController extends Controller
                     ->orWhere('created_by_id',Auth()->id())
                     ->select(sprintf('%s.*', (new Task())->table));
             }
+           
+            
             if ($request->has('employee_id') && $request->employee_id !='') {
+                
                 $query->where('to_user_id', $request->employee_id);
             }
+
+          
+         
+           if($request->has('status') && $request->status !='') {
+           
+                if ($request->status == 'upcoming')
+                {
+                    $query->where('task_date', '>' ,$todayDate);   
+              
+                }
+                elseif($request->status == 'today'){
+                 
+                    $query->where('task_date', $todayDate); 
+                }
+                elseif($request->status == 'pending')
+                {
+                    $query->where('status', 'pending');
+                }
+
+                elseif($request->status == 'done_with_confirm')
+                {
+                    $query->where('status','done_with_confirm')->orWhere('status' ,'done');
+                }
+            }
+
+            
 
             $table = DataTables::eloquent($query);
 
@@ -107,10 +139,72 @@ class TasksController extends Controller
 
             return $table->make(true);
         }
+        
 
         $employees = Employee::where('status' ,'active')->get();
+        
+        if ($request->has('employee_id') && $request->employee_id !='') {
+        $pendingQuery = Task::where('status', 'pending')->where('to_user_id', $request->employee_id);
+        $todayQuery = Task::where('task_date', $todayDate)->where('to_user_id', $request->employee_id);
+        $doneQuery = Task::where('status' ,'done_with_confirm')->where('to_user_id', $request->employee_id);
+        $upcomingQuery = Task::where('task_date', '>', $todayDate)->where('to_user_id', $request->employee_id);
+        }
+        else
+        {
+            $pendingQuery = Task::where('status', 'pending');
+            $todayQuery = Task::where('task_date', $todayDate);
+            $doneQuery = Task::where('status' ,'done_with_confirm');
+            $upcomingQuery = Task::where('task_date', '>', $todayDate);
+        }
+        if(Auth()->user()->roles[0]->title == 'Super Admin') {
+            // No additional conditions for Super Admin
+        } 
+        elseif(Auth()->user()->roles[0]->title == 'Admin') 
+        {
+            $pendingQuery->whereHas('created_by', fn($q) => $q->whereHas('employee', fn($x) => $x->whereBranchId($employee->branch_id)))
+                        ->orWhere('supervisor_id', Auth()->id());
 
-        return view('admin.tasks.index' , compact('employees'));
+            $todayQuery->whereHas('created_by', fn($q) => $q->whereHas('employee', fn($x) => $x->whereBranchId($employee->branch_id)))
+            ->orWhere('supervisor_id', Auth()->id());
+
+            $doneQuery->whereHas('created_by', fn($q) => $q->whereHas('employee', fn($x) => $x->whereBranchId($employee->branch_id)))
+            ->orWhere('supervisor_id', Auth()->id());
+
+            $upcomingQuery->whereHas('created_by', fn($q) => $q->whereHas('employee', fn($x) => $x->whereBranchId($employee->branch_id)))
+            ->orWhere('supervisor_id', Auth()->id());
+        } 
+        else 
+        {
+            $pendingQuery->whereSupervisorId(Auth()->id())
+                        ->orWhere('to_user_id', Auth()->id())
+                        ->orWhere('created_by_id', Auth()->id());
+            $todayQuery->whereSupervisorId(Auth()->id())
+            ->orWhere('to_user_id', Auth()->id())
+            ->orWhere('created_by_id', Auth()->id());
+
+            $doneQuery->whereSupervisorId(Auth()->id())
+            ->orWhere('to_user_id', Auth()->id())
+            ->orWhere('created_by_id', Auth()->id());
+
+            $upcomingQuery->whereSupervisorId(Auth()->id())
+            ->orWhere('to_user_id', Auth()->id())
+            ->orWhere('created_by_id', Auth()->id());
+        }
+        // Apply employee filter if exists
+        if ($request->has('employee_id') && $request->employee_id != '') {
+            $pendingQuery->where('to_user_id', $request->employee_id);
+            $todayQuery->where('to_user_id', $request->employee_id);
+            $doneQuery->where('to_user_id', $request->employee_id);
+            $upcomingQuery->where('to_user_id', $request->employee_id);
+            
+        }
+        $pendingTasksCount = $pendingQuery->count();
+        $todayTasksCount = $todayQuery->count();
+        $doneTasksCount = $doneQuery->count();
+        $upcomingCount = $upcomingQuery->count();
+
+
+        return view('admin.tasks.index' , compact('employees' ,'pendingTasksCount' ,'todayTasksCount' ,'doneTasksCount' ,'upcomingCount'));
     }
 
     public function create()
@@ -245,11 +339,49 @@ class TasksController extends Controller
     public function my_tasks(Request $request)
     {
         abort_if(Gate::denies('task_access'), Response::HTTP_FORBIDDEN, '403 Forbidden');
-
+        $todayDate = Carbon::today()->toDateString();
+     
         if ($request->ajax()) {
-            $query = Task::with(['to_user', 'created_by', 'to_role','supervisor'])
+           
+
+            if($request->has('status') && $request->status !='') {
+                if ($request->status == 'upcoming')
+                {
+                    $query = Task::with(['to_user', 'created_by', 'to_role','supervisor'])
+                    ->where('task_date', '>' ,$todayDate)
+                    ->where('to_user_id', Auth()->user()->id)
+                    ->orWhere('to_role_id', Auth()->user()->roles[0]->id)->select(sprintf('%s.*', (new Task())->table)); 
+                }
+                elseif($request->status == 'today'){
+                    $query = Task::with(['to_user', 'created_by', 'to_role','supervisor'])
+                    ->where('task_date', $todayDate)
+                    ->where('to_user_id', Auth()->user()->id)
+                    ->orWhere('to_role_id', Auth()->user()->roles[0]->id)->select(sprintf('%s.*', (new Task())->table));
+                }
+                elseif($request->status == 'pending')
+                {
+                    $query = Task::with(['to_user', 'created_by', 'to_role','supervisor'])
+                    ->where('status', 'pending')
+                    ->where('to_user_id', Auth()->user()->id)
+                    ->orWhere('to_role_id', Auth()->user()->roles[0]->id)->select(sprintf('%s.*', (new Task())->table));
+                }
+
+                elseif($request->status == 'done_with_confirm')
+                {
+                    $query = Task::with(['to_user', 'created_by', 'to_role','supervisor'])
+                    ->where('status','done_with_confirm')->orWhere('status' ,'done')
+                    ->where('to_user_id', Auth()->user()->id)
+                    ->orWhere('to_role_id', Auth()->user()->roles[0]->id)->select(sprintf('%s.*', (new Task())->table));
+                }
+            }
+            else
+            {
+                $query = Task::with(['to_user', 'created_by', 'to_role','supervisor'])
+                ->where('status', 'pending')
                 ->where('to_user_id', Auth()->user()->id)
                 ->orWhere('to_role_id', Auth()->user()->roles[0]->id)->select(sprintf('%s.*', (new Task())->table));
+            }
+    
             $table = DataTables::of($query);
 
             $table->addColumn('placeholder', '&nbsp;');
@@ -318,7 +450,13 @@ class TasksController extends Controller
             return $table->make(true);
         }
 
-        return view('admin.tasks.my_tasks');
+       
+        $pendingTasksCount = Task::where('status', 'pending')->where('to_user_id' , Auth::user()->id)->count();
+        $todayTasksCount = Task::where('task_date', $todayDate)->where('to_user_id' , Auth::user()->id)->count();
+        $doneTasksCount = Task::where('status' ,'done_with_confirm')->where('to_user_id' , Auth::user()->id)->count();
+        $upcomingCount = Task::where('task_date', '>', $todayDate)->where('to_user_id' , Auth::user()->id)->count();
+
+        return view('admin.tasks.my_tasks' , compact('pendingTasksCount', 'todayTasksCount' ,'doneTasksCount' ,'upcomingCount'));
     }
     public function created_tasks(Request $request)
     {
@@ -387,5 +525,7 @@ class TasksController extends Controller
         return view('admin.tasks.created_tasks');
     }
 
+
+    
     
 }

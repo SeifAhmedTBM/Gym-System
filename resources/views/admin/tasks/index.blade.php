@@ -9,25 +9,39 @@
             </div>
         </div>
     @endcan
+<style>
+    .bg-orange{
+        background-color:#d5a439 !important;
+        color:black !important;
+    }
+</style>
     <div class="card">
+        
         <form method="get" enctype="multipart/form-data">
             @csrf
             <div class="row">
-                <div class="form-group col-lg-4" style="padding:50px;">
+                <div class="form-group col-lg-8" style="padding:50px;">
                     <div class="row">
                     <label for="" >{{ trans('global.employee')}}</label>
-                    <div class="col-lg-10">
+                    <div class="col-lg-5">
                         <select name="employee_id" class="form-control select2" id="">
-                            <option value="" selected>{{ trans('global.select_employee')}}</option> 
-                            @foreach($employees as $employee)
-                            @if(isset($tasks[0]))
-                            <option value="{{$employee->user_id}}" {{ $tasks[0]->to_user_id == $employee->user_id ? 'selected' : ' ' }}>{{$employee->name}}</option>
-                            @else
-                            <option value="{{$employee->user_id}}" >{{$employee->name}}</option>
-                            @endif
+                            <option value="" selected>All Employees</option> 
+                            @foreach($employees as $employee)       
+                            <option value="{{ $employee->user_id }}" {{ request('employee_id') == $employee->user_id ? 'selected' : '' }}>{{ $employee->name }}</option>                        
                             @endforeach
                         </select>
                     </div>
+
+                    <div class="col-lg-5">
+                        <select name="status" class="form-control select2" id="">
+                            <option value="" selected>All Status</option> 
+                            <option value="today" {{ request('status') == 'today' ? 'selected' : '' }}>Today</option>
+                            <option value="upcoming" {{ request('status') == 'upcoming' ? 'selected' : '' }}>Upcoming</option>
+                            <option value="pending" {{ request('status') == 'pending' ? 'selected' : '' }}>Overdue</option>
+                            <option value="done_with_confirm"{{ request('status') == 'done_with_confirm' ? 'selected' : '' }}>Done</option>
+                        </select>
+                    </div>
+                   
                     <div class="col-lg-2">
                     <button type="submit" class="btn btn-primary">{{ trans('global.submit')}}</button>
 
@@ -39,6 +53,48 @@
             </div>
            
         </form>
+        <div class="row" style="padding:20px;">
+            <div class="col-lg-3 col-md-3 col-sm-12 col-xs-12">
+                <div class="card {{ request('status') === 'today' ? 'bg-orange' : '' }}">
+                <a href="{{ route('admin.tasks.index', ['employee_id' => request('employee_id'), 'status' => 'today' ]) }}"> 
+                    <div class="card-body" style="text-align:center">
+                        <h2 class="text-center"> Today </h2>
+                        <h2 class="text-center">{{$todayTasksCount}}</h2>
+                    </div>
+                    </a>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-3 col-sm-12 col-xs-12">
+                <div class="card {{ request('status') === 'upcoming' ? 'bg-orange' : '' }}">
+                <a href="{{ route('admin.tasks.index', ['employee_id' => request('employee_id'), 'status' => 'upcoming' ]) }}"> 
+                    <div class="card-body" style="text-align:center">
+                        <h2 class="text-center"> Upcoming</h2>
+                        <h2 class="text-center">{{$upcomingCount}}</h2>
+                    </div>
+                    </a>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-3 col-sm-12 col-xs-12">
+                <div class="card {{ request('status') === 'pending' ? 'bg-orange' : '' }}">
+                    <a href="{{ route('admin.tasks.index', ['employee_id' => request('employee_id'), 'status' => 'pending' ]) }}">                    
+                    <div class="card-body" style="text-align:center">
+                        <h2 class="text-center"> Overdue </h2>
+                        <h2 class="text-center">{{$pendingTasksCount}}</h2>
+                    </div>
+                    </a>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-3 col-sm-12 col-xs-12">
+                <div class="card {{ request('status') === 'done_with_confirm' ? 'bg-orange' : '' }}">
+                <a href="{{ route('admin.tasks.index', ['_token' => auth()->user()->api_token ,'employee_id' => request('employee_id'), 'status' => 'done_with_confirm']) }}">                   
+                    <div class="card-body" style="text-align:center">
+                        <h2 class="text-center"> Done</h2>
+                        <h2 class="text-center">{{$doneTasksCount}}</h2>
+                    </div>
+                    </a>
+                </div>
+            </div>
+        </div>
         <div class="card-header">
             <h5>Tasks{{ trans('global.list') }}</h5>
         </div>
@@ -102,6 +158,7 @@
 
             const urlParams = new URLSearchParams(window.location.search);
             const emp_id = urlParams.get('employee_id') ?? '';
+            const status = urlParams.get('status') ?? '';
             let dtOverrideGlobals = {
             buttons: [dtButtons],
             processing: true,
@@ -109,7 +166,7 @@
             retrieve: true,
             searching: true,
             aaSorting: [],
-            ajax: "{{ route('admin.tasks.index') }}?employee_id="+emp_id,
+            ajax: "{{ route('admin.tasks.index') }}?employee_id="+emp_id+"&status="+status,
                 columns: [{
                         data: 'placeholder',
                         name: 'placeholder'
