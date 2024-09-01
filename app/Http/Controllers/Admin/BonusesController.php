@@ -41,10 +41,16 @@ class BonusesController extends Controller
                                 ->with(['employee', 'created_by'])
                                 ->select(sprintf('%s.*', (new Bonu())->table));
             }
-            if (!isset($request->created_at)) {
+            if (
+                (!isset($request->created_at) ||
+                    ($request->created_at['from'] === null && $request->created_at['to'] === null)) &&
+                (!isset($request['amp;created_at']) ||
+                    ($request['amp;created_at']['from'] === null && $request['amp;created_at']['to'] === null))
+            ) {
                 $query = $query->where('created_at', '>=', date('Y-m-1'))
                     ->where('created_at', '<=', date('Y-m-t'));
             }
+
 
             $table = Datatables::of($query);
 
@@ -104,8 +110,12 @@ class BonusesController extends Controller
         })->pluck('name', 'id');
 
         $bonuses = Bonu::index($data);
-        
-        if (!isset($request->created_at) || ($request->created_at['from']==null && $request->created_at['to']==null)) {
+        if (
+            (!isset($request->created_at) ||
+                ($request->created_at['from'] === null && $request->created_at['to'] === null)) &&
+            (!isset($request['amp;created_at']) ||
+                ($request['amp;created_at']['from'] === null && $request['amp;created_at']['to'] === null))
+        ) {
             $bonuses = $bonuses->where('created_at', '>=', date('Y-m-1'))->where('created_at', '<=', date('Y-m-t'));;
         }
         return view('admin.bonus.index',compact('created_bies','bonuses'));
