@@ -1,6 +1,6 @@
 @extends('layouts.admin')
 @section('content')
-    
+
         <div style="margin-bottom: 10px;" class="row">
             <div class="col-lg-4">
                 @can('invoice_filter')
@@ -18,7 +18,7 @@
                         'name' =>['label' => 'Membership', 'type' => 'text', 'related_to' => 'membership.service_pricelist'],
                         'created_at' => ['label' => 'Created at', 'type' => 'date', 'from_and_to' => true],
                     ],
-                        'route' => 'admin.invoices.partial'
+                        'route' => 'admin.invoices.settlement'
                     ])
                 @endcan
 
@@ -27,10 +27,10 @@
                         <i class="fa fa-download"></i> {{ trans('global.export_excel') }}
                     </a>
                 @endcan --}}
-                
+
             </div>
         </div>
-        
+
         @can('invoice_counter')
             <div class="row form-group">
                 <div class="col-lg-3 col-md-2 col-sm-12">
