@@ -31,11 +31,11 @@ class ExternalPaymentController extends Controller
 
         $employee = Auth()->user()->employee;
 
-        if (isset($data['amp;created_at'])){
+        if (isset($data['created_at'])){
             $startOfMonth = Carbon::now()->startOfMonth();
             $endOfMonth = Carbon::now()->endOfMonth();
-            $data['created_at']['from'] = isset($data['amp;created_at']['from']) ? $data['amp;created_at']['from'] : $startOfMonth;
-            $data['created_at']['to'] = isset($data['amp;created_at']['to']) ? $data['amp;created_at']['to'] : $endOfMonth;
+            $data['created_at']['from'] = isset($data['created_at']['from']) ? $data['created_at']['from'] : $startOfMonth;
+            $data['created_at']['to'] = isset($data['created_at']['to']) ? $data['created_at']['to'] : $endOfMonth;
         }
 
         if ($request->ajax()) {

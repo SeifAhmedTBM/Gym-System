@@ -8338,7 +8338,7 @@ html:not([dir="rtl"]) .page-item:last-child .page-link {
   pointer-events: none;
   cursor: auto;
   color: #8a93a2;
-  background-color: transparent;
+  background-color: #fff;
   border-color: #c4c9d0;
 }
 .pagination-lg .page-link {
