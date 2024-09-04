@@ -1,6 +1,11 @@
 @extends('layouts.admin')
 @section('content')
-    
+<link rel="stylesheet" href="https://cdn.datatables.net/2.1.4/css/dataTables.dataTables.css" />
+<style>
+    .dataTables_wrapper .dataTables_paginate .paginate_button{
+        padding:0px !important;
+    }
+</style>
         <div style="margin-bottom: 10px;" class="row">
             <div class="col-lg-6">
                 @can('expense_create')
@@ -60,12 +65,10 @@
         </div>
 
         <div class="card-body">
-            <table class=" table table-bordered table-striped table-hover ajaxTable datatable datatable-Expense">
+            <table class=" table table-bordered table-striped table-hover ajaxTable datatable datatable-Expense" id="myTable">
                 <thead>
                     <tr>
-                        <th width="10">
-
-                        </th>
+                     
                         <th>
                             {{ trans('cruds.expense.fields.id') }}
                         </th>
@@ -95,113 +98,56 @@
                         </th>
                     </tr>
                 </thead>
+                <tbody>
+                    @foreach($expenses as $expense)
+                      <tr>
+                        <td>{{$expense->id}}</td>
+                        <td>{{$expense->expenses_category?->name}}</td>
+                        <td>{{$expense->account?->branch?->name}}</td>
+                        <td>{{$expense->note}}</td>
+                        <td>{{$expense->date}}</td>
+                        <td>{{$expense->account?->name}}</td>
+                        <td>{{$expense->amount}}</td>
+                        <td>{{$expense->created_by->name}}</td>
+                        <td>
+                            <div class="dropdown">
+                                <a class="btn btn-primary dropdown-toggle" href="#" role="button" id="dropdownMenuLink" data-toggle="dropdown" aria-expanded="false">
+                                    Action
+                                </a>
+                                <div class="dropdown-menu" aria-labelledby="dropdownMenuLink">
+                                    <a class="dropdown-item" href="/admin/expenses/{{$expense->id}}">
+                                        <i class="fa fa-eye"></i> &nbsp; View
+                                    </a>                                   
+                                    <a class="dropdown-item" href="/admin/expenses/{{$expense->id}}/edit">
+                                        <i class="fa fa-edit"></i> &nbsp; Edit
+                                    </a>
+                                    <form action="/admin/expenses/{{$expense->id}}" method="POST" onsubmit="return confirm('Are you sure?');" style="display: inline-block;">
+                                        <input type="hidden" name="_method" value="DELETE">
+                                        <input type="hidden" name="_token" value="z4QFvWSQb3v1LhLC5Wp9JkTKWZ4EXS4D0Dy3VtKq">
+                                        <button type="submit" class="dropdown-item">
+                                            <i class="fa fa-trash"></i> &nbsp; Delete
+                                        </button>
+                                    </form>
+                            
+                                </div>
+                            </div>
+                        </td>
+                      </tr>
+                    @endforeach
+                </tbody>
             </table>
         </div>
     </div>
 
 
-
+<script src="https://cdn.datatables.net/2.1.4/js/dataTables.js"></script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+    $(document).ready( function () {
+    $('#myTable').DataTable();
+    } );
+</script>
 @endsection
 @section('scripts')
-    @parent
-    <script>
-        $(function() {
-            let dtButtons = $.extend(true, [], $.fn.dataTable.defaults.buttons)
-            @can('expense_delete')
-                let deleteButtonTrans = '{{ trans('global.datatables.delete') }}';
-                let deleteButton = {
-                text: deleteButtonTrans,
-                url: "{{ route('admin.expenses.massDestroy') }}",
-                className: 'btn-danger',
-                action: function (e, dt, node, config) {
-                var ids = $.map(dt.rows({ selected: true }).data(), function (entry) {
-                return entry.id
-                });
-            
-                if (ids.length === 0) {
-                alert('{{ trans('global.datatables.zero_selected') }}')
-            
-                return
-                }
-            
-                if (confirm('{{ trans('global.areYouSure') }}')) {
-                $.ajax({
-                headers: {'x-csrf-token': _token},
-                method: 'POST',
-                url: config.url,
-                data: { ids: ids, _method: 'DELETE' }})
-                .done(function () { location.reload() })
-                }
-                }
-                }
-                dtButtons.push(deleteButton)
-            @endcan
-
-            let dtOverrideGlobals = {
-                buttons:[],
-                processing: true,
-                serverSide: true,
-                retrieve: true,
-                searching:true,
-                aaSorting: [],
-                ajax: "{{ route('admin.expenses.index', request()->all()) }}",
-                columns: [{
-                        data: 'placeholder',
-                        name: 'placeholder'
-                    },
-                    {
-                        data: 'id',
-                        name: 'id'
-                    },
-                    {
-                        data: 'expenses_category_name',
-                        name: 'expenses_category.name'
-                    },
-                    {
-                        data: 'branch_name',
-                        name: 'branch_name'
-                    },
-                    {
-                        data: 'name',
-                        name: 'name'
-                    },
-                    {
-                        data: 'date',
-                        name: 'date'
-                    },
-                    {
-                        data: 'account_name',
-                        name: 'account.name'
-                    },
-                    {
-                        data: 'amount',
-                        name: 'amount'
-                    },
-                   
-                    {
-                        data: 'created_by_name',
-                        name: 'created_by.name'
-                    },
-                   
-
-                    
-                    {
-                        data: 'actions',
-                        name: '{{ trans('global.actions') }}'
-                    }
-                ],
-                orderCellsTop: true,
-                order: [
-                    [1, 'desc']
-                ],
-                pageLength: 50,
-            };
-            let table = $('.datatable-Expense').DataTable(dtOverrideGlobals);
-            $('a[data-toggle="tab"]').on('shown.bs.tab click', function(e) {
-                $($.fn.dataTable.tables(true)).DataTable()
-                    .columns.adjust();
-            });
-
-        });
-    </script>
+@parent
 @endsection
