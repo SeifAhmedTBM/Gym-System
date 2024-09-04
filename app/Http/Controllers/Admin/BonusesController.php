@@ -43,9 +43,7 @@ class BonusesController extends Controller
             }
             if (
                 (!isset($request->created_at) ||
-                    ($request->created_at['from'] === null && $request->created_at['to'] === null)) &&
-                (!isset($request['amp;created_at']) ||
-                    ($request['amp;created_at']['from'] === null && $request['amp;created_at']['to'] === null))
+                    ($request->created_at['from'] === null && $request->created_at['to'] === null))
             ) {
                 $query = $query->where('created_at', '>=', date('Y-m-1'))
                     ->where('created_at', '<=', date('Y-m-t'));
@@ -112,9 +110,7 @@ class BonusesController extends Controller
         $bonuses = Bonu::index($data);
         if (
             (!isset($request->created_at) ||
-                ($request->created_at['from'] === null && $request->created_at['to'] === null)) &&
-            (!isset($request['amp;created_at']) ||
-                ($request['amp;created_at']['from'] === null && $request['amp;created_at']['to'] === null))
+                ($request->created_at['from'] === null && $request->created_at['to'] === null))
         ) {
             $bonuses = $bonuses->where('created_at', '>=', date('Y-m-1'))->where('created_at', '<=', date('Y-m-t'));;
         }
