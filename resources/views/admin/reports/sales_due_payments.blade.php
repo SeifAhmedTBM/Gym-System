@@ -172,8 +172,8 @@
         document.addEventListener('DOMContentLoaded', function() {
             var branchSelect = document.getElementById('branch_id');
             var salesSelect = document.getElementById('sales_id');
-
-            branchSelect.addEventListener('change', function() {
+            getSales();
+            function getSales(){
                 var branch_id = branchSelect.value;
 
                 var xhr = new XMLHttpRequest();
@@ -181,11 +181,16 @@
                 xhr.onreadystatechange = function() {
                     if (xhr.readyState === 4 && xhr.status === 200) {
                         var data = JSON.parse(xhr.responseText);
+                        let selected_Sales_id = salesSelect.value
+                        console.log(selected_Sales_id)
 
                         salesSelect.innerHTML = '<option value="">All Sales</option>';
 
                         data.forEach(function(sales) {
                             var option = document.createElement('option');
+                            if(selected_Sales_id == sales.id){
+                                option.selected = true
+                            }
                             option.value = sales.id;
                             option.textContent = sales.name;
                             salesSelect.appendChild(option);
@@ -193,6 +198,10 @@
                     }
                 };
                 xhr.send();
+            }
+            branchSelect.addEventListener('change', function() {
+                getSales();
+
             });
         });
 

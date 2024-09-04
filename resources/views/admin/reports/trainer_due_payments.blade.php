@@ -167,7 +167,8 @@
         var branchSelect = document.getElementById('branch_id');
         var trainerSelect = document.getElementById('trainer_id');
 
-        branchSelect.addEventListener('change', function() {
+        getTrainer();
+        function getTrainer(){
             var branch_id = branchSelect.value;
 
             var xhr = new XMLHttpRequest();
@@ -175,11 +176,15 @@
             xhr.onreadystatechange = function() {
                 if (xhr.readyState === 4 && xhr.status === 200) {
                     var data = JSON.parse(xhr.responseText);
-
+                    let selected_trainer_id = trainerSelect.value
+                    console.log(selected_trainer_id)
                     trainerSelect.innerHTML = '<option value="">All Trainers</option>';
 
                     data.forEach(function(trainer) {
                         var option = document.createElement('option');
+                        if(selected_trainer_id == trainer.id){
+                            option.selected = true
+                        }
                         option.value = trainer.id;
                         option.textContent = trainer.name;
                         trainerSelect.appendChild(option);
@@ -187,6 +192,9 @@
                 }
             };
             xhr.send();
+        }
+        branchSelect.addEventListener('change', function() {
+            getTrainer();
         });
     });
 

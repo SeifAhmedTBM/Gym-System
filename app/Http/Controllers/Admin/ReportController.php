@@ -2607,17 +2607,24 @@ class ReportController extends Controller
     }
     public function getSalesByBranch(Request $request)
     {
-        $branch_id = $request->branch_id;
+        $branch_id = $request->input('branch_id');
 
-        $sales_representatives = User::whereHas('employee', function ($query) use ($branch_id) {
-            $query->where('branch_id', $branch_id);
-        })->whereHas('roles', function ($query) {
-            $query->where('role_id', 3);
-        })->get();
+        $sales_representatives = User::whereHas('roles', function ($query) {
+            $query->where('role_id', 3); // Ensure role_id is 3
+        });
+
+
+        if (!empty($branch_id)) {
+            $sales_representatives = $sales_representatives->whereHas('employee', function ($query) use ($branch_id) {
+                $query->where('branch_id', $branch_id);
+            });
+        }
+
+
+        $sales_representatives = $sales_representatives->get();
 
         return response()->json($sales_representatives);
     }
-
 
     public function trainer_due_payments(Request $request)
     {
@@ -2678,16 +2685,25 @@ class ReportController extends Controller
     }
     public function getTrainersByBranch(Request $request)
     {
-        $branch_id = $request->branch_id;
+        $branch_id = $request->input('branch_id');
 
-        $trainers = User::whereHas('employee', function ($query) use ($branch_id) {
-            $query->where('branch_id', $branch_id);
-        })->whereHas('roles', function ($query) {
+        $trainersQuery = User::whereHas('roles', function ($query) {
             $query->where('role_id', 2);
-        })->get();
+        });
+
+
+        if (!empty($branch_id)) {
+            $trainersQuery->whereHas('employee', function ($query) use ($branch_id) {
+                $query->where('branch_id', $branch_id);
+            });
+        }
+
+
+        $trainers = $trainersQuery->get();
 
         return response()->json($trainers);
     }
+
 
 
     public function daily_task_report(Request $request)
