@@ -32,7 +32,7 @@
                     <div class="card">
                         <div class="card-body">
                             <h2 class="text-center">{{ trans('cruds.bonu.title_singular') }}</h2>
-                            <h2 class="text-center">{{ $bonuses->where('created_at','>=',date('Y-m-1'))->where('created_at','<=',date('Y-m-t'))->count() }}</h2>
+                            <h2 class="text-center">{{ $bonuses->count() }}</h2>
                         </div>
                     </div>
                 </div>
@@ -40,7 +40,7 @@
                     <div class="card">
                         <div class="card-body">
                             <h2 class="text-center">{{ trans('cruds.bonu.fields.amount') }}</h2>
-                            <h2 class="text-center">{{ number_format($bonuses->where('created_at','>=',date('Y-m-1'))->where('created_at','<=',date('Y-m-t'))->sum('amount'),2) }}</h2>
+                            <h2 class="text-center">{{ number_format($bonuses->sum('amount'),2) }}</h2>
                         </div>
                     </div>
                 </div>
@@ -129,7 +129,7 @@
                 retrieve: true,
                 searching:true,
                 aaSorting: [],
-                ajax: "{{ route('admin.bonus.index',request()->all()) }}",
+                ajax: "{!!   route('admin.bonus.index',request()->all()) !!}",
                 columns: [{
                         data: 'placeholder',
                         name: 'placeholder'
