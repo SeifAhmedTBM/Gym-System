@@ -38,8 +38,17 @@
                                         <option  value="{{ $id }}" {{ (request()->get($column_name) ? in_array($id,request()->get($column_name)) : NULL) ? 'selected' : '' }}>{{ $col }}</option>
                                     @endforeach
                                 </select>
+                            @elseif ($data['type'] == 'select' && isset($data['related_to'])&&$data['label']=='Account')
+                                {!! Form::label($column_name, Str::ucfirst($data['label']), ['class' => 'font-weight-bold']) !!}
+                                {{-- {{ dd(request()->all()) }} --}}
+                                <select name="relations[{{ $data['related_to'] }}][{{ $column_name }}][]" id="{{ $column_name }}" class=" form-control select2" {{ $column_name == 'trainer_id' && Auth()->user()->roles[0]->title == 'Trainer' ? 'readonly' : '' }}>
+                                    @foreach ($data['data'] as $id => $col)
+                                        <option value="{{ $id }}" {{ (request()->get('relations') && isset(request()->get('relations')[$data['related_to']][$column_name]) ? in_array($id,request()->get('relations')[$data['related_to']][$column_name]) : '') ? 'selected' : '' }}>
+                                            {{ $col }}
+                                        </option>
+                                    @endforeach
+                                </select>
                             @elseif ($data['type'] == 'select' && isset($data['related_to']))
-                                
                                 {!! Form::label($column_name, Str::ucfirst($data['label']), ['class' => 'font-weight-bold']) !!}
                                 {{-- {{ dd(request()->all()) }} --}}
                                 <select name="relations[{{ $data['related_to'] }}][{{ $column_name }}][]" id="{{ $column_name }}" class=" form-control select2" {{ $column_name == 'trainer_id' && Auth()->user()->roles[0]->title == 'Trainer' ? 'readonly' : '' }} multiple>
@@ -88,7 +97,7 @@
                                         </div>
                                     </div>
                             @endif
-                            
+
                         @elseif($col_data['type'] == 'date' && $col_data['from_and_to'] == false)
                             {!! Form::label($col_name, Str::ucfirst($col_data['label']), ['class' => 'font-weight-bold']) !!}
                             <div class="form-group">
@@ -103,15 +112,15 @@
                 @endisset
             </div>
             <div class="modal-footer">
-                
+
                 <a href="{{ route($route) }}" class="btn btn-warning">
                     <i class="fa fa-arrow-circle-left"></i> Reset
                 </a>
-                <button type="button" class="btn btn-danger" data-dismiss="modal"> 
-                    <i class="fa fa-times"></i> {{ trans('global.cancel') }} 
+                <button type="button" class="btn btn-danger" data-dismiss="modal">
+                    <i class="fa fa-times"></i> {{ trans('global.cancel') }}
                 </button>
                 @isset($columns)
-                    <button type="submit" class="btn btn-primary"> 
+                    <button type="submit" class="btn btn-primary">
                         <i class="fa fa-check"></i> {{ trans('global.filter') }}
                     </button>
                 @endisset

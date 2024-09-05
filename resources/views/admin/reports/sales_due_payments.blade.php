@@ -5,11 +5,10 @@
 @extends('layouts.admin')
 @section('content')
 
-    {{-- Filter Form --}}
-    <form method="GET" action="{{ route('admin.reports.all-due-payments') }}">
+    <form method="GET" action="{{ route('admin.reports.sales_due_payments') }}">
         <div class="row align-items-end mb-5">
             <div class="col-md-3">
-                <div class="">
+                <div>
                     <label for="branch_id">Branch</label>
                     <select name="branch_id" id="branch_id" class="form-control">
                         <option value="">All Branches</option>
@@ -21,22 +20,35 @@
                     </select>
                 </div>
             </div>
-
             <div class="col-md-3">
-                <div class="">
+                <div>
+                    <label for="sales_id">Sales</label>
+                    <select name="sales_id" id="sales_id" class="form-control">
+                        <option value="">All Sales</option>
+                        @foreach($sales_representatives as $sales)
+                            <option value="{{ $sales->id }}" {{ request('sales_id') == $sales->id ? 'selected' : '' }}>
+                                {{ $sales->name }}
+                            </option>
+                        @endforeach
+                    </select>
+                </div>
+            </div>
+
+            <div class="col-md-2">
+                <div>
                     <label for="start_date">Start Date</label>
-                    <input type="date" name="start_date" id="start_date" class="form-control" value="{{ request('start_date')??$startOfMonth }}">
+
+                    <input type="date" name="start_date" id="start_date" class="form-control" value="{{ request('start_date')??$startOfMonth}}">
                 </div>
             </div>
-
-            <div class="col-md-3">
-                <div class="">
+{{--            {{ request('end_date')??$endOfMonth }}--}}
+            <div class="col-md-2">
+                <div>
                     <label for="end_date">End Date</label>
-                    <input type="date" name="end_date" id="end_date" class="form-control" value="{{ request('end_date')??$endOfMonth }}">
+                    <input type="date" name="end_date" id="end_date" class="form-control" value="{{request('end_date')??$endOfMonth }}">
                 </div>
             </div>
-
-            <div class="col-md-3">
+            <div class="col-md-2">
                 <button type="submit" class="btn btn-primary">Filter</button>
             </div>
         </div>
@@ -81,7 +93,7 @@
 
     <div class="card">
         <div class="card-header">
-            <h5><i class="fa fa-file"></i> Due Payments</h5>
+            <h5><i class="fa fa-file"></i> Due Payments </h5>
         </div>
 
         <div class="card-body">
@@ -114,7 +126,7 @@
                                     {{ $due_payment->membership->member->phone ?? '-' }}
                                 </a>
                             </td>
-                            <td>{{ $due_payment->membership->service_pricelist->name ?? '-' }} </td>
+                            <td>{{ $due_payment->membership->service_pricelist->name ?? '-' }}</td>
                             <td>{{ number_format($due_payment->net_amount) ?? '-' }} EGP</td>
                             <td>{{ number_format($due_payment->payments_sum_amount) ?? '-' }} EGP</td>
                             <td>{{ number_format($due_payment->rest) ?? '-' }} EGP</td>
@@ -147,10 +159,56 @@
                 </table>
             </div>
         </div>
+
         <div class="card-footer">
-            {{-- Add pagination if needed --}}
             {{-- {{ $due_payments->links() }} --}}
         </div>
     </div>
 
 @endsection
+
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            var branchSelect = document.getElementById('branch_id');
+            var salesSelect = document.getElementById('sales_id');
+            getSales();
+            function getSales(){
+                var branch_id = branchSelect.value;
+
+                var xhr = new XMLHttpRequest();
+                xhr.open('GET', '{{ route("admin.reports.get.sales.by.branch") }}' + '?branch_id=' + branch_id, true);
+                xhr.onreadystatechange = function() {
+                    if (xhr.readyState === 4 && xhr.status === 200) {
+                        var data = JSON.parse(xhr.responseText);
+                        let selected_Sales_id = salesSelect.value
+                        console.log(selected_Sales_id)
+
+                        salesSelect.innerHTML = '<option value="">All Sales</option>';
+
+                        data.forEach(function(sales) {
+                            var option = document.createElement('option');
+                            if(selected_Sales_id == sales.id){
+                                option.selected = true
+                            }
+                            option.value = sales.id;
+                            option.textContent = sales.name;
+                            salesSelect.appendChild(option);
+                        });
+                    }
+                };
+                xhr.send();
+            }
+            branchSelect.addEventListener('change', function() {
+                getSales();
+
+            });
+        });
+
+        function setSettlementInvoice(button) {
+            var url = button.getAttribute('data-url');
+            var form = document.getElementById('settlement_invoice_form');
+            form.setAttribute('action', url);
+        }
+    </script>
+

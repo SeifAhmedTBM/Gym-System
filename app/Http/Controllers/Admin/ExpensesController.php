@@ -37,6 +37,12 @@ class ExpensesController extends Controller
         $endOfMonth = Carbon::now()->endOfMonth();
         $data['date']['from'] = isset($data['date']['from']) ? $data['date']['from'] : $startOfMonth;
         $data['date']['to'] = isset($data['date']['to']) ? $data['date']['to'] : $endOfMonth ;
+        
+        if (isset($request->date_1) && $request->date_1 !== '') {
+         
+            $data['date']['from'] = Carbon::createFromFormat('Y-m', $request->date_1)->startOfMonth()->format('Y-m-d');
+            $data['date']['to'] = Carbon::createFromFormat('Y-m', $request->date_1)->endOfMonth()->format('Y-m-d');
+        }
 
         if ($request->ajax()) {
             if ($employee && $employee->branch_id != NULL) 
@@ -108,7 +114,7 @@ class ExpensesController extends Controller
             return $table->make(true);
         }
 
-        $expenses_categories = ExpensesCategory::pluck('name', 'id');
+        $expenses_categories = ExpensesCategory::pluck('name','id');
 
         $accounts = Account::orderBy('name')->pluck('name','id');
 
@@ -126,8 +132,74 @@ class ExpensesController extends Controller
             $expenses = Expense::index($data);
 
         }
-        
+    
         return view('admin.expenses.index',compact('expenses_categories','users','accounts','expenses','branches'));
+    }
+
+
+    // public function expenses_categories(){
+    //     $expenses_categories = ExpensesCategory::get();
+    //     return view('admin.expenses.categories',compact('expenses_categories'));
+    // }
+
+
+    public function expenses_categories(Request $request)
+    {
+        $branches = Branch::get();
+ 
+        $branchId = $request->input('branch_id');
+        $account = Account::where('branch_id' , $branchId)->first();
+        $date = $request->input('date');
+        // if (is_string($date)) {
+        //     $date = Carbon::createFromFormat('Y-m', $date);
+        //     $date_format = $date->format('Y-m');
+        // } else {
+        //     $date_format = $date->format('Y-m');
+        // }
+        $expenses_categories = ExpensesCategory::with('expenses.account.branch')
+            ->get();
+    
+        foreach ($expenses_categories as $category) {
+            $category->total_amount = $category->expensesCount($category->id, $branchId, $date);
+        }
+
+        return view('admin.expenses.categories',compact('expenses_categories' ,'branches' , 'branchId' ,'account' ,'date'));
+  
+    }
+
+
+    public function expenses_categories_show_by_filter(Request $request){
+
+        $employee = Auth()->user()->employee;
+
+        $data['date']['from'] = Carbon::createFromFormat('Y-m', $request->date)->startOfMonth()->format('Y-m-d');
+        $data['date']['to'] = Carbon::createFromFormat('Y-m', $request->date)->endOfMonth()->format('Y-m-d');
+
+        $query = Expense::with(['expenses_category', 'created_by', 'account']);
+
+        if ($request->account_id) {
+            $query->whereHas('account', fn($q) => $q->whereBranchId($request->account_id));
+        }
+    
+        $expenses = $query
+            ->whereBetween('created_at', [$data['date']['from'], $data['date']['to']])
+            ->where('expenses_category_id', $request->expenses_category_id)
+            ->get();
+    
+       
+
+        $expenses_categories = ExpensesCategory::pluck('name','id');
+
+        $accounts = Account::orderBy('name')->pluck('name','id');
+
+        $users = User::whereHas('employee')->orderBy('name')->pluck('name','id');
+
+        $branches = Branch::pluck('name','id');
+        
+        return view('admin.expenses.categories_filter',compact('expenses_categories' ,'branches' , 'users' ,'accounts' ,'expenses'));
+
+        
+
     }
 
     public function create()

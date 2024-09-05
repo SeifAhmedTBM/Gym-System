@@ -2492,20 +2492,219 @@ class ReportController extends Controller
         return view('admin.reports.customer_invitation', compact('leads'));
     }
 
+//    public function all_due_payments(Request $request)
+//    {
+//        $employee = Auth()->user()->employee;
+//
+//        if ($employee && $employee->branch_id != NULL) {
+//            $branch_id = $employee->branch_id;
+//        } else {
+//            $branch_id = $request['branch_id'] != NULL ? $request['branch_id'] : '';
+//        }
+//
+//        $due_payments = Invoice::whereStatus('partial')->withSum('payments', 'amount')->latest()->get();
+//
+//        return view('admin.reports.all_due_payments', compact('due_payments', 'employee', 'branch_id'));
+//    }
     public function all_due_payments(Request $request)
     {
         $employee = Auth()->user()->employee;
 
-        if ($employee && $employee->branch_id != NULL) {
-            $branch_id = $employee->branch_id;
-        } else {
-            $branch_id = $request['branch_id'] != NULL ? $request['branch_id'] : '';
+        $branch_id = $employee && $employee->branch_id ? $employee->branch_id : $request->branch_id;
+
+        $branches = Branch::all();
+
+        $start_date = $request->start_date;
+        $end_date = $request->end_date;
+
+        if ($start_date && !$end_date) {
+            $end_date = now()->toDateString();
         }
 
-        $due_payments = Invoice::whereStatus('partial')->withSum('payments', 'amount')->latest()->get();
+        if (!$start_date && !$end_date) {
+            $start_date = now()->startOfMonth()->toDateString();
+            $end_date = now()->endOfMonth()->toDateString();
+        }
 
-        return view('admin.reports.all_due_payments', compact('due_payments', 'employee', 'branch_id'));
+        $due_payments = Invoice::whereStatus('partial')
+            ->when($branch_id, function ($query) use ($branch_id) {
+                return $query->whereHas('membership.member', function ($q) use ($branch_id) {
+                    $q->where('branch_id', $branch_id);
+                });
+            })
+            ->when($start_date && $end_date, function ($query) use ($start_date, $end_date) {
+                return $query->whereBetween('created_at', [$start_date, $end_date]);
+            })
+            ->withSum('payments', 'amount')
+            ->latest()
+            ->get();
+        return view('admin.reports.all_due_payments', compact('due_payments', 'employee', 'branch_id', 'branches', 'start_date', 'end_date'));
     }
+
+
+    public function sales_due_payments(Request $request)
+    {
+        $employee = Auth()->user()->employee;
+
+        // Determine branch ID based on employee or request
+        $branch_id = $employee && $employee->branch_id != NULL
+            ? $employee->branch_id
+            : ($request->branch_id != NULL ? $request->branch_id : '');
+
+
+        // Fetch all branches for dropdown
+        $branches = Branch::all();
+
+        // Fetch all sales representatives for dropdown
+        $sales_representatives = User::whereHas('roles', function ($query) {
+            $query->where('role_id', 3); // Assuming '3' is the ID for the Sales role
+        })->get();
+
+        // Get the start and end dates from the request
+        $start_date = $request->start_date;
+        $end_date = $request->end_date;
+
+        // Handle default date ranges
+        if ($start_date && !$end_date) {
+            $end_date = now()->toDateString();
+        }
+
+        if (!$start_date && !$end_date) {
+            $start_date = now()->startOfMonth()->toDateString();
+            $end_date = now()->endOfMonth()->toDateString();
+        }
+
+        // Get selected sales representative ID from request
+        $sales_id = $request->sales_id;
+
+        // Build the query
+        $due_payments = Invoice::whereStatus('partial')
+            ->whereHas('membership', function ($query) {
+                $query->whereHas('service_pricelist', function ($q) {
+                    $q->whereHas('service', function ($q) {
+                        $q->where('trainer', 0); // Filter out trainer services
+                    });
+                });
+            })
+            ->when($branch_id, function ($query) use ($branch_id) {
+                return $query->whereHas('membership.member', function ($q) use ($branch_id) {
+                    $q->where('branch_id', $branch_id);
+                });
+            })
+            ->when($sales_id, function ($query) use ($sales_id) {
+                return $query->whereHas('sales_by', function ($q) use ($sales_id) {
+                    $q->where('id', $sales_id);
+                });
+            })
+            ->when($start_date && $end_date, function ($query) use ($start_date, $end_date) {
+                return $query->whereBetween('created_at', [$start_date, $end_date]);
+            })
+            ->withSum('payments', 'amount')
+            ->latest()
+            ->get();
+
+        return view('admin.reports.sales_due_payments', compact('due_payments', 'employee', 'branch_id', 'branches', 'sales_representatives', 'start_date', 'end_date'));
+    }
+    public function getSalesByBranch(Request $request)
+    {
+        $branch_id = $request->input('branch_id');
+
+        $sales_representatives = User::whereHas('roles', function ($query) {
+            $query->where('role_id', 3); // Ensure role_id is 3
+        });
+
+
+        if (!empty($branch_id)) {
+            $sales_representatives = $sales_representatives->whereHas('employee', function ($query) use ($branch_id) {
+                $query->where('branch_id', $branch_id);
+            });
+        }
+
+
+        $sales_representatives = $sales_representatives->get();
+
+        return response()->json($sales_representatives);
+    }
+
+    public function trainer_due_payments(Request $request)
+    {
+        $employee = Auth()->user()->employee;
+
+        // Determine the branch ID
+        $branch_id = $employee && $employee->branch_id != NULL
+            ? $employee->branch_id
+            : ($request->branch_id != NULL ? $request->branch_id : '');
+
+        $branches = Branch::all();
+
+        $trainers = User::whereHas('roles', function ($query) {
+            $query->where('role_id', 2);
+        })->get();
+
+        $start_date = $request->start_date;
+        $end_date = $request->end_date;
+
+        if ($start_date && !$end_date) {
+            $end_date = now()->toDateString();
+        }
+
+        if (!$start_date && !$end_date) {
+            $start_date = now()->startOfMonth()->toDateString();
+            $end_date = now()->endOfMonth()->toDateString();
+        }
+
+        $trainer_id = $request->trainer_id;
+
+        $due_payments = Invoice::whereStatus('partial')
+            ->whereHas('membership', function ($query) {
+                $query->whereHas('service_pricelist', function ($q) {
+                    $q->whereHas('service', function ($q) {
+                        $q->where('trainer', 1);
+                    });
+                });
+            })
+            ->when($trainer_id, function ($query) use ($trainer_id) {
+                return $query->whereHas('membership', function ($q) use ($trainer_id) {
+                    $q->where('trainer_id', $trainer_id);
+                });
+            })
+
+            ->when($branch_id, function ($query) use ($branch_id) {
+                return $query->whereHas('membership.member', function ($q) use ($branch_id) {
+                    $q->where('branch_id', $branch_id);
+                });
+            })
+            ->when($start_date && $end_date, function ($query) use ($start_date, $end_date) {
+                return $query->whereBetween('created_at', [$start_date, $end_date]);
+            })
+            ->withSum('payments', 'amount')
+            ->latest()
+            ->get();
+
+        return view('admin.reports.trainer_due_payments', compact('due_payments', 'employee', 'branch_id', 'branches', 'trainers', 'start_date', 'end_date'));
+    }
+    public function getTrainersByBranch(Request $request)
+    {
+        $branch_id = $request->input('branch_id');
+
+        $trainersQuery = User::whereHas('roles', function ($query) {
+            $query->where('role_id', 2);
+        });
+
+
+        if (!empty($branch_id)) {
+            $trainersQuery->whereHas('employee', function ($query) use ($branch_id) {
+                $query->where('branch_id', $branch_id);
+            });
+        }
+
+
+        $trainers = $trainersQuery->get();
+
+        return response()->json($trainers);
+    }
+
+
 
     public function daily_task_report(Request $request)
     {

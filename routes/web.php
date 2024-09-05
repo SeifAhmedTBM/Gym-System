@@ -296,6 +296,11 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.', 'namespace' => 'Admin', 'mi
         Route::get('customer-invitation-report', 'ReportController@customerInvitation')->name('customer-invitation');
 
         Route::get('all-duepayments-report', 'ReportController@all_due_payments')->name('all-due-payments');
+        Route::get('sales-due-payments', 'ReportController@sales_due_payments')->name('sales_due_payments');
+        Route::get('trainer-due-payments', 'ReportController@trainer_due_payments')->name('trainer_due_payments');
+        Route::get('/trainers-by-branch', 'ReportController@getTrainersByBranch')->name('trainers.by.branch');
+        Route::get('/get-sales-by-branch', 'ReportController@getSalesByBranch')->name('get.sales.by.branch');
+
 
         Route::get('daily-task-report', 'ReportController@daily_task_report')->name('daily-task-report');
 
@@ -580,6 +585,9 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.', 'namespace' => 'Admin', 'mi
     Route::post('expenses/parse-csv-import', 'ExpensesController@parseCsvImport')->name('expenses.parseCsvImport');
     Route::post('expenses/process-csv-import', 'ExpensesController@processCsvImport')->name('expenses.processCsvImport');
     Route::resource('expenses', 'ExpensesController');
+    Route::get('expenses_categories', 'ExpensesController@expenses_categories')->name('expenses_categories');
+    Route::get('expenses_categories_show_by_filter' ,'ExpensesController@expenses_categories_show_by_filter')->name('expenses_categories_show_by_filter');
+
 
     // Invoice
     Route::delete('invoices/destroy', 'InvoiceController@massDestroy')->name('invoices.massDestroy');
