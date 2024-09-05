@@ -296,6 +296,11 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.', 'namespace' => 'Admin', 'mi
         Route::get('customer-invitation-report', 'ReportController@customerInvitation')->name('customer-invitation');
 
         Route::get('all-duepayments-report', 'ReportController@all_due_payments')->name('all-due-payments');
+        Route::get('sales-due-payments', 'ReportController@sales_due_payments')->name('sales_due_payments');
+        Route::get('trainer-due-payments', 'ReportController@trainer_due_payments')->name('trainer_due_payments');
+        Route::get('/trainers-by-branch', 'ReportController@getTrainersByBranch')->name('trainers.by.branch');
+        Route::get('/get-sales-by-branch', 'ReportController@getSalesByBranch')->name('get.sales.by.branch');
+
 
         Route::get('daily-task-report', 'ReportController@daily_task_report')->name('daily-task-report');
 
