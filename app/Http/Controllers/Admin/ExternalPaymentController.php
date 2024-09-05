@@ -18,6 +18,7 @@ use App\Http\Requests\StoreExternalPaymentRequest;
 use App\Http\Requests\UpdateExternalPaymentRequest;
 use App\Http\Requests\MassDestroyExternalPaymentRequest;
 use Carbon\Carbon;
+
 class ExternalPaymentController extends Controller
 {
     use CsvImportTrait;
@@ -30,13 +31,10 @@ class ExternalPaymentController extends Controller
         $data = $request->except(['draw', 'columns', 'order', 'start', 'length', 'search', 'change_language','_']);
 
         $employee = Auth()->user()->employee;
-
-        $startOfMonth = Carbon::now()->startOfMonth();
-        $endOfMonth = Carbon::now()->endOfMonth();
-
-        $data['created_at']['from'] = isset($data['amp;created_at']['from']) ? $data['amp;created_at']['from'] : ($data['created_at']['from'] ?? $startOfMonth);
-        $data['created_at']['to'] = isset($data['amp;created_at']['to']) ? $data['amp;created_at']['to'] : ($data['created_at']['to'] ?? $endOfMonth);
-
+            $startOfMonth = Carbon::now()->startOfMonth();
+            $endOfMonth = Carbon::now()->endOfMonth();
+            $data['created_at']['from'] = isset($data['created_at']['from']) ? $data['created_at']['from'] : $startOfMonth;
+            $data['created_at']['to'] = isset($data['created_at']['to']) ? $data['created_at']['to'] : $endOfMonth;
 
         if ($request->ajax()) {
             if ($employee && $employee->branch_id != NULL) 

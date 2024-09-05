@@ -54,6 +54,14 @@
             z-index : 9;
         }
 
+        .page-item.disabled .page-link {
+            pointer-events: none;
+            cursor: auto;
+            color: #8a93a2;
+            background-color: transparent;
+            border-color: #c4c9d0;
+        }
+
     </style>
 </head>
 

@@ -34,6 +34,7 @@ return [
         'ID'                        => 1,
         'Create'                    => 'task_create',
         'Edit'                      => 'task_edit',
+        'All'                       => 'all_tasks_access',
         'Show'                      => 'task_show',
         'Delete'                    => 'task_delete',
         'Access'                    => 'task_access',
