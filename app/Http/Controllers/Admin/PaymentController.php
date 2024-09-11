@@ -165,8 +165,18 @@ class PaymentController extends Controller
             return $table->make(true);
         }
 
-        $accounts = Account::pluck('name','id');
-
+        $accounts = [
+            ''=>'All',
+            'instapay' => 'Instapay',
+            'cash' => 'Cash',
+            'visa' => 'Visa',
+            'vodafone' => 'Vodafone',
+            'valu' => 'Valu',
+            'premium' => 'Premium',
+            'sympl' => 'Sympl'
+        ];
+        
+        $accounts = $accounts + Account::pluck('name', 'id')->toArray();
         $branches = Branch::pluck('name','id');
 
         $sales_bies = User::whereHas('roles',function($q){
