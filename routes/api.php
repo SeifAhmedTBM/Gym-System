@@ -7,10 +7,11 @@ Route::group(['prefix' => 'v1', 'namespace' => 'Api'], function() {
     Route::post('sendOtp', 'AuthController@sendOtp');
     Route::post('logout', 'AuthController@logout');
     Route::get('profile', 'AuthController@profile');
+    Route::post('profile', 'AuthController@updateProfile');
+    Route::post('updateImage', 'AuthController@updateImage');
     Route::get('getMemberhips', 'AuthController@getMemberships');
     Route::get('trainers', 'AuthController@trainers');
     Route::get('currentTrainer', 'AuthController@currentTrainer');
-    Route::post('updateImage', 'AuthController@updateImage');
     Route::get('contact','AuthController@contact');
     Route::apiResource('leads', 'V1\Admin\LeadsApiController');
     Route::get('privacy','AuthController@privacy');

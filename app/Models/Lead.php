@@ -40,6 +40,7 @@ class Lead extends Model implements HasMedia
 
     protected $appends = [
         'photo',
+        'profile_photo',
     ];
 
     protected $dates = [
@@ -89,6 +90,24 @@ class Lead extends Model implements HasMedia
         $this->addMediaConversion('preview')->fit('crop', 120, 120);
     }
 
+    public function getProfilePhotoAttribute()
+    {
+        $file = $this->getMedia('photo')->last();
+        if ($file) {
+
+            return [
+                "url"=> $file->getUrl(),
+                "thumbnail"=> $file->getUrl('thumb'),
+                "preview"=> $file->getUrl('preview'),
+            ];
+        }
+        return [
+            "url"=> "",
+            "thumbnail"=>"",
+            "preview"=>"",
+        ];
+
+    }
     public function getPhotoAttribute()
     {
         $file = $this->getMedia('photo')->last();
