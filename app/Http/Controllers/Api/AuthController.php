@@ -14,44 +14,36 @@ class AuthController extends Controller
 {
     public function login(Request $request)
     {
-        // return 1;
         $validatedData = Validator::make($request->all(), [
             'phone'         => 'required|exists:leads,phone',
             'member_code'   => 'required|exists:leads,member_code'
         ]);
-
         if($validatedData->fails()) {
-            $errors = [];
-            return response()->json($validatedData->errors()->all(), 422); 
+            return response()->json([
+                'message' => 'Invalid credentials',
+                'validation_message'=>$validatedData->errors(),
+                'data' => null
+            ], 422);
         }
         $lead = Lead::with(['user'])
                         ->where('phone', $request['phone'])
                         ->where('member_code', $request['member_code'])
                         ->first();
-
         if (!$lead) 
         {
             return response()->json([
-                'message' => 'Invalid credentials'
-            ], 422);
+                'message' => 'Invalid credentials',
+                'data' => null
+            ], 401);
         }
-
-        // if($lead->user)
-        // {
-            $authToken = $lead->user;
-            
-            $authToken = $lead->user->createToken('auth-token')->plainTextToken;
-        // }else{
-        //     return response()->json([
-        //         'message'       => 'something went wrong !'
-        //     ]);
-        // }
-
-
-        $data['user'] = $lead->user;
-        $data['access_token'] = $authToken;
-        
-        return response()->json($data, 201);
+        $authToken = $lead->user->createToken('auth-token')->plainTextToken;
+        return response()->json([
+            'message' => 'Login successfully',
+            'data' => [
+                'user_info' =>$lead->user,
+                'access_token' => $authToken
+            ]
+        ], 201);
     }
 
 
@@ -62,12 +54,14 @@ class AuthController extends Controller
             User::find(auth('sanctum')->id())->tokens()->delete();
 
             return response()->json([
-                'message' => 'Logged Out Successfully'
+                'message' => 'Logged Out Successfully',
+                'data'=> null
             ], 201);
         }else{
             return response()->json([
-                'message' => "You Didn't Login Before, Please Login First !!"
-            ], 201);
+                'message' => "You Didn't Login Before, Please Login First !!",
+                'data'=> null
+            ], 403);
         }
     }
 
@@ -77,16 +71,20 @@ class AuthController extends Controller
         {
             $member = Lead::whereUserId(Auth('sanctum')->id())
                             ->with([
-                                'memberships'
+                                'memberships','memberships.service_pricelist'
                             ])->first();
 
             return response()->json([
-                'memberships'   => $member->memberships
+                'message'=>"successfully",
+                'data'=>[
+                    'memberships'   => $member->memberships
+                ]
             ], 201);
         }else{
             return response()->json([
-                'message'       => 'Please Login First !'
-            ], 201);
+                'message'=>"unauthorized",
+                'data'=>null
+            ], 403);
         }
         
         
@@ -94,34 +92,39 @@ class AuthController extends Controller
 
     public function profile()
     {
-        if(auth('sanctum')->id())
+        if(! auth('sanctum')->id())
         {
-            $member = Lead::with(['user','status','address','source'])
-                                ->whereUserId(auth('sanctum')->id())
-                                ->first();
-        }else{
             return response()->json([
-                'Please Login first !'
-            ],404);
+                'message' =>'unauthorized!',
+                'data' => null
+            ],403);
         }
 
-        if($member)
-        {
-            $memberships = Membership::with(['service_pricelist','sales_by','trainer'])
-                            ->withCount('attendances')
-                            ->withSum('freezeRequests','freeze')
-                            ->whereMemberId($member->id)
-                            ->get();
-    
+        $member = Lead::with(['status','address','source'])
+                            ->whereUserId(auth('sanctum')->id())
+                            ->first()->makeHidden([
+                                'photo','downloaded_app','status_id','source_id','sales_by_id','address_id','media','source']);
+        if(!$member){
             return response()->json([
+                'message' =>'Can not find member',
+                'data' => null
+            ],403);
+        }
+
+        $memberships = Membership::with(['service_pricelist'])
+                        ->withCount('attendances')
+                        ->withSum('freezeRequests','freeze')
+                        ->whereMemberId($member->id)
+                        ->get();
+    
+        return response()->json([
+            'message'=>'Successfully',
+            'data'=>[
                 'member'        => $member,
                 'memberships'   => $memberships,
-            ],200);
-        }else{
-            return response()->json([
-                'Something went wrong'
-            ],404);
-        }
+            ]
+        ],200);
+
     }
 
 
@@ -141,90 +144,80 @@ class AuthController extends Controller
     public function updateProfile(Request $request)
     {
         $user = User::find(auth('sanctum')->id());
-
+        if(!$request['name']){
+            return response()->json(['message' => 'need to send name', 'validation_error'=>['name'=>'required']], 422);
+        }
         $user->update([
-            'name'              =>  $request['name']
+            'name' =>  $request['name']
         ]);
-
-        return response()->json(['message' => 'Updated successfully'], 201);
+        $user->lead->update(['name'=>$request['name']]);
+        return response()->json(['message' => 'Updated successfully', 'data'=>$user->makeHidden('lead')], 201);
     }
 
     public function updateImage(Request $request)
     {
-        if (auth('sanctum')->id()) 
-        {
-            $member = Lead::whereType('member')
-                                ->whereUserId(auth('sanctum')->user()->id)
-                                ->first();
-    
-            if ($request->file('photo')) 
-            {
-                if ($member->photo) {
-                    $member->photo->delete();
-                }
-                $member->addMediaFromRequest('photo')->toMediaCollection('photo');
-            }
-    
-            return response()->json(['message' => 'Updated successfully'], 201);
-        }else{
-            return response()->json(['message' => 'Please Login First !'], 201);
+        if (!auth('sanctum')->id()) {
+            return response()->json(['message' => 'UnAuthorized', 'data' => null], 403);
         }
+        $member = Lead::whereType('member')
+                            ->whereUserId(auth('sanctum')->user()->id)
+                            ->first();
+
+        if (!$request->file('photo'))
+        {
+            return response()->json(['message' => 'need to send photo', 'validation_error'=>['photo'=>'required']], 422);
+        }
+        if ($member->photo) {
+            $member->photo->delete();
+        }
+        $member->addMediaFromRequest('photo')->toMediaCollection('photo');
+        return response()->json(['message' => 'Updated successfully' ,'data'=>$member->fresh()], 201);
     }
 
     public function trainers()
     {
-        if (auth('sanctum')->id()) {
-            $member = Lead::with(['status','address','source'])->whereUserId(auth('sanctum')->user()->id)->first();
-    
-            $memberships = Membership::with([
-                    'service_pricelist',
-                    'sales_by',
-                    'trainer'           => fn($q) => ($q->withSum('ratings','rate') && $q->withCount('ratings')),
-                    'assigned_coach'    => fn($q) => ($q->withSum('ratings','rate') && $q->withCount('ratings')),
-                ])
-                ->withCount(['attendances'])
-                ->withSum('freezeRequests','freeze')
-                ->whereMemberId($member->id)
-                ->get()
-                ->pluck('trainer')
-                ->unique('trainer');
-    
-            $trainer_average = User::withSum('ratings','rate')->withCount('ratings')->whereIn('id',$memberships)->get();
-    
-            return response()->json([
-                'trainer' => $trainer_average
-            ],200);
-        }else{
-            return response()->json([
-                'message'       => 'Please Login first !'
-            ],200);
+        if (!auth('sanctum')->check()) {
+            return response()->json(['message' => 'Please login first!','data'=>null], 403);
         }
+
+        $member = auth('sanctum')->user()->lead;
+
+        $trainerIds = $member->memberships()
+            ->with(['trainer' => function ($query) {
+                $query->withSum('ratings', 'rate')->withCount('ratings');
+            }])
+            ->get()
+            ->pluck('trainer.id')
+            ->unique();
+
+        $trainers = User::withSum('ratings', 'rate')
+            ->withCount('ratings')
+            ->whereIn('id', $trainerIds)
+            ->get();
+
+        return response()->json(['message'=>"completed",'data'=>['trainers' => $trainers]], 200);
     }
 
     public function currentTrainer()
     {
-        if (auth('sanctum')->id()) 
-        {
-            $member = Lead::with(['status','address','source'])->whereUserId(auth('sanctum')->user()->id)->first();
-            
-            $membership = Membership::whereMemberId($member->id)
-                            ->with([
-                                'trainer' => fn($q) => ($q->withSum('ratings','rate') && $q->withCount('ratings'))
-                            ])
-                            ->latest()
-                            ->firstOr(function(){
-                                    return response()->json(['message' => 'Current membership is expired']
-                            );
-            });
-    
-            return response()->json([
-                'trainer' => $membership->trainer
-            ],200);
-        }else{
-            return response()->json([
-                'message' => 'Please Login First !'
-            ],200);
+        if (!auth('sanctum')->check()) {
+            return response()->json(['message' => 'Please login first!','data'=>null], 403);
         }
+
+        $member = auth('sanctum')->user()->lead;
+
+        $membership = $member->memberships()
+            ->with(['trainer' => function ($query) {
+                $query->withSum('ratings', 'rate')->withCount('ratings');
+            }])
+            ->latest()
+            ->first();
+
+        if (!$membership) {
+            return response()->json(['message' => 'Current membership is expired'], 402);
+        }
+
+        return response()->json(['message'=>'completed','data'=>['trainer' => $membership->trainer]], 200);
     }
 
     public function contact()
