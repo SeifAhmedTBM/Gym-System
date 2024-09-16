@@ -27,7 +27,8 @@ class ExpensesExport implements FromCollection,WithHeadings
                 'amount'                 => $expense->amount ?? '-',
                 'expenses_category_id'   => $expense->expenses_category->name ?? '-',
                 'created_by'             => $expense->created_by->name ?? '-',
-                'created_at'             => $expense->created_at,
+                'created_at'             => $expense->created_at->format('Y-m-d'),
+                
             ];
         });
 
