@@ -41,6 +41,10 @@ class Employee extends Model implements HasMedia
         'active'   => 'Active',
         'inactive' => 'Inactive',
     ];
+    public const MOBILE_STATUS_SELECT = [
+        1   => 'Active',
+        0 => 'Inactive',
+    ];
 
     public const JOB_STATUS_SELECT = [
         'fulltime' => 'Full-time',

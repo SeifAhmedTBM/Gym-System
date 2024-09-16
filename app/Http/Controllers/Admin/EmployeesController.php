@@ -110,6 +110,11 @@ class EmployeesController extends Controller
             });
 
             $table->editColumn('status', function ($row) {
+//                Trainer
+                if($row->user->roles[0]->title == 'Trainer'){
+                    return $row->status ? Employee::STATUS_SELECT[$row->status] . '<br> Mobile: '.($row->mobile_visibility ? 'Active' : 'inactive') : '';
+
+                }
                 return $row->status ? Employee::STATUS_SELECT[$row->status] : '';
             });
 
@@ -142,7 +147,7 @@ class EmployeesController extends Controller
                 return $row->created_at ? $row->created_at->toFormattedDateString() . ' , ' . $row->created_at->format('g:i A') : '';
             });
 
-            $table->rawColumns(['actions', 'placeholder', 'user', 'role', 'branch_name', 'employee_name','photo']);
+            $table->rawColumns(['actions', 'placeholder', 'user', 'role', 'branch_name', 'employee_name','photo','status']);
 
             return $table->make(true);
         }
@@ -710,7 +715,15 @@ class EmployeesController extends Controller
         return back();
     }
 
+    public function change_mobile_status($id)
+    {
+        $employee = Employee::findOrFail($id);
 
+        $employee->mobile_visibility = ! $employee->mobile_visibility;
+        $employee->save();
+        $this->sent_successfully();
+        return back();
+    }
     public function fixedComission($id)
     {
         $payroll = Payroll::find($id);

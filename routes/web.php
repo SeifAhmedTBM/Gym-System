@@ -650,6 +650,7 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.', 'namespace' => 'Admin', 'mi
     Route::get('add-document/{id}', 'EmployeesController@add_document')->name('employees.add_document');
 
     Route::put('employee/{id}/change-status', 'EmployeesController@change_status')->name('employees.change_status');
+    Route::put('employee/{id}/change-mobile-status', 'EmployeesController@change_mobile_status')->name('employees.change_mobile_status');
 
 
     // Employee attendances

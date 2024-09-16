@@ -18,8 +18,8 @@ return new class extends Migration
             $table->text('about_us')->nullable();
             $table->text('rules')->nullable();
             $table->text('terms_conditions')->nullable();
-            $table->bigInteger('pt_service_type')->nullable();
-            $table->foreign('pt_service_type')->on('service_types')->onDelete('set null')->onUpdate('cascade');
+            $table->unsignedBigInteger('pt_service_type')->nullable();
+            $table->foreign('pt_service_type')->on('service_types')->references('id');
 
         });
     }

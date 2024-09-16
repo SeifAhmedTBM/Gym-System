@@ -501,6 +501,18 @@
                         : '<i class="fa fa-check-circle"></i> &nbsp; Active ' !!}
                 </button>
             </form>
+            @if($row->user->roles[0]->title == 'Trainer')
+                    <form action="{{ route('admin.employees.change_mobile_status', $row->id) }}" method="POST"
+                          onsubmit="return confirm('{{ trans('global.areYouSure') }}');" style="display: inline-block;">
+                        <input type="hidden" name="_method" value="PUT">
+                        <input type="hidden" name="_token" value="{{ csrf_token() }}">
+                        <button type="submit" class="dropdown-item">
+                            {!! $row->mobile_visibility
+                                ? '<i class="fa fa-times-circle"></i> &nbsp;Mobile: Inactive '
+                                : '<i class="fa fa-check-circle"></i> &nbsp;Mobile: Active ' !!}
+                        </button>
+                    </form>
+            @endif
         @endif
     </div>
 </div>

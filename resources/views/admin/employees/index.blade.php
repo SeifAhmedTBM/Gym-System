@@ -18,6 +18,7 @@
                         'branch_id'     => ['label' => 'Branch', 'type' => 'select', 'data' => $branches],
                         'job_status'    => ['label' => 'Job Status', 'type' => 'select' , 'data' => \App\Models\Employee::JOB_STATUS_SELECT],
                         'status'        => ['label' => 'Status', 'type' => 'select' , 'data' => \App\Models\Employee::STATUS_SELECT],
+                        'mobile_visibility'        => ['label' => 'Mobile Status', 'type' => 'select' , 'data' => \App\Models\Employee::MOBILE_STATUS_SELECT],
                         'created_at'    => ['label' => 'Created at', 'type' => 'date', 'from_and_to' => true]
                     ],
                         'route' => 'admin.employees.index'
