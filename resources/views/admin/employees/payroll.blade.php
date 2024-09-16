@@ -59,13 +59,13 @@
                     <div class="input-group">
                         <input type="month" class="form-control" name="date" value="{{ request('date') ?? date('Y-m') }}">
                         <select name="branch_id" id="branch_id" class="form-control" {{ $emp && $emp->branch_id != NULL ? 'readonly' : '' }}>
-                            <option value="{{ NULL }}" selected hidden disabled>Branch</option>
+                            <option value="{{ NULL }}" selected >All Branches</option>
                             @foreach (\App\Models\Branch::pluck('name','id') as $id => $name)
                                 <option value="{{ $id }}" {{ $branch_id == $id ? 'selected' : '' }}>{{ $name }}</option>
                             @endforeach
                         </select>
                         <select name="role_id" id="role_id" class="form-control">
-                            <option value="{{ NULL }}" selected hidden disabled>Role</option>
+                            <option value="{{ NULL }}" selected >All Roles</option>
                             @foreach (\App\Models\Role::pluck('title','id') as $id => $title)
                                 <option value="{{ $id }}" {{ request('role_id') == $id ? 'selected' : '' }}>{{ $title }}</option>
                             @endforeach

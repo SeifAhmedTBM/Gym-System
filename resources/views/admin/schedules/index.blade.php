@@ -51,6 +51,9 @@
                             <th>
                                 {{ trans('cruds.schedule.fields.trainer') }}
                             </th>
+                            <th>
+                                Branch
+                            </th>
                             <!-- <th>
                                 {{ trans('cruds.schedule.fields.comission_type') }}
                             </th>
@@ -88,6 +91,9 @@
                                 </td>
                                 <td>
                                     {{ $schedule->trainer->name ?? '' }}
+                                </td>
+                                <td>
+                                    {{ $schedule->branch->name ?? 'N/A' }}
                                 </td>
                                 <!-- <td>
                                     {{ $schedule->comission_type ?? '' }}

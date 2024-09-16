@@ -33,11 +33,11 @@
                                         <td class="font-weight-bold">
                                             {{ date('g:i A', strtotime($timeslot->from)) }}  - {{ date('g:i A', strtotime($timeslot->to))}}
                                         </td>
+
                                         @foreach (App\Models\Schedule::DAY_SELECT as $k => $d)
                                             @if ($branch_id != NULL)
                                                 @if ($sch_day = $timeslot->schedules()
-                                                ->whereHas('schedule_main.schedule_main_group',fn($q) => $q->whereStatus('active'))
-                                                ->whereHas('schedule_main',fn($x) => $x->whereStatus('active')->whereBranchId($branch_id))
+                                                ->where('branch_id' , $branch_id)
                                                 ->where('day', $k)->get())
                                                     <td class="font-weight-bold">
                                                         @forelse ($sch_day as $item)

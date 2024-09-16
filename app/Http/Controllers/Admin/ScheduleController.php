@@ -10,6 +10,7 @@ use App\Http\Requests\UpdateScheduleRequest;
 use App\Models\Schedule;
 use App\Models\SessionList;
 use App\Models\Timeslot;
+use App\Models\Branch;
 use App\Models\User;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Http\Request;
@@ -33,6 +34,7 @@ class ScheduleController extends Controller
         abort_if(Gate::denies('schedule_create'), Response::HTTP_FORBIDDEN, '403 Forbidden');
 
         $sessions = SessionList::pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
+        $branches = Branch::get();
 
         $timeslots = Timeslot::get(['to', 'from', 'id']);
 
@@ -40,7 +42,7 @@ class ScheduleController extends Controller
             $q->where('title','Trainer');
         })->pluck('name', 'id')->prepend(trans('global.pleaseSelect'), 'disabled');
 
-        return view('admin.schedules.create', compact('sessions', 'timeslots', 'trainers'));
+        return view('admin.schedules.create', compact('sessions', 'timeslots', 'trainers' ,'branches'));
     }
 
     public function store(StoreScheduleRequest $request)
@@ -53,7 +55,8 @@ class ScheduleController extends Controller
                 'timeslot_id'       => $request['timeslot_id'],
                 'trainer_id'        => $request['trainer_id'],
                 'comission_type'    => $request['comission_type'],
-                'comission_amount'  => $request['comission_amount']
+                'comission_amount'  => $request['comission_amount'] ,
+                'branch_id'         => $request['branch_id'],
             ]);
         }
 

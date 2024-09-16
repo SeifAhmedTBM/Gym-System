@@ -8,6 +8,9 @@ class GallerySectionResource extends JsonResource
 {
     public function toArray($request)
     {
-        return parent::toArray($request);
+        return [
+            'message'=>"successfully",
+            'data'=>parent::toArray($request)
+        ];
     }
 }
