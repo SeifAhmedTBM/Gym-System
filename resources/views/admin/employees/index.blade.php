@@ -54,6 +54,9 @@
                             {{ trans('cruds.employee.fields.order') }}
                         </th>
                         <th>
+                            {{ trans('cruds.employee.fields.photo') }}
+                        </th>
+                        <th>
                             {{ trans('cruds.user.fields.name') }}
                         </th>
                         <th>
@@ -142,6 +145,10 @@
                     {
                         data: 'id',
                         name: 'id'
+                    },
+                    {
+                        data: 'photo',
+                        name: 'photo'
                     },
                     {
                         data: 'employee_name',

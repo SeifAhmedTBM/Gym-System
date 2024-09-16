@@ -637,6 +637,7 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.', 'namespace' => 'Admin', 'mi
     Route::post('employees/parse-csv-import', 'EmployeesController@parseCsvImport')->name('employees.parseCsvImport');
     Route::post('employees/process-csv-import', 'EmployeesController@processCsvImport')->name('employees.processCsvImport');
     Route::resource('employees', 'EmployeesController');
+    Route::post('employees/media', 'EmployeesController@storeMedia')->name('employees.storeMedia');
 
     Route::get('transfer-sales-data', 'EmployeesController@transferSalesData')->name('transfer_sales_data.index');
     Route::post('transfer-sales-data', 'EmployeesController@storeTransferSalesData')->name('transfer_sales_data.store');

@@ -68,6 +68,10 @@ class StoreEmployeeRequest extends FormRequest
                 // 'required',
                 // 'unique:employees,access_card,deleted_at,NULL'
             ],
+            'photo' => [
+                 'nullable',
+                // 'unique:employees,access_card,deleted_at,NULL'
+            ],
         ];
     }
 }

@@ -29,21 +29,21 @@
                 @endif
                 <span class="help-block">{{ trans('cruds.sessionList.fields.name_helper') }}</span>
             </div>
-            {{-- <div class="form-group">
-                <label class="required" for="service_id">{{ trans('cruds.sessionList.fields.service') }}</label>
-                <select class="form-control select2 {{ $errors->has('service') ? 'is-invalid' : '' }}" name="service_id" id="service_id" required>
-                    @foreach($services as $id => $entry)
-                        <option value="{{ $id }}" {{ old('service_id') == $id ? 'selected' : '' }}>{{ $entry }}</option>
-                    @endforeach
-                </select>
-                @if($errors->has('service'))
-                    <div class="invalid-feedback">
-                        {{ $errors->first('service') }}
-                    </div>
-                @endif
-                <span class="help-block">{{ trans('cruds.sessionList.fields.service_helper') }}</span>
-            </div> --}}
-            
+{{--             <div class="form-group">--}}
+{{--                <label class="required" for="service_id">{{ trans('cruds.sessionList.fields.service') }}</label>--}}
+{{--                <select class="form-control select2 {{ $errors->has('service') ? 'is-invalid' : '' }}" name="service_id" id="service_id" required>--}}
+{{--                    @foreach($services as $id => $entry)--}}
+{{--                        <option value="{{ $id }}" {{ old('service_id') == $id ? 'selected' : '' }}>{{ $entry }}</option>--}}
+{{--                    @endforeach--}}
+{{--                </select>--}}
+{{--                @if($errors->has('service'))--}}
+{{--                    <div class="invalid-feedback">--}}
+{{--                        {{ $errors->first('service') }}--}}
+{{--                    </div>--}}
+{{--                @endif--}}
+{{--                <span class="help-block">{{ trans('cruds.sessionList.fields.service_helper') }}</span>--}}
+{{--            </div>--}}
+
             <div class="form-group">
                 <label class="required" for="max_capacity">{{ trans('cruds.sessionList.fields.max_capacity') }}</label>
                 <input class="form-control {{ $errors->has('max_capacity') ? 'is-invalid' : '' }}" type="number" name="max_capacity" id="max_capacity" value="{{ old('max_capacity', '') }}" step="1" required>

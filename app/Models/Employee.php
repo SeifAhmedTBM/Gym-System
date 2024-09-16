@@ -11,12 +11,16 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-
-class Employee extends Model
+use Spatie\MediaLibrary\HasMedia;
+use Spatie\MediaLibrary\InteractsWithMedia;
+use Spatie\MediaLibrary\MediaCollections\Models\Media;
+class Employee extends Model implements HasMedia
 {
     use SoftDeletes;
     use Auditable;
     use HasFactory;
+
+    use InteractsWithMedia;
 
     public const COLORS = [
         'Sat' => '#8946A6',
@@ -71,7 +75,50 @@ class Employee extends Model
         'created_at',
         'updated_at',
         'deleted_at',
+        'mobile_visibility'
     ];
+//    Profile image
+    protected $appends = [
+        'photo',
+        'profile_photo',
+    ];
+    public function registerMediaConversions(Media $media = null): void
+    {
+        $this->addMediaConversion('thumb')->fit('crop', 50, 50);
+        $this->addMediaConversion('preview')->fit('crop', 120, 120);
+    }
+
+
+    public function getProfilePhotoAttribute()
+    {
+        $file = $this->getMedia('photo')->last();
+        if ($file) {
+
+            return [
+                "url"=> $file->getUrl(),
+                "thumbnail"=> $file->getUrl('thumb'),
+                "preview"=> $file->getUrl('preview'),
+            ];
+        }
+        return [
+            "url"=> "",
+            "thumbnail"=>"",
+            "preview"=>"",
+        ];
+
+    }
+    public function getPhotoAttribute()
+    {
+        $file = $this->getMedia('photo')->last();
+        if ($file) {
+            $file->url       = $file->getUrl();
+            $file->thumbnail = $file->getUrl('thumb');
+            $file->preview   = $file->getUrl('preview');
+        }
+
+        return $file;
+    }
+
 
     public function getStartDateAttribute($value)
     {
