@@ -143,6 +143,7 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.', 'namespace' => 'Admin', 'mi
 
     // Settings
     Route::resource('settings', 'SettingController');
+    Route::resource('mobile_settings', 'MobileSettingController');
 
     // Membership Schedule
     // Route::resource('membership-schedule', 'MembershipScheduleController');
