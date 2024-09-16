@@ -43,6 +43,7 @@ class Schedule extends Model
         'comission_type',
         'trainer_id',
         'schedule_main_id',
+        'branch_id',
         'created_at',
         'updated_at',
         'deleted_at',
@@ -81,5 +82,11 @@ class Schedule extends Model
     public function schedule_main() :BelongsTo
     {
         return $this->belongsTo(ScheduleMain::class,'schedule_main_id');
+    }
+
+    public function branch() : BelongsTo
+    {
+        return $this->belongsTo(Branch::Class ,  'branch_id');
+
     }
 }

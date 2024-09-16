@@ -971,6 +971,7 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.', 'namespace' => 'Admin', 'mi
     Route::resource('products', 'ProductsController');
     Route::get('products/transactions/{id}', 'ProductsController@transactions')->name('product.transactions');
 
+
     // Warehouse Products
     Route::delete('warehouse-products/destroy', 'WarehouseProductsController@massDestroy')->name('warehouse-products.massDestroy');
     Route::resource('warehouse-products', 'WarehouseProductsController');

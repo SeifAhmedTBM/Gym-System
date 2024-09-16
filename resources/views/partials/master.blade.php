@@ -145,6 +145,7 @@
                 //     'linkUrl'   => 'admin.schedule-mains.index',
                 //     'type'      => '',
                 // ],
+                
                 [
                     'can'       => 'schedule_access',
                     'title'     => 'Schedules',
