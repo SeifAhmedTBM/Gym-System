@@ -1,12 +1,12 @@
 @extends('layouts.admin')
 @section('content')
-    <form action="{{ route('admin.reports.reminders') }}" method="get">
+    <form action="{{ route('admin.reports.trainers-reminders') }}" method="get">
         <div class="row form-group">
             <div class="col-md-6">
-                <label for="date">{{ trans('global.date') }}</label>
+                <label for="branch">{{ trans('global.branch') }}</label>
                 <div class="input-group">
                     <select name="branch_id" id="branch_id" class="form-control" {{ $employee && $employee->branch_id != NULL ? 'readonly' : '' }}>
-                        <option value="{{ NULL }}" selected hidden disabled>Branch</option>
+                        <option value="{{ NULL }}" selected > All Branches</option>
                         @foreach (\App\Models\Branch::pluck('name','id') as $id => $name)
                             <option value="{{ $id }}" {{ $branch_id == $id ? 'selected' : '' }}>{{ $name }}</option>
                         @endforeach
