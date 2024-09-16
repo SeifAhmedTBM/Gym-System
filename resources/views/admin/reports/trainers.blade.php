@@ -19,7 +19,7 @@
             </div>
         </div>
     </div>
-   
+
 </div>
 <form action="{{ route('admin.reports.trainers-report') }}" method="get">
     <div class="row form-group">
@@ -27,7 +27,7 @@
             <label for="date">{{ trans('global.filter') }}</label>
             <div class="input-group">
                 <select name="branch_id" class="form-control" {{ $employee && $employee->branch_id != NULL ? 'readonly' : '' }}>
-                    <option value="{{ NULL }}" selected>Branch</option>
+                    <option value="{{ NULL }}" selected>All Branches</option>
                     @foreach (\App\Models\Branch::pluck('name','id') as $id => $name)
                         <option value="{{ $id }}" {{ request('branch_id') == $id ? 'selected' : '' }}>{{ $name }}</option>
                     @endforeach

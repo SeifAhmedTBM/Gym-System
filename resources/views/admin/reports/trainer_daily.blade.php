@@ -14,7 +14,7 @@
                                 value="{{ request('to') ?? date('Y-m-t') }}">
                             <select name="branch_id" id="branch_id" class="form-control"
                                 {{ $employee && $employee->branch_id != null ? 'readonly' : '' }}>
-                                <option value="{{ null }}" selected hidden disabled>Branch</option>
+                                <option value="{{ null }}" selected hidden disabled>All Branches</option>
                                 @foreach (\App\Models\Branch::pluck('name', 'id') as $id => $name)
                                     <option value="{{ $id }}" {{ $branch_id == $id ? 'selected' : '' }}>
                                         {{ $name }}</option>
@@ -171,7 +171,7 @@
             <div class="card">
                 <div class="card-header bg-danger">
                     <strong>
-                        {{ $key }} - {{ trans('global.outcome') }} : <span>{{ number_format($refund->sum('amount')) }} EGP ({{ $refund->count() . ' Refund' }})</span> 
+                        {{ $key }} - {{ trans('global.outcome') }} : <span>{{ number_format($refund->sum('amount')) }} EGP ({{ $refund->count() . ' Refund' }})</span>
                     </strong>
                 </div>
                 <div class="card-body table-responsive">

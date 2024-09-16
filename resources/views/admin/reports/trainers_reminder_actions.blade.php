@@ -12,7 +12,7 @@
                             <input type="date" class="form-control" name="to"
                                 value="{{ request('to') ?? date('Y-m-t') }}">
                             <select name="branch_id" id="branch_id" class="form-control">
-                                <option value="{{ null }}" selected>Branch</option>
+                                <option value="{{ null }}" selected>All Branches</option>
                                 @foreach (App\Models\Branch::pluck('name', 'id') as $id => $name)
                                     <option value="{{ $id }}" {{ request('branch_id') == $id ? 'selected' : '' }}>
                                         {{ $name }}</option>

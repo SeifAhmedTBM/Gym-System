@@ -7,7 +7,7 @@
                 <div class="input-group">
                     <select name="branch_id" id="branch_id" class="form-control"
                         {{ $employee && $employee->branch_id != null ? 'readonly' : '' }}>
-                        <option value="{{ null }}" selected>Select Branch</option>
+                        <option value="{{ null }}" selected>All Branches</option>
                         @foreach (\App\Models\Branch::pluck('name', 'id') as $id => $name)
                             <option value="{{ $id }}" {{ $branch_id == $id ? 'selected' : '' }}>
                                 {{ $name }}</option>
