@@ -73,6 +73,7 @@
                     'linkUrl' => 'admin.news.index',
                     'type' => '',
                 ],
+             
             ],
         ],
     ];
