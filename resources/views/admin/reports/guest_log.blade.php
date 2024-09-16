@@ -6,7 +6,7 @@
                 <input type="date" value="{{ request('from') ?? date('Y-m-01') }}" name="from" class="form-control">
                 <input type="date" value="{{ request('to') ?? date('Y-m-t') }}" name="to" class="form-control">
                 <select name="branch_id" id="branch_id" class="form-control" {{ $employee && $employee->branch_id != NULL ? 'readonly' : '' }}>
-                    <option value="{{ NULL }}" selected>Branch</option>
+                    <option value="{{ NULL }}" selected>All Branches</option>
                     @foreach (\App\Models\Branch::pluck('name','id') as $id => $name)
                         <option value="{{ $id }}" {{ $branch_id == $id ? 'selected' : '' }}>{{ $name }}</option>
                     @endforeach
@@ -117,7 +117,7 @@
                                                             </td>
                                                         </tr>
                                                     @empty
-                                                        NOT FOUND 
+                                                        NOT FOUND
                                                     @endforelse
                                                 </tbody>
                                             </table>

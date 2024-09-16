@@ -7,7 +7,7 @@
             <div class="input-group">
                 <input type="month" class="form-control" name="date" value="{{ request('date') ?? date('Y-m') }}">
                 <select name="branch_id" id="branch_id" class="form-control" {{ $employee && $employee->branch_id != NULL ? 'readonly' : '' }}>
-                    <option value="{{ NULL }}" selected hidden disabled>Branch</option>
+                    <option value="{{ NULL }}" selected hidden disabled>All Branches</option>
                     @foreach (\App\Models\Branch::pluck('name','id') as $id => $name)
                         <option value="{{ $id }}" {{ $branch_id == $id ? 'selected' : '' }}>{{ $name }}</option>
                     @endforeach
@@ -78,12 +78,12 @@
 @section('scripts')
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
-        
+
         const ctx = document.getElementById('external_payment_category').getContext('2d');
         const external_payment_category = new Chart(ctx, {
             type: 'pie',
             data: {
-                labels: [@php 
+                labels: [@php
                         foreach($external_payment_categories as $ex_category){
                             echo "'".$ex_category->name."'" . ',';
                         }
@@ -91,14 +91,14 @@
                 datasets: [{
                     label: 'External-payment-categories',
                     data: [
-                        @php 
+                        @php
                             foreach($external_payment_categories as $ex_category){
                                 echo "'".$ex_category->external_payments_count."'" . ',';
                             }
                         @endphp
                     ],
                     backgroundColor: [
-                        @php 
+                        @php
                         function random_color_part() {
                             return str_pad( dechex( mt_rand( 0, 255 ) ), 2, '0', STR_PAD_LEFT);
                         }

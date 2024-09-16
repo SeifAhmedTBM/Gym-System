@@ -1,13 +1,13 @@
 @extends('layouts.admin')
 @section('content')
-    
+
     <form action="{{ route('admin.reports.sales-report') }}" method="get">
         <div class="row form-group">
             <div class="col-md-8">
                 <label for="date">{{ trans('global.filter') }}</label>
                 <div class="input-group">
                     <select name="branch_id" class="form-control" {{ $employee && $employee->branch_id != NULL ? 'readonly' : '' }}>
-                        <option value="{{ NULL }}" selected>Branch</option>
+                        <option value="{{ NULL }}" selected>All Branches</option>
                         @foreach (\App\Models\Branch::pluck('name','id') as $id => $name)
                             <option value="{{ $id }}" {{ request('branch_id') == $id ? 'selected' : '' }}>{{ $name }}</option>
                         @endforeach
@@ -18,7 +18,7 @@
                             <option value="{{ $sales_by_id }}" {{ request('sales_by_id') == $sales_by_id ? 'selected' : '' }}>{{ $sales_by_name }}</option>
                         @endforeach
                     </select>
-                    
+
                     <input type="month" class="form-control" name="date" value="{{ request('date') ?? date('Y-m') }}">
                     <div class="input-group-prepend">
                         <button class="btn btn-primary" type="submit">{{ trans('global.submit') }}</button>
@@ -80,15 +80,15 @@
                                     @endif
                                 </td>
                                 <td>
-                                    
+
                                     @isset($sale->payments)
                                         @isset($sale->sales_tier->sales_tier)
                                         @php
                                             $sales_payments = $sale->payments->sum('amount');
-                                            if ($sales_payments && $sale->employee->target_amount > 0) 
+                                            if ($sales_payments && $sale->employee->target_amount > 0)
                                             {
                                                 $achieved = ($sales_payments / $sale->employee->target_amount) *100;
-                                                
+
                                                 $sales_sales_tier_amount = ($sales_payments * $sale->sales_tier->sales_tier->sales_tiers_ranges()->where('range_from', '<=', $achieved)->orderBy('range_from','desc')->first()->commission) / 100;
                                             }
                                         @endphp
@@ -103,12 +103,12 @@
                                         @isset($sale->sales_tier->sales_tier)
                                             @php
                                                 $sales_payments = $sale->payments->sum('amount');
-                                                if ($sales_payments && $sale->employee->target_amount > 0) 
+                                                if ($sales_payments && $sale->employee->target_amount > 0)
                                                 {
                                                     $achieved = ($sales_payments / $sale->employee->target_amount) *100;
                                                     $sales_sales_tier_commission = ($sale->sales_tier->sales_tier->sales_tiers_ranges()->where('range_from', '<=', $achieved)->orderBy('range_from','desc')->first()->commission ?? 0);
                                                 }
-                                                
+
                                             @endphp
                                             {{ $sales_payments ? $sales_sales_tier_commission  : 0 }} %
                                         @else

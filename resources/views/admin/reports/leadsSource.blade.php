@@ -13,7 +13,7 @@
                     <div class="input-group">
                         <input type="month" value="{{ request('date') ?? date('Y-m') }}" name="date" class="form-control">
                         <select name="branch_id" id="branch_id" class="form-control" {{ $employee && $employee->branch_id != NULL ? 'readonly' : '' }}>
-                            <option value="{{ NULL }}" selected hidden disabled>Branch</option>
+                            <option value="{{ NULL }}" selected hidden disabled>All Branches</option>
                             @foreach (\App\Models\Branch::pluck('name','id') as $id => $name)
                                 <option value="{{ $id }}" {{ $branch_id == $id ? 'selected' : '' }}>{{ $name }}</option>
                             @endforeach
@@ -71,12 +71,12 @@
 @section('scripts')
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
-    
+
     const ctx = document.getElementById('myChart').getContext('2d');
     const myChart = new Chart(ctx, {
         type: 'pie',
         data: {
-            labels: [@php 
+            labels: [@php
                     foreach($sources as $key => $source){
                         echo "'".$key."'" . ',';
                     }
@@ -84,14 +84,14 @@
             datasets: [{
                 label: '# of Votes',
                 data: [
-                    @php 
+                    @php
                         foreach($sources as $source){
                             echo "'".$source->count()."'" . ',';
                         }
                     @endphp
                 ],
                 backgroundColor: [
-                    @php 
+                    @php
                     function random_color_part() {
                         return str_pad( dechex( mt_rand( 0, 255 ) ), 2, '0', STR_PAD_LEFT);
                     }
