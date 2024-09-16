@@ -134,7 +134,7 @@
                 retrieve: true,
                 searching:true,
                 aaSorting: [],
-                ajax: "{{ route('admin.employees.index',request()->all()) }}",
+                ajax: "{!! route('admin.employees.index',request()->all()) !!}",
                 columns: [{
                         data: 'placeholder',
                         name: 'placeholder'
