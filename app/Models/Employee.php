@@ -105,9 +105,9 @@ class Employee extends Model implements HasMedia
             ];
         }
         return [
-            "url"=> "",
-            "thumbnail"=>"",
-            "preview"=>"",
+            "url"=> null,
+            "thumbnail"=>null,
+            "preview"=>null,
         ];
 
     }
