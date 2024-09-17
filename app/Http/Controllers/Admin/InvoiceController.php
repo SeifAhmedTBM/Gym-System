@@ -778,6 +778,25 @@ class InvoiceController extends Controller
 
         return view('admin.payments.create', compact('invoice', 'accounts', 'sales_bies', 'memberStatuses'));
     }
+    public function paymentDuePayments($id)
+    {
+        abort_if(Gate::denies('payment_create'), Response::HTTP_FORBIDDEN, '403 Forbidden');
+
+        $selected_branch = isset(Auth()->user()->employee) ? Auth()->user()->employee->branch : Branch::first();
+
+
+        $invoice = Invoice::withSum('payments', 'amount')->findOrFail($id);
+
+         $accounts = Account::pluck('name','id');
+
+        $sales_bies = User::whereHas('roles', function ($q) {
+            $q = $q->whereTitle('Sales');
+        })->pluck('name', 'id');
+
+        $memberStatuses = Status::pluck('name', 'id');
+
+        return view('admin.payments.create', compact('invoice', 'accounts', 'sales_bies', 'memberStatuses'));
+    }
 
     public function storePayment(Request $request, $id)
     {
