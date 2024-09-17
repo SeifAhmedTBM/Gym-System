@@ -1,10 +1,32 @@
 <div class="row">
     <div class="col-md-12">
         <div class="card">
+            
             <div class="card-body" id="printMe">
+            @if(auth()->user()->roles[0]->title == 'Super Admin')
+            <form action="{{ route('admin.home') }}" method="get">
+                <div class="row">
+                    <div class="col-md-6">
+                        <label for="date">{{ trans('global.branch') }}</label>
+                        <div class="input-group">
+                            <select name="branch_id" id="" class="form-control">
+                                <option value="" selected>All Branches</option>
+                                @foreach($branches as $branch)
+                                  <option value="{{$branch->id}}" {{ $branch->id == request()->input('branch_id') ? 'selected' : ''}}>{{$branch->name}}</option>
+                                @endforeach
+                            </select>
+                            <div class="input-group-prepend">
+                                <button class="btn btn-primary" type="submit" >{{ trans('global.submit') }}</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </form>
+            @endif
                 <a href="{{ route('admin.reports.sessionsAttendancesReport') }}" class="btn btn-sm float-right mb-2 btn-success">
                     <i class="fas fa-fingerprint"></i> {{ trans('global.session_attendances') }}
                 </a>
+              
                 <div class="table-responsive">
                     <table class="table table-bordered table-hover table-striped">
                         <thead>
@@ -24,10 +46,15 @@
                             </tr>
                         </thead>
                         <tbody>
-                            @php
-                                $branch_id = Auth()->user()->employee && Auth()->user()->employee->branch_id != NULL ?
-                                 Auth()->user()->employee->branch_id : NULL;
-                            @endphp
+                                @php
+                                    if (request()->input('branch_id')) {
+                                        $branch_id = request()->input('branch_id');
+                                    } else {
+                                        $branch_id = Auth()->user()->employee && Auth()->user()->employee->branch_id != NULL
+                                            ? Auth()->user()->employee->branch_id
+                                            : NULL;
+                                    }
+                                @endphp
                                 @forelse ($timeslots as $timeslot)
                                     <tr>
                                         <td class="font-weight-bold">
