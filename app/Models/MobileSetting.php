@@ -14,5 +14,6 @@ class MobileSetting extends Model
         'rules',
         'terms_conditions',
         'pt_service_type',
+        'classes_service_type',
     ];
 }
