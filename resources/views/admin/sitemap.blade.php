@@ -314,11 +314,12 @@
                                 <li>
                                     <a href="{{ route('admin.reports.sessions-revenue') }}">Sessions Revenue ( Heat map ) </a>
                                 </li> --}}
-                                {{-- @can('expense_access')
-                                <li>
-                                    <a href="{{ route('admin.expenses.index') }}">{{ trans('cruds.expense.title') }}</a>
-                                </li>
-                            @endcan --}}
+                                @can('expense_access')
+                                    <li>
+                                        <a href="{{ route('admin.expenses_categories') }}">Expenses Categories</a>
+                                        <span class="badge badge-danger">NEW</span>
+                                    </li>
+                                @endcan 
                             </ul>
                         </div>
 
@@ -392,6 +393,8 @@
                             </ul>
                         </div>
                     </div>
+
+                    
 
                 </div>
             </div>

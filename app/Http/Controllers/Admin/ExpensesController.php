@@ -149,13 +149,13 @@ class ExpensesController extends Controller
  
         $branchId = $request->input('branch_id');
         $account = Account::where('branch_id' , $branchId)->first();
-        $date = $request->input('date');
-        // if (is_string($date)) {
-        //     $date = Carbon::createFromFormat('Y-m', $date);
-        //     $date_format = $date->format('Y-m');
-        // } else {
-        //     $date_format = $date->format('Y-m');
-        // }
+        
+        if($request->input('date')){
+            $date = $request->input('date');
+        }
+        else{
+            $date = date('Y-m');
+        }
         $expenses_categories = ExpensesCategory::with('expenses.account.branch')
             ->get();
     
@@ -163,7 +163,9 @@ class ExpensesController extends Controller
             $category->total_amount = $category->expensesCount($category->id, $branchId, $date);
         }
 
-        return view('admin.expenses.categories',compact('expenses_categories' ,'branches' , 'branchId' ,'account' ,'date'));
+        $total_expenses = $expenses_categories->sum('total_amount');
+
+        return view('admin.expenses.categories',compact('expenses_categories' ,'branches' , 'branchId' ,'account' ,'date' ,'total_expenses'));
   
     }
 
