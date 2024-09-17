@@ -50,6 +50,9 @@ class UpdateEmployeeRequest extends FormRequest
             'target_amount' => [
                 'nullable'
             ],
+            'image' => [
+                'nullable'
+            ],
             // 'finger_print_id' => [
             //     'nullable',
             //     'required_if:status,active',

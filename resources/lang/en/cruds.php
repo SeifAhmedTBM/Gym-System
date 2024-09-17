@@ -669,6 +669,7 @@ return [
         'fields'         => [
             'id'                       => 'ID',
             'id_helper'                => ' ',
+            'photo'                 => 'photo',
             'order'                       => 'Order',
             'order_helper'                => ' ',
             'job_status'               => 'Job Status',

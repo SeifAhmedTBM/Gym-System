@@ -635,6 +635,11 @@ return [
         'Delete'                    => 'news_delete',
         'Access'                    => 'news_access',
     ],
+//    'Mobile Settings' => [
+//        'ID'                        => 8,
+//        'Edit'                      => 'mobile_settings',
+//
+//    ],
 
     // 'Service Options Pricelists' => [
     //     'Create' => 'service_options_pricelist_create',

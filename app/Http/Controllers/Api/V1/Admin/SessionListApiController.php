@@ -18,7 +18,7 @@ class SessionListApiController extends Controller
 
     public function index()
     {
-        abort_if(Gate::denies('session_list_access'), Response::HTTP_FORBIDDEN, '403 Forbidden');
+//        abort_if(Gate::denies('session_list_access'), Response::HTTP_FORBIDDEN, '403 Forbidden');
 
         return new SessionListResource(SessionList::with(['service'])->get());
     }

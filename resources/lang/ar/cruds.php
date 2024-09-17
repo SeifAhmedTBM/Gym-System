@@ -626,6 +626,8 @@ return [
             'status_helper'            => ' ',
             'user'                     => 'المستخدم',
             'user_helper'              => ' ',
+            'photo'                 => 'الصورة',
+
             'created_at'               => 'تاريخ الأنشاء',
             'created_at_helper'        => ' ',
             'updated_at'               => 'اخر تحديث',
