@@ -149,7 +149,8 @@
                     },
                     {
                         data: 'photo',
-                        name: 'photo'
+                        name: 'photo',
+                        'searchable': false
                     },
                     {
                         data: 'employee_name',
