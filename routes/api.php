@@ -53,6 +53,11 @@ Route::group(['prefix' => 'v1', 'as' => 'api.', 'namespace' => 'Api\V1\Admin'], 
     Route::get('pt-services/', 'PTServicesApiController@trainers_pricelist');
     Route::get('classes-services/pricelist', 'ClassesServicesApiController@pricelist');
     Route::get('classes-services/', 'ClassesServicesApiController@classes');
+    
+    Route::get('info/privacy/', 'InformationApiController@privacy');
+    Route::get('info/about-us/', 'InformationApiController@about_us');
+    Route::get('info/rules/', 'InformationApiController@rules');
+    Route::get('info/terms-conditions/', 'InformationApiController@terms_conditions');
 
     // Pricelist
     Route::apiResource('pricelists', 'PricelistApiController');
