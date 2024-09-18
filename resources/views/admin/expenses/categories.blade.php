@@ -7,6 +7,7 @@
     }
 </style>
 
+
     <form action="{{ route('admin.expenses_categories') }}" method="GET" style="padding:20px;">
         @csrf
         <div class="row">
@@ -37,6 +38,18 @@
         
         
     </form>
+    <div class="row" style="direction:rtl">
+    @can('expenses_counter')
+    <div class="col-lg-3 col-md-3 col-sm-12 col-xs-12">
+        <div class="card">
+            <div class="card-body" style="text-align:center">
+                <h2 class="text-center">Total Amount</h2>
+                <h2 class="text-center">{{ number_format($total_expenses , 2) }}</h2>
+            </div>
+        </div>
+    </div>
+    @endcan
+    </div>
 
     <div class="card">
         <div class="card-header">
