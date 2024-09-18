@@ -20,6 +20,11 @@
                     <div class="input-group-prepend">
                         <button class="btn btn-primary" type="submit" >{{ trans('global.submit') }}</button>
                     </div>
+                    <div class="col-md-2">
+                        <a href="{{ route('admin.members.inactive') }}" class="btn btn-warning">
+                            <i class="fa fa-arrow-circle-left"></i> Reset
+                        </a>
+                    </div>
                 </div>
             </form>
         </div>
@@ -30,7 +35,7 @@
                 <a href="{{ route('admin.inactiveMembers.export',request()->all()) }}" class="btn btn-info"><i class="fa fa-download"></i> {{ trans('global.export_excel') }}</a>
             @endcan --}}
         </div>
-        
+
         <div class="col-md-2">
             <h4 class="text-center">{{ $members->count() }}</h4>
             <h4 class="text-center">{{ trans('global.inactive_members') }}</h4>

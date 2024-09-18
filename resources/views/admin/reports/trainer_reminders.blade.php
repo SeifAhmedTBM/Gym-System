@@ -14,6 +14,11 @@
                     <div class="input-group-prepend">
                         <button class="btn btn-primary" type="submit" >{{ trans('global.submit') }}</button>
                     </div>
+                    <div class="col-lg-2">
+                        <a href="{{ route('admin.reports.trainers-reminders') }}" class="btn btn-warning">
+                            <i class="fa fa-arrow-circle-left"></i> Reset
+                        </a>
+                    </div>
                 </div>
             </div>
         </div>

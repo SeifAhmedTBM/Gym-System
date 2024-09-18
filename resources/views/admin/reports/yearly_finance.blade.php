@@ -1,6 +1,6 @@
 @extends('layouts.admin')
 @section('content')
-    
+
     <form action="{{ route('admin.reports.yearlyFinance.report') }}" method="get">
         <div class="form-group row">
             <div class="input-group align-items-end ">
@@ -22,10 +22,15 @@
                 <div class="input-group-prepend">
                     <button class="btn btn-primary" type="submit" >{{ trans('global.submit') }}</button>
                 </div>
+                <div class="col-md-2">
+                    <a href="{{ route('admin.reports.yearlyFinance.report') }}" class="btn btn-warning">
+                        <i class="fa fa-arrow-circle-left"></i> Reset
+                    </a>
+                </div>
             </div>
         </div>
     </form>
-    
+
     <div class="row">
         <div class="col-md-12">
             <div class="card">
@@ -81,7 +86,7 @@
                                        <td>{{ date('F', mktime(0, 0, 0, $index, 1)) }}</td>
                                        <td>{{ number_format($month['total_income']) }} EGP</td>
                                        <td>{{ number_format($month['total_outcome']) }} EGP</td>
-                                       <td>{{ number_format($month['net_income']) }} EGP</td>                                       
+                                       <td>{{ number_format($month['net_income']) }} EGP</td>
                                    </tr>
                                @endforeach
                             </tbody>

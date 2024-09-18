@@ -12,7 +12,7 @@
                             <input type="date" class="form-control" name="to"
                                 value="{{ request('to') ?? date('Y-m-t') }}">
                             <select name="branch_id" id="branch_id" class="form-control">
-                                <option value="{{ null }}" selected>Branch</option>
+                                <option value="{{ null }}" selected>All Branch</option>
                                 @foreach (App\Models\Branch::pluck('name', 'id') as $id => $name)
                                     <option value="{{ $id }}" {{ request('branch_id') == $id ? 'selected' : '' }}>
                                         {{ $name }}</option>
@@ -43,6 +43,11 @@
                             </select>
                             <div class="input-group-prepend">
                                 <button class="btn btn-primary" type="submit">{{ trans('global.submit') }}</button>
+                            </div>
+                            <div class="col-lg-2">
+                                <a href="{{ route('admin.reports.trainers-reminder-history-actions') }}" class="btn btn-warning">
+                                    <i class="fa fa-arrow-circle-left"></i> Reset
+                                </a>
                             </div>
                         </div>
                     </div>

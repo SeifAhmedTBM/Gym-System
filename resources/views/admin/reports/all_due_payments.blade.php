@@ -22,22 +22,27 @@
                 </div>
             </div>
 
-            <div class="col-md-3">
+            <div class="col-md-2">
                 <div class="">
                     <label for="start_date">Start Date</label>
                     <input type="date" name="start_date" id="start_date" class="form-control" value="{{ request('start_date')??$startOfMonth }}">
                 </div>
             </div>
 
-            <div class="col-md-3">
+            <div class="col-md-2">
                 <div class="">
                     <label for="end_date">End Date</label>
                     <input type="date" name="end_date" id="end_date" class="form-control" value="{{ request('end_date')??$endOfMonth }}">
                 </div>
             </div>
 
-            <div class="col-md-3">
-                <button type="submit" class="btn btn-primary">Filter</button>
+            <div class="col-md-1 d-flex justify-content-center">
+                <button type="submit" class="btn btn-primary px-4">Filter</button>
+            </div>
+            <div class="col-md-2">
+                <a href="{{ route('admin.reports.all-due-payments') }}" class="btn btn-warning">
+                    <i class="fa fa-arrow-circle-left"></i> Reset
+                </a>
             </div>
         </div>
     </form>

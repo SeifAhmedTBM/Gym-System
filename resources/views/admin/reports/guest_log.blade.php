@@ -33,6 +33,11 @@
                         <i class="fa fa-download"></i>
                     </a>
                 </div>
+                <div class="col-lg-2">
+                    <a href="{{ route('admin.reports.guest-log-report') }}" class="btn btn-warning">
+                        <i class="fa fa-arrow-circle-left"></i> Reset
+                    </a>
+                </div>
             </div>
         </div>
     </form>

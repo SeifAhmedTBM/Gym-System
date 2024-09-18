@@ -16,6 +16,11 @@
                 <div class="input-group-prepend">
                     <button class="btn btn-primary" type="submit" >{{ trans('global.submit') }}</button>
                 </div>
+                <div class="col-md-2">
+                    <a href="{{ route('admin.reports.offers') }}" class="btn btn-warning">
+                        <i class="fa fa-arrow-circle-left"></i> Reset
+                    </a>
+                </div>
             </div>
         </div>
     </div>
@@ -75,13 +80,13 @@
 @section('scripts')
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
-    
+
     const ctx = document.getElementById('myChart').getContext('2d');
     const myChart = new Chart(ctx, {
         type: 'pie',
         data: {
             labels: [
-                @php 
+                @php
                     foreach($payments as $key => $payment){
                         echo "'".$key."'" . ',';
                     }
@@ -89,15 +94,15 @@
             ],
             datasets: [{
                 label: '# of Votes',
-                data: [@php 
+                data: [@php
                     foreach($payments as $key => $payment){
                         echo "'".$payment->sum('amount')."'" . ',';
                     }
                 @endphp],
-                
+
                 backgroundColor: [
-                    
-                    @php 
+
+                    @php
                     function random_color_part() {
                         return str_pad( dechex( mt_rand( 0, 255 ) ), 2, '0', STR_PAD_LEFT);
                     }
@@ -111,7 +116,7 @@
                         }
                     @endphp
                 ],
-                
+
                 borderWidth: 1
             }]
         },

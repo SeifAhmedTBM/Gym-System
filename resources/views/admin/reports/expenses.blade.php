@@ -18,6 +18,11 @@
                                     <i class="fa fa-filter"></i>
                                 </button>
                             </div>
+                            <div class="col-md-2">
+                                <a href="{{ route('admin.reports.expenses.report') }}" class="btn btn-warning">
+                                    <i class="fa fa-arrow-circle-left"></i> Reset
+                                </a>
+                            </div>
                         </div>
                     </div>
                 </div>
