@@ -424,6 +424,8 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.', 'namespace' => 'Admin', 'mi
     Route::post('services/parse-csv-import', 'ServicesController@parseCsvImport')->name('services.parseCsvImport');
     Route::post('services/process-csv-import', 'ServicesController@processCsvImport')->name('services.processCsvImport');
     Route::resource('services', 'ServicesController');
+    Route::post('services/media', 'ServicesController@storeMedia')->name('services.storeMedia');
+
 
     // Pricelist
     Route::delete('pricelists/destroy', 'PricelistController@massDestroy')->name('pricelists.massDestroy');

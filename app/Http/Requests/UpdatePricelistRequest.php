@@ -23,7 +23,8 @@ class UpdatePricelistRequest extends FormRequest
             'service_id' => [
                 'required',
                 'integer',
-            ]
+            ],
+            'max_count'=>['nullable']
         ];
     }
 }
