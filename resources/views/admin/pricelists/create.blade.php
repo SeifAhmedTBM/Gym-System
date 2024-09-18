@@ -37,6 +37,19 @@
                     @endif
                     <span class="help-block">{{ trans('cruds.pricelist.fields.service_helper') }}</span>
                 </div>
+                @if($service->service_type->id == $class_service_id)
+                    <div class="col-md-6">
+                        <label class="required" for="max_count">{{ trans('cruds.pricelist.fields.max_count') }}</label>
+                        <input class="form-control {{ $errors->has('max_count') ? 'is-invalid' : '' }}" type="text" name="max_count" id="max_count" value="{{ old('max_count', '') }}"  required>
+                        @if($errors->has('max_count'))
+                            <div class="invalid-feedback">
+                                {{ $errors->first('max_count') }}
+                            </div>
+                        @endif
+                        <span class="help-block">{{ trans('cruds.pricelist.fields.name_helper') }}</span>
+                    </div>
+                @endif
+
 
               
                 

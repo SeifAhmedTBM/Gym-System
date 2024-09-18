@@ -51,6 +51,8 @@ Route::group(['prefix' => 'v1', 'as' => 'api.', 'namespace' => 'Api\V1\Admin'], 
     Route::get('pt-services/pricelist', 'PTServicesApiController@pricelist');
     Route::get('pt-services/trainers', 'PTServicesApiController@trainers');
     Route::get('pt-services/', 'PTServicesApiController@trainers_pricelist');
+    Route::get('classes-services/pricelist', 'ClassesServicesApiController@pricelist');
+    Route::get('classes-services/', 'ClassesServicesApiController@classes');
 
     // Pricelist
     Route::apiResource('pricelists', 'PricelistApiController');

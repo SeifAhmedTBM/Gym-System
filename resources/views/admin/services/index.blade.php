@@ -25,6 +25,9 @@
                             {{ trans('cruds.service.fields.order') }}
                         </th>
                         <th>
+                            {{ trans('cruds.gallery.fields.images') }}
+                        </th>
+                        <th>
                             {{ trans('cruds.service.fields.name') }}
                         </th>
                         <th>
@@ -101,6 +104,11 @@
                     {
                         data: 'id',
                         name: 'id'
+                    },
+                    {
+                        data: 'logo',
+                        name: 'logo',
+                        searchable:false
                     },
                     {
                         data: 'name',

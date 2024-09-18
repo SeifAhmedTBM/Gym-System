@@ -27,6 +27,7 @@ class StorePricelistRequest extends FormRequest
                 'required',
                 'integer',
             ],
+            'max_count' => ['nullable']
         ];
     }
 }
