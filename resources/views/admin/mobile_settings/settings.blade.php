@@ -52,6 +52,15 @@
                         ['class' => 'form-control']) !!}
                     </div>
                 </div>
+                <div class="col-md-6">
+                    <div class="form-group">
+                        {!! Form::label('classes_service_type', trans('global.classes_service_type')) !!}
+                        {!! Form::select('classes_service_type',
+                            ['service1' => \App\Models\ServiceType::pluck('name','id')],
+                            $settings->classes_service_type ?? null,
+                        ['class' => 'form-control']) !!}
+                    </div>
+                </div>
             </div>
         </div>
     </div>

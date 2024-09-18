@@ -54,6 +54,7 @@ class Pricelist extends Model
         'created_at',
         'updated_at',
         'deleted_at',
+        'max_count',
     ];
 
     public function service()
@@ -89,5 +90,13 @@ class Pricelist extends Model
     public function pricelist_days() : HasMany
     {
         return $this->hasMany(PricelistDays::class,'pricelist_id');
+    }
+
+    public function branches(){
+        if ($this->all_branches == "true"){
+            return Branch::whereNull('deleted_at')->get(['name','id']);
+        }
+        return Branch::where('id',$this->branch_id)->get(['name','id']);
+        
     }
 }

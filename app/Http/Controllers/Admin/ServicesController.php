@@ -14,10 +14,14 @@ use Illuminate\Support\Facades\Gate;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Yajra\DataTables\Facades\DataTables;
+use Spatie\MediaLibrary\MediaCollections\Models\Media;
+use App\Http\Controllers\Traits\MediaUploadingTrait;
+use App\Models\MobileSetting;
 
 class ServicesController extends Controller
 {
     use CsvImportTrait;
+    use MediaUploadingTrait;
 
     public function index(Request $request)
     {
@@ -29,7 +33,17 @@ class ServicesController extends Controller
 
             $table->addColumn('placeholder', '&nbsp;');
             $table->addColumn('actions', '&nbsp;');
+            $table->editColumn('logo', function ($row) {
+                if ($photo = $row->logo) {
+                    return sprintf(
+                        '<a href="%s" target="_blank"><img src="%s" width="50px" height="50px"></a>',
+                        $photo->url,
+                        $photo->thumbnail
+                    );
+                }
 
+                return '';
+            });
             $table->editColumn('actions', function ($row) {
                 $viewGate = 'service_show';
                 $editGate = 'service_edit';
@@ -73,7 +87,7 @@ class ServicesController extends Controller
                 return $row->created_at ? $row->created_at->toFormattedDateString() . ' , ' . $row->created_at->format('g:i A') : '';
             });
 
-            $table->rawColumns(['actions', 'placeholder', 'service_type', 'status']);
+            $table->rawColumns(['actions', 'placeholder', 'service_type', 'status','logo']);
 
             return $table->make(true);
         }
@@ -86,13 +100,20 @@ class ServicesController extends Controller
         abort_if(Gate::denies('service_create'), Response::HTTP_FORBIDDEN, '403 Forbidden');
 
         $service_types = ServiceType::pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
+        $image_service_id = MobileSetting::all()->first()->classes_service_type;
 
-        return view('admin.services.create', compact('service_types'));
+        return view('admin.services.create', compact('service_types','image_service_id'));
     }
 
     public function store(StoreServiceRequest $request)
     {
         $service = Service::create($request->all());
+        if ($request->input('cover', false)) {
+            $service->addMedia(storage_path('tmp/uploads/' . basename($request->input('cover'))))->toMediaCollection('cover');
+        }
+        if ($request->input('logo', false)) {
+            $service->addMedia(storage_path('tmp/uploads/' . basename($request->input('logo'))))->toMediaCollection('logo');
+        }
 
         return redirect()->route('admin.services.index');
     }
@@ -102,15 +123,35 @@ class ServicesController extends Controller
         abort_if(Gate::denies('service_edit'), Response::HTTP_FORBIDDEN, '403 Forbidden');
 
         $service_types = ServiceType::pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
-
+        $image_service_id = MobileSetting::all()->first()->classes_service_type;
         $service->load('service_type');
 
-        return view('admin.services.edit', compact('service_types', 'service'));
+        return view('admin.services.edit', compact('service_types', 'service','image_service_id'));
     }
 
     public function update(UpdateServiceRequest $request, Service $service)
     {
         $service->update($request->all());
+        if ($request->input('cover', false)) {
+            if (!$service->cover || $request->input('cover') !== $service->cover->file_name) {
+                if ($service->cover) {
+                    $service->cover->delete();
+                }
+                $service->addMedia(storage_path('tmp/uploads/' . basename($request->input('cover'))))->toMediaCollection('cover');
+            }
+        } elseif ($service->cover) {
+            $service->cover->delete();
+        }
+        if ($request->input('logo', false)) {
+            if (!$service->logo || $request->input('logo') !== $service->logo->file_name) {
+                if ($service->logo) {
+                    $service->logo->delete();
+                }
+                $service->addMedia(storage_path('tmp/uploads/' . basename($request->input('logo'))))->toMediaCollection('logo');
+            }
+        } elseif ($service->logo) {
+            $service->logo->delete();
+        }
 
         return redirect()->route('admin.services.index');
     }

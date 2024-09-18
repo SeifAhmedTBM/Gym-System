@@ -29,7 +29,13 @@ class StoreServiceRequest extends FormRequest
             'service_type_id' => [
                 'required',
                 'integer',
-            ]
+            ],
+            'cover' => [
+                'nullable',
+            ],
+            'logo' => [
+                'nullable',
+            ],
         ];
     }
 }

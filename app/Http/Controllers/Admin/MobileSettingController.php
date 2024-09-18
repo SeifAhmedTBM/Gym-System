@@ -46,6 +46,7 @@ class MobileSettingController extends Controller
         $settings->rules                     = $request['rules'] ?? '';
         $settings->terms_conditions                     = $request['terms_conditions'] ?? '';
         $settings->pt_service_type                     = $request['pt_service_type'] ?? 2;
+        $settings->classes_service_type                     = $request['classes_service_type'] ?? null;
 
         $settings->save();
         Alert::success('Saved Successfully');
@@ -68,6 +69,7 @@ class MobileSettingController extends Controller
         $mobileSetting->about_us                     = $request['about_us'] ?? '';
         $mobileSetting->rules                     = $request['rules'] ?? '';
         $mobileSetting->terms_conditions                     = $request['terms_conditions'] ?? '';
+        $mobileSetting->classes_service_type                     = $request['classes_service_type'] ?? 2;
         $mobileSetting->pt_service_type                     = $request['pt_service_type'] ?? 2;
         $mobileSetting->save();
         Alert::success('Saved Successfully');
