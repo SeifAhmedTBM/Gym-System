@@ -72,11 +72,14 @@ class ScheduleController extends Controller
 
         $timeslots = Timeslot::pluck('from', 'id')->prepend(trans('global.pleaseSelect'), '');
 
-        $trainers = User::pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
-
+        $trainers = User::whereHas('roles',function($q){
+            $q->where('title','Trainer');
+        })->pluck('name', 'id')->prepend(trans('global.pleaseSelect'), 'disabled');
         $schedule->load('session', 'timeslot', 'trainer');
 
-        return view('admin.schedules.edit', compact('sessions', 'timeslots', 'trainers', 'schedule'));
+        $branches = Branch::get();
+
+        return view('admin.schedules.edit', compact('sessions', 'timeslots', 'trainers', 'schedule' ,'branches'));
     }
 
     public function update(UpdateScheduleRequest $request, Schedule $schedule)

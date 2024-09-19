@@ -77,7 +77,7 @@
                 @endif
                 <span class="help-block">{{ trans('cruds.schedule.fields.trainer_helper') }}</span>
             </div>
-            <div class="form-group">
+            <div class="form-group" style="display:none">
                 <label class="required" for="comission_type">{{ trans('cruds.schedule.fields.comission_type') }}</label>
                 <select class="form-control select2 {{ $errors->has('comission_type') ? 'is-invalid' : '' }}" name="comission_type" id="comission_type" required>
                     <option value="fixed" @if($schedule->comission_type == 'fixed') selected @endif>Fixed</option>
@@ -90,7 +90,7 @@
                 @endif
                 <span class="help-block">{{ trans('cruds.schedule.fields.comission_type_helper') }}</span>
             </div>
-            <div class="form-group">
+            <div class="form-group" style="display:none">
                 <label class="required" for="comission_amount">{{ trans('cruds.schedule.fields.comission_amount') }}</label>
                 <input type="number" id="comission_amount" name="comission_amount" value="{{$schedule->comission_amount}}" class="form-control">
                 @if($errors->has('comission_amount'))
@@ -99,6 +99,20 @@
                     </div>
                 @endif
                 <span class="help-block">{{ trans('cruds.schedule.fields.comission_amount_helper') }}</span>
+            </div>
+            <div class="form-group">
+                <label class="required" for="branch_id">Branch</label>
+                <select class="form-control select2 {{ $errors->has('branch_id') ? 'is-invalid' : '' }}" name="branch_id" id="branch_id" required>
+                    <option value="" >Select Branch</option>
+                     @foreach($branches as $branch)
+                     <option value="{{$branch->id}}" {{$schedule->branch_id == $branch->id ? 'selected' : ''}}>{{$branch->name}}</option>
+                     @endforeach
+                </select>
+                @if($errors->has('branch_id'))
+                    <div class="invalid-feedback">
+                        {{ $errors->first('branch_id') }}
+                    </div>
+                @endif
             </div>
 
             <div class="form-group">

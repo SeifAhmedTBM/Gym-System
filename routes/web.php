@@ -143,6 +143,7 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.', 'namespace' => 'Admin', 'mi
 
     // Settings
     Route::resource('settings', 'SettingController');
+    Route::resource('mobile_settings', 'MobileSettingController');
 
     // Membership Schedule
     // Route::resource('membership-schedule', 'MembershipScheduleController');
@@ -423,6 +424,8 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.', 'namespace' => 'Admin', 'mi
     Route::post('services/parse-csv-import', 'ServicesController@parseCsvImport')->name('services.parseCsvImport');
     Route::post('services/process-csv-import', 'ServicesController@processCsvImport')->name('services.processCsvImport');
     Route::resource('services', 'ServicesController');
+    Route::post('services/media', 'ServicesController@storeMedia')->name('services.storeMedia');
+
 
     // Pricelist
     Route::delete('pricelists/destroy', 'PricelistController@massDestroy')->name('pricelists.massDestroy');
@@ -637,6 +640,7 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.', 'namespace' => 'Admin', 'mi
     Route::post('employees/parse-csv-import', 'EmployeesController@parseCsvImport')->name('employees.parseCsvImport');
     Route::post('employees/process-csv-import', 'EmployeesController@processCsvImport')->name('employees.processCsvImport');
     Route::resource('employees', 'EmployeesController');
+    Route::post('employees/media', 'EmployeesController@storeMedia')->name('employees.storeMedia');
 
     Route::get('transfer-sales-data', 'EmployeesController@transferSalesData')->name('transfer_sales_data.index');
     Route::post('transfer-sales-data', 'EmployeesController@storeTransferSalesData')->name('transfer_sales_data.store');
@@ -649,6 +653,7 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.', 'namespace' => 'Admin', 'mi
     Route::get('add-document/{id}', 'EmployeesController@add_document')->name('employees.add_document');
 
     Route::put('employee/{id}/change-status', 'EmployeesController@change_status')->name('employees.change_status');
+    Route::put('employee/{id}/change-mobile-status', 'EmployeesController@change_mobile_status')->name('employees.change_mobile_status');
 
 
     // Employee attendances

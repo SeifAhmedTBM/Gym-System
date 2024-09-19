@@ -88,8 +88,8 @@
                                 <div class="col-md-3">
                                     <div class="row">
                                         <div class="col-md-12">
-                                            <a href="{{ asset('images/user.png') }}" style="display: inline-block">
-                                                <img src="{{ asset('images/user.png') }}" class="rounded-circle"
+                                            <a href="{{ $employee->photo->url ?? '' }}" style="display: inline-block">
+                                                <img src="{{ $employee->photo->thumbnail ?? '' }}" class="rounded-circle"
                                                     style="width: 150px;height:150px">
                                             </a>
                                         </div>

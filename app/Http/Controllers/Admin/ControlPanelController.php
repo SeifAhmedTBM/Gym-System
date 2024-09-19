@@ -33,6 +33,7 @@ class ControlPanelController extends Controller
     {
         return view('partials.mobile');
     }
+
     public function taskManagement()
     {
         return view('partials.task_management');

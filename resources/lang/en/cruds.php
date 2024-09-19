@@ -327,6 +327,7 @@ return [
         'title_singular' => 'Pricelist',
         'fields'         => [
             'id'                    => 'ID',
+            'max_count'        => 'max count',
             'id_helper'             => ' ',
             'name'                  => 'Name',
             'name_helper'           => ' ',
@@ -669,6 +670,7 @@ return [
         'fields'         => [
             'id'                       => 'ID',
             'id_helper'                => ' ',
+            'photo'                 => 'photo',
             'order'                       => 'Order',
             'order_helper'                => ' ',
             'job_status'               => 'Job Status',
@@ -1210,6 +1212,7 @@ return [
             'id'                    => 'ID',
             'id_helper'             => ' ',
             'service_option'        => 'Service Option',
+           
             'service_option_helper' => ' ',
             'pricelist'             => 'Pricelist',
             'pricelist_helper'      => ' ',

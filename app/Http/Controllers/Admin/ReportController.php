@@ -2436,11 +2436,26 @@ class ReportController extends Controller
         $to = $request['to'] != NULL ? $request['to'] : date('Y-m-t');
 
         $branch_id = $request['branch_id'] != NULL ? $request['branch_id'] : NULL;
+        $accounts = [
+            ''=>'All',
+            'instapay' => 'Instapay',
+            'cash' => 'Cash',
+            'visa' => 'Visa',
+            'vodafone' => 'Vodafone',
+            'valu' => 'Valu',
+            'premium' => 'Premium',
+            'sympl' => 'Sympl'
+        ];
 
-        $accounts = Account::where('name', 'NOT LIKE', '%cash%')
-                                ->where('name', 'NOT LIKE', '%vodafone%')
-                                ->orderBy('name')
-                                ->pluck('name', 'id');
+        $accounts = $accounts + Account::where('name', 'NOT LIKE', '%cash%')
+                ->where('name', 'NOT LIKE', '%vodafone%')
+                ->orderBy('name')
+                ->pluck('name', 'id')->toArray();
+//        $accounts = Account::where('name', 'NOT LIKE', '%cash%')
+//                                ->where('name', 'NOT LIKE', '%vodafone%')
+//                                ->orderBy('name')
+//                                ->pluck('name', 'id');
+
 
         $branches = Branch::pluck('name', 'id');
 

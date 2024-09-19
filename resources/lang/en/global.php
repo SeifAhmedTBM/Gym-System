@@ -3,6 +3,11 @@
 return [
     'actions'                        => 'Actions',
     'add'                            => 'Add',
+    'privacy_setting'                            => 'privacy setting',
+    'about_us'                            => 'about us',
+    'rules'                            => 'rules',
+    'pt_service_type'                            => 'pt service type',
+    'terms_conditions'                            => 'terms conditions',
     'allRightsReserved'              => 'All rights reserved.',
     'areYouSure'                     => 'Are you sure?',
     'clickHereToVerify'              => 'Click here to verify',

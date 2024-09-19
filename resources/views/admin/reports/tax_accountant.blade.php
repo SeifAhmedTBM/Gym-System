@@ -36,7 +36,7 @@
                     @include('admin_includes.filters', [
                         'columns' => [
                             'branch_id'  => ['label' => 'Branch', 'type' => 'select', 'data' => $branches,'related_to' => 'account'],
-                            'account_id' => ['label' => 'Account', 'type' => 'select', 'data' => $accounts],
+                            'account_id' => ['label' => 'Account', 'type' => 'select', 'data' => $accounts,'related_to' => 'account'],
                             'created_at' => ['label' => trans('global.created_at'), 'type' => 'date', 'from_and_to' => true]
                         ],
                         'route' => 'admin.reports.tax-accountant'
