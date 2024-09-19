@@ -113,13 +113,13 @@
                     'type' => '',
                     
                 ],
-                [
-                    'can' => 'expense_access',
-                    'title' => 'Expenses Categories',
-                    'imageUrl' => '15.png',
-                    'linkUrl' => 'admin.expenses_categories',
-                    'type' => '',
-                ],
+                // [
+                //     'can' => 'expense_access',
+                //     'title' => 'Expenses Categories',
+                //     'imageUrl' => '15.png',
+                //     'linkUrl' => 'admin.expenses_categories',
+                //     'type' => '',
+                // ],
                 [
                     'can' => 'member_access',
                     'title' => 'Member Suggestions',

@@ -85,7 +85,7 @@
                                
                                 <a href="{{route('admin.expenses_categories_show_by_filter' , [
                                         'expenses_category_id' => $category->id,
-                                        'account_id' => isset($branchId) ? [$account->id] : [],
+                                        'account_id' => isset($branchId) && $account ? [$account->id] : [],
                                         'date' => isset($date) ? $date : date('Y-m') ,
                                     ])}}" class="btn btn-primary">
                                         <i class="fas fa-eye"></i>
