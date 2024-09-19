@@ -193,7 +193,7 @@ Route::group(['prefix' => 'v1', 'as' => 'api.', 'namespace' => 'Api\V1\Admin'], 
     Route::apiResource('schedules', 'ScheduleApiController');
 
     // Ratings
-    Route::apiResource('rate', 'RatingsApiController');
+    Route::apiResource('rate', 'RatingsApiController')->middleware('auth:sanctum');
 
     // Reasons
     Route::post('reasons/media', 'ReasonsApiController@storeMedia')->name('reasons.storeMedia');
