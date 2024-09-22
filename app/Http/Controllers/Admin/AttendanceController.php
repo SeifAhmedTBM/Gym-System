@@ -656,6 +656,7 @@ class AttendanceController extends Controller
     {
         $membership = Membership::whereHas('member')->with('member')->whereId($request->membership_id)->first();
         $sales_by_id = $membership->member->sales_by_id;
+        $lead_id = $request->lead_id??'';
         if (is_null($request['lead_id'])) {
                 $request->validate([
                     'name'                  => 'required',
@@ -674,6 +675,7 @@ class AttendanceController extends Controller
                     'type'              => 'lead',
                     'source_id'         => Source::whereName('invitation')->first()->id ?? Source::firstOrCreate(['name' => 'invitation'])->id,
                 ]);
+                $lead_id=$lead->id;
 
                 $invitation = Invitation::create([
                     'member_id'         => $membership->member->id,
@@ -681,6 +683,7 @@ class AttendanceController extends Controller
                     'membership_id'     => $request['membership_id']
                 ]);
         }else{
+
             $invitation = Invitation::create([
                 'member_id'             => $membership->member->id,
                 'lead_id'               => $request['lead_id'],
@@ -690,7 +693,7 @@ class AttendanceController extends Controller
 
         $reminder = Reminder::create([
             'type'              => 'sales',
-            'lead_id'           => $lead->id,
+            'lead_id'           => $lead_id ,
             'due_date'          => $request['followup'],
             'user_id'           => $sales_by_id,
         ]);

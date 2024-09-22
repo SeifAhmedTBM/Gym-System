@@ -12,7 +12,10 @@ class SearchLeadComponent extends Component
     public function render()
     {
         if($this->lead_name != NULL) {
-            $leads = Lead::where('name', 'LIKE', '%' . $this->lead_name . '%')->orWhere('phone', 'LIKE', '%'. $this->lead_name . '%')->get();
+            $leads = Lead::where('name', 'LIKE', '%' . $this->lead_name . '%')
+                ->orWhere('phone', 'LIKE', '%' . $this->lead_name . '%')
+                ->limit(10)
+                ->get();
         }else {
             $leads = [];
         }
