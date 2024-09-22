@@ -156,8 +156,10 @@ class ExpensesController extends Controller
         else{
             $date = date('Y-m');
         }
+        
         $expenses_categories = ExpensesCategory::with('expenses.account.branch')
-            ->get();
+        ->where('name', '!=', 'Salary')
+        ->get();
     
         foreach ($expenses_categories as $category) {
             $category->total_amount = $category->expensesCount($category->id, $branchId, $date);
