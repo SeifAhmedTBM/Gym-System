@@ -6,12 +6,17 @@ use App\Models\Lead;
 use App\Models\User;
 use App\Models\Setting;
 use App\Models\Membership;
+use App\Models\MobileSetting;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Validator;
 
 class AuthController extends Controller
 {
+    private $setting;
+    public function __construct(){
+        $this->setting = MobileSetting::all()->first();
+    }
     public function login(Request $request)
     {
         $validatedData = Validator::make($request->all(), [
@@ -207,9 +212,13 @@ class AuthController extends Controller
         $member = auth('sanctum')->user()->lead;
 
         $membership = $member->memberships()
+            ->whereHas('service_pricelist.service', function ($query) {
+                $query->where('service_type_id', $this->setting->pt_service_type);
+            })
             ->with(['trainer' => function ($query) {
                 $query->withSum('ratings', 'rate')->withCount('ratings');
             }])
+            ->where('status', 'current')
             ->latest()
             ->first();
 

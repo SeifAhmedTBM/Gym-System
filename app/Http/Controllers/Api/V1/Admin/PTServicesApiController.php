@@ -18,6 +18,10 @@ use Symfony\Component\HttpFoundation\Response;
 
 class PTServicesApiController extends Controller
 {
+    private $setting;
+    public function __construct(){
+        $this->setting = MobileSetting::all()->first();
+    }
     public function pricelist()
     {
 //        abort_if(Gate::denies('service_access'), Response::HTTP_FORBIDDEN, '403 Forbidden');

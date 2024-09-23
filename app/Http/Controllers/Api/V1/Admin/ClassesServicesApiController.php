@@ -18,10 +18,15 @@ use Symfony\Component\HttpFoundation\Response;
 
 class ClassesServicesApiController extends Controller
 {
+    private $mobile_setting;
+    public function __construct(){
+        $this->mobile_setting = MobileSetting::all()->first();
+    }
     public function pricelist()
     {
 
-        $service_type_id = MobileSetting::first()->classes_service_type;
+        $service_type_id = $this->mobile_setting->classes_service_type;
+
         $service_type = ServiceType::with(['service_pricelists' => fn($q) => $q->where('pricelists.status','active')])->findOrFail($service_type_id);
         return response()->json([
             'message'=>"success",
@@ -33,7 +38,6 @@ class ClassesServicesApiController extends Controller
                         'amount'=>$price->amount,
                         'session_count'=>$price->session_count,
                         'name'=>$price->name,
-//                        'name'=>$price->name,
                     ];
                 }),
             ]
@@ -42,7 +46,7 @@ class ClassesServicesApiController extends Controller
     }
     public function classes()
     {
-        $service_type_id = MobileSetting::first()->classes_service_type;
+        $service_type_id = $this->mobile_setting->classes_service_type;
         $serviceType = ServiceType::with([
             'services' => function ($query) {
                 $query->with(['service_pricelist' => function ($q) {
@@ -94,41 +98,22 @@ class ClassesServicesApiController extends Controller
             ]
         ]);
     }
-//     public function trainers_pricelist(){
-//         $service_type_id = MobileSetting::first()->pt_service_type;
-//         $service_type = ServiceType::with(['service_pricelists' => fn($q) => $q->where('pricelists.status','active')])->findOrFail($service_type_id);
-//         $trainers = User::with(['employee', 'employee.branch'])
-//             ->whereHas('roles', function ($q) {
-//                 $q->where('title', 'Trainer');
-//             })
-//             ->whereHas('employee', function ($i) {
-//                 $i->whereStatus('active')->where('mobile_visibility', true);
-//             })
-//             ->get()
-//             ->map(function ($trainer) use ($service_type) {
-//                 return [
-//                     'id' => $trainer->id,
-//                     'name' => $trainer->employee->name,
-//                     'profile_photo' => $trainer->employee->profile_photo,
-//                     'branch_name' => $trainer->employee->branch->name ?? '-', // Fallback if branch is not available
-//                     'price_list'=>$service_type->service_pricelists->map(function($price){
-//                         return [
-//                             'id'=>$price->id,
-//                             'amount'=>$price->amount,
-//                             'session_count'=>$price->session_count,
-//                             'name'=>$price->name,
-// //                        'name'=>$price->name,
-//                         ];
-//                     }),
-//                 ];
-//             });
+    function my_classes(Request $request)  {
+        if (!auth('sanctum')->check()) {
+            return response()->json(['message' => 'Please login first!','data'=>null], 403);
+        }
+        $member = auth('sanctum')->user()->lead;
 
-//         return response()->json([
-//             'message'=>"success",
-//             'data'=>[
-//                 'trainers' => $trainers,
-//             ]
-//         ]);
+        $membership = $member->memberships()
+            ->whereHas('service_pricelist.service', function ($query) {
+                $query->where('service_type_id', $this->mobile_setting->classes_service_type);
+            })
+            ->where('status', 'current')
+            ->latest()->get();
+        dd($membership);
+        if (!$membership) {
+            return response()->json(['message' => 'Current membership is expired'], 402);
+        }
 
-//     }
+    }
 }

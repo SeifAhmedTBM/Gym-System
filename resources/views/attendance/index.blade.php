@@ -59,6 +59,13 @@
                     {!! Form::label('membership_id', trans('cruds.lead.fields.member_code')) !!}
 
                     <div class="input-group">
+                        <div class="input-group-prepend ">
+                            <select name="member_branch_id" id="member_branch_id" class="form-control form-control-lg shadow-none border-0" style="color: black !important;">
+                                @foreach (\App\Models\Branch::pluck('member_prefix','id') as $id => $entry)
+                                    <option value="{{ $id }}" {{ Auth()->user()->employee &&  Auth()->user()->employee->branch_id == $id ? 'selected' : '' }}>{{ $entry }}</option>
+                                @endforeach
+                            </select>
+                        </div>
                         <input type="text" name="membership_id" id="membership_id"
                             class="form-control form-control-lg shadow-none" placeholder="Enter Member code / Card Number"
                             autofocus oninput="this.value = this.value.replace(/[^0-9.]/g, '').replace(/(\..*)\./g, '$1');" required>
@@ -77,11 +84,11 @@
                     <small class="text-danger font-weight-bold" id="response-message"></small>
                     {!! Form::close() !!}
 
-                    {{-- <div class="row  mt-5">
+                    <div class="row  mt-5">
                     <div class="col-12 ">
                         <a href="{{ route('admin.home') }}" class="btn btn-lg btn-success mx-auto"><i class="fa fa-arrow-left"></i> {{ trans('global.back') }} {{ trans('global.to') }} {{ trans('global.dashboard') }}</a>
                     </div>
-                </div> --}}
+                </div>
                 </div>
 
 

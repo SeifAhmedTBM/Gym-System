@@ -59,6 +59,9 @@ Route::group(['prefix' => 'v1', 'as' => 'api.', 'namespace' => 'Api\V1\Admin'], 
     Route::get('info/rules/', 'InformationApiController@rules');
     Route::get('info/terms-conditions/', 'InformationApiController@terms_conditions');
 
+    Route::get('classes-services/my-classes', 'ClassesServicesApiController@my_classes');
+
+
     // Pricelist
     Route::apiResource('pricelists', 'PricelistApiController');
 

@@ -1,12 +1,13 @@
 <?php
 
-namespace App\Http\Controllers\Admin;
+namespace App\Http\Controllers\Api\V1\Admin;
 
 use Carbon\Carbon;
 use App\Models\Lead;
 use App\Models\User;
 use App\Models\Invoice;
 use App\Models\Payment;
+use App\Models\MobileSetting;
 use App\Models\Setting;
 use App\Models\Reminder;
 use App\Models\Schedule;
@@ -25,51 +26,21 @@ use App\Models\Source;
 use Illuminate\Support\Facades\Auth;
 use PhpOffice\PhpSpreadsheet\Calculation\Financial\CashFlow\Constant\Periodic\Payments;
 
-class AttendanceController extends Controller
+class AttendanceAPIController extends Controller
 {
-    
-    public function index()
-    {
-        $master_cards = MasterCard::get();
-
-        return view('attendance.index',compact('master_cards'));
+    private $mobile_setting;
+    public function __construct(){
+        $this->mobile_setting = MobileSetting::all()->first();
     }
 
     public function getMembershipDetails(Request $request)
     {
-        $master_cards = MasterCard::pluck('master_card')->toArray();
 
-        if(in_array($request['membership_id'],$master_cards)){
-            try {
-                session()->flash('attended', 'master card entry');
-                return back();
-            } catch (\Throwable $th) {
-                return back(); 
-            }
-        }
-
+        // member is logged in
+        $member = auth('sanctum')->user()->lead;
         $setting = Setting::first()->has_lockers;
         try {
-            $member = Lead::whereType('member')
-                            ->with([
-                                        'memberships' => fn($q) => $q->with([
-                                            'service_pricelist'
-                                            ,'freezeRequests' => fn($x) => $x->whereStatus('confirmed'),
-                                        ])
-                                        ->latest()
-                                    ])
-                            ->where('branch_id',$request['member_branch_id'])
-                            ->where(function($q) use ($request){
-
-                                return $q->where('member_code',$request['membership_id'])
-                                ->orWhere('card_number',$request['membership_id']);
-                            })
-                            ->firstOr(function(){
-                                    session()->flash('user_invalid', trans('global.member_is_not_found'));
-                                    return back();
-                                }
-            ); 
-           
+             
             $memberships = Membership::where('member_id','=',$member->id)->get();
          
             foreach($memberships as $membership){
