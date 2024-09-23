@@ -234,7 +234,7 @@ return [
     ],
     "https://zfitnesseg.com" => [
         "employees_schedule"            => false,
-        "timeline_schedule"             => false,
+        "timeline_schedule"             => true,
         "due_payment"                   => true,
         "sessions_count"                => false,
         "national_id"                   => false,
@@ -277,7 +277,7 @@ return [
     ],
     "https://staging.zfitnesseg.com" => [
         "employees_schedule"            => false,
-        "timeline_schedule"             => false,
+        "timeline_schedule"             => true,
         "due_payment"                   => true,
         "sessions_count"                => false,
         "national_id"                   => false,
