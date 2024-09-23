@@ -350,35 +350,34 @@ class TasksController extends Controller
                     $query = Task::with(['to_user', 'created_by', 'to_role','supervisor'])
                     ->where('task_date', '>' ,$todayDate)
                     ->where('to_user_id', Auth()->user()->id)
-                    ->orWhere('to_role_id', Auth()->user()->roles[0]->id)->select(sprintf('%s.*', (new Task())->table)); 
+                    ->select(sprintf('%s.*', (new Task())->table)); 
                 }
                 elseif($request->status == 'today'){
                     $query = Task::with(['to_user', 'created_by', 'to_role','supervisor'])
                     ->where('task_date', $todayDate)
                     ->where('to_user_id', Auth()->user()->id)
-                    ->orWhere('to_role_id', Auth()->user()->roles[0]->id)->select(sprintf('%s.*', (new Task())->table));
+                    ->select(sprintf('%s.*', (new Task())->table));
                 }
                 elseif($request->status == 'pending')
                 {
                     $query = Task::with(['to_user', 'created_by', 'to_role','supervisor'])
                     ->where('status', 'pending')
                     ->where('to_user_id', Auth()->user()->id)
-                    ->orWhere('to_role_id', Auth()->user()->roles[0]->id)->select(sprintf('%s.*', (new Task())->table));
+                    ->select(sprintf('%s.*', (new Task())->table));
                 }
 
-                elseif($request->status == 'done_with_confirm')
-                {
-                    $query = Task::with(['to_user', 'created_by', 'to_role','supervisor'])
-                    ->where('status','done_with_confirm')->orWhere('status' ,'done')
-                    ->where('to_user_id', Auth()->user()->id)
-                    ->orWhere('to_role_id', Auth()->user()->roles[0]->id)->select(sprintf('%s.*', (new Task())->table));
+                elseif ($request->status == 'done_with_confirm') {
+                    $query = Task::with(['to_user', 'created_by', 'to_role', 'supervisor'])
+                        ->whereIn('status', ['done_with_confirm', 'done'])
+                        ->where('to_user_id', Auth()->user()->id)
+                        ->select(sprintf('%s.*', (new Task())->table));
                 }
             }
             else
             {
                 $query = Task::with(['to_user', 'created_by', 'to_role','supervisor'])
                 ->where('to_user_id', Auth()->user()->id)
-                ->orWhere('to_role_id', Auth()->user()->roles[0]->id)->select(sprintf('%s.*', (new Task())->table));
+                ->select(sprintf('%s.*', (new Task())->table));
             }
     
             $table = DataTables::of($query);
