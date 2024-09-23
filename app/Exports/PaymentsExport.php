@@ -8,32 +8,41 @@ use Maatwebsite\Excel\Concerns\Exportable;
 use Maatwebsite\Excel\Concerns\FromCollection;
 use Maatwebsite\Excel\Concerns\WithHeadings;
 
-class PaymentsExport implements FromCollection,WithHeadings
+class PaymentsExport implements FromCollection, WithHeadings
 {
     use Exportable;
 
     public function collection()
     {
-        $payments = Payment::index(request()->all())
-                            ->with(['invoice','invoice.membership','invoice.membership.member','account', 'sales_by'])
-                            ->whereHas('invoice', fn($q) => $q->whereHas('membership'))
-                            ->latest()
-                            ->get();
+        $employee = Auth()->user()->employee;
 
-        $payments = $payments->map(function ($payment) {
+        $query = Payment::index(request()->all())
+            ->with(['invoice', 'invoice.membership', 'invoice.membership.member', 'account', 'sales_by'])
+            ->whereHas('invoice', function ($q) {
+                $q->whereHas('membership')
+                    ->where('status', '!=', 'refund');
+            });
+
+        if ($employee && $employee->branch_id != NULL) {
+            $query->whereHas('account', function ($q) use ($employee) {
+                $q->whereBranchId($employee->branch_id);
+            });
+        }
+
+        $payments = $query->latest()->get();
+
+        return $payments->map(function ($payment) {
             return [
-                'id'                     => $payment->id,
-                'name'                   => $payment->invoice->membership->member->name ?? '-',
-                'account'                => $payment->account->name ?? '-',
-                'service'                => $payment->invoice->membership->service_pricelist->name ?? '-',
-                'amount'                 => $payment->amount ?? '-',
-                'invoice'                => \App\Models\Setting::first()->invoice_prefix.$payment->invoice_id ?? '-',
-                'sales_by_id'            => $payment->sales_by->name ?? '-',
-                'created_at'             => $payment->created_at,
+                'id'            => $payment->id,
+                'name'          => $payment->invoice->membership->member->name ?? '-',
+                'account'       => $payment->account->name ?? '-',
+                'service'       => $payment->invoice->membership->service_pricelist->name ?? '-',
+                'amount'        => $payment->amount ?? '-',
+                'invoice'       => Setting::first()->invoice_prefix . $payment->invoice_id ?? '-',
+                'sales_by_id'   => $payment->sales_by->name ?? '-',
+                'created_at'    => $payment->created_at->format('Y-m-d H:i:s'),
             ];
         });
-
-        return $payments;
     }
 
     public function headings(): array
@@ -42,7 +51,7 @@ class PaymentsExport implements FromCollection,WithHeadings
             'ID',
             'Member Name',
             'Account',
-            'service',
+            'Service',
             'Amount',
             'Invoice ID',
             'Sales By',
