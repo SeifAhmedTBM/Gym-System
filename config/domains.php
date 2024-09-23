@@ -241,7 +241,7 @@ return [
         "email"                         => false,
         "vat"                           => false,
         'profile_attendance'            => true,
-        'profile_attendance_dashboard'  => ture,
+        'profile_attendance_dashboard'  => true,
         'sales_by'                      => false,
         'show_schedule_dashboard'       => true,
         'member_code_enabled'           => false,
