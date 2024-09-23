@@ -233,25 +233,25 @@ return [
         'settlement_invoices'            => false
     ],
     "https://zfitnesseg.com" => [
-        "employees_schedule"            => false,
+        "employees_schedule"            => true,
         "timeline_schedule"             => true,
         "due_payment"                   => true,
-        "sessions_count"                => false,
+        "sessions_count"                => true,
         "national_id"                   => false,
         "email"                         => false,
         "vat"                           => false,
-        'profile_attendance'            => true,
-        'profile_attendance_dashboard'  => true,
+        'profile_attendance'            => false,
+        'profile_attendance_dashboard'  => false,
         'sales_by'                      => false,
         'show_schedule_dashboard'       => false,
         'member_code_enabled'           => false,
         'is_reviewed_invoices'          => false,
         'trainer_services_option'       => false,
-        'sports_option'                 => false,
-        'minor'                         => false,
+        'sports_option'                 => true,
+        'minor'                         => true,
         'short_reports'                 => false,
-        'add_to_class_in_invoice'       => false,
-        'settlement_invoices'           => false
+        'add_to_class_in_invoice'       => true,
+        'transactions_date'             => true
     ],
     "http://localhost" => [
         "employees_schedule"            => false,
