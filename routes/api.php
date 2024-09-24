@@ -47,19 +47,25 @@ Route::group(['prefix' => 'v1', 'as' => 'api.', 'namespace' => 'Api\V1\Admin'], 
     Route::apiResource('service-types', 'ServiceTypesApiController');
 
     // Services
-    Route::apiResource('services', 'ServicesApiController');
-    Route::get('pt-services/pricelist', 'PTServicesApiController@pricelist');
-    Route::get('pt-services/trainers', 'PTServicesApiController@trainers');
-    Route::get('pt-services/', 'PTServicesApiController@trainers_pricelist');
-    Route::get('classes-services/pricelist', 'ClassesServicesApiController@pricelist');
-    Route::get('classes-services/', 'ClassesServicesApiController@classes');
-    
+
     Route::get('info/privacy/', 'InformationApiController@privacy');
     Route::get('info/about-us/', 'InformationApiController@about_us');
     Route::get('info/rules/', 'InformationApiController@rules');
     Route::get('info/terms-conditions/', 'InformationApiController@terms_conditions');
 
-    Route::get('classes-services/my-classes', 'ClassesServicesApiController@my_classes');
+    Route::group(['prefix' => 'services', 'as' => 'services.'], function () {
+        Route::apiResource('', 'ServicesApiController');
+        Route::get('pt/pricelist', 'PTServicesApiController@pricelist');
+        Route::get('pt/trainers', 'PTServicesApiController@trainers');
+        Route::get('pt/', 'PTServicesApiController@trainers_pricelist');
+        Route::get('classes/pricelist', 'ClassesServicesApiController@pricelist');
+        Route::get('classes/', 'ClassesServicesApiController@classes');
+        Route::get('classes/current', 'ClassesServicesApiController@my_classes');
+
+        Route::get('memberships/current', 'MembershipsServicesApiController@my_membership');
+        Route::get('memberships', 'MembershipsServicesApiController@memberships');
+    });
+
 
 
     // Pricelist
