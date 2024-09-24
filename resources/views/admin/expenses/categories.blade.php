@@ -32,11 +32,9 @@
             </div>
             <div class="col-lg-4">
             <button type="submit" class="btn btn-primary" style="margin-top:30px;">{{ __('Filter') }}</button>
-
+            <button type="button"  onclick="exportAllDataToExcel()" class="btn btn-success" style="margin-top:30px;">{{ __('Export') }}</button>
             </div>
         </div>
-        
-        
     </form>
     <div class="row" style="direction:rtl">
     @can('expenses_counter')
@@ -100,13 +98,51 @@
 
 
 
-    <script src="https://cdn.datatables.net/2.1.4/js/dataTables.js"></script>
+<script src="https://cdn.datatables.net/2.1.4/js/dataTables.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.16.9/xlsx.full.min.js"></script>
 
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
 <script>
 $(document).ready( function () {
 $('#myTable').DataTable();
 } );
+
+  
+$(".filterButton").on("click", function(){
+$("#modal-filter").modal({"show":true});
+});
+function exportAllDataToExcel() {
+var workbook = XLSX.utils.book_new();
+
+// Get the DataTable instance
+var table = $('#myTable').DataTable();
+
+// Get all data from the DataTable, excluding the action column
+var allData = table.rows().data().toArray().map(function(row) {
+    return row.slice(0, -1); // Exclude the last column (action column)
+});
+
+// Prepare header, excluding the action column header
+var headers = [];
+$('#myTable thead th').each(function(index) {
+    if (index < $('#myTable thead th').length - 1) { // Exclude the action column header
+        headers.push($(this).text());
+    }
+});
+
+// Combine headers and data
+var dataWithHeader = [headers].concat(allData);
+
+// Create a worksheet from the data
+var worksheet = XLSX.utils.aoa_to_sheet(dataWithHeader);
+
+// Append the worksheet to the workbook
+XLSX.utils.book_append_sheet(workbook, worksheet, 'All Records');
+
+// Export the workbook
+XLSX.writeFile(workbook, 'expenses categories.xlsx');
+}
 </script>
 @endsection
 @section('scripts')
