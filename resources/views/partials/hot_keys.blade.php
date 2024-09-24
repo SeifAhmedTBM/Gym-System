@@ -59,6 +59,13 @@
                     'type' => '',
                 ],
                 [
+                    'can' => 'membership_attendance_create',
+                    'title' => 'Take sessions/clasess Attendance',
+                    'imageUrl' => 'attendance.png',
+                    'linkUrl' => 'attendance_take.index',
+                    'type' => '',
+                ],
+                [
                     'can' => 'refund_create',
                     'title' => 'Add Refund Request',
                     'imageUrl' => 'refund_icon.png',

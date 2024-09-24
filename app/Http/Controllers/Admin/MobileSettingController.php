@@ -38,6 +38,7 @@ class MobileSettingController extends Controller
             'rules' => '',
             'terms_conditions' => '',
             'pt_service_type' => '',
+            'membership_service_type' => '',
 
         ]);
         $settings = new MobileSetting();
@@ -47,6 +48,7 @@ class MobileSettingController extends Controller
         $settings->terms_conditions                     = $request['terms_conditions'] ?? '';
         $settings->pt_service_type                     = $request['pt_service_type'] ?? 2;
         $settings->classes_service_type                     = $request['classes_service_type'] ?? null;
+        $settings->membership_service_type                     = $request['membership_service_type'] ?? null;
 
         $settings->save();
         Alert::success('Saved Successfully');
@@ -65,12 +67,14 @@ class MobileSettingController extends Controller
     public function update(Request $request, MobileSetting $mobileSetting)
     {
         //
+
         $mobileSetting->privacy_setting                     = $request['privacy_setting'] ?? '';
         $mobileSetting->about_us                     = $request['about_us'] ?? '';
         $mobileSetting->rules                     = $request['rules'] ?? '';
         $mobileSetting->terms_conditions                     = $request['terms_conditions'] ?? '';
         $mobileSetting->classes_service_type                     = $request['classes_service_type'] ?? 2;
         $mobileSetting->pt_service_type                     = $request['pt_service_type'] ?? 2;
+        $mobileSetting->membership_service_type                     = $request['membership_service_type'] ?? 2;
         $mobileSetting->save();
         Alert::success('Saved Successfully');
         return redirect()->route('admin.mobile_settings.index');

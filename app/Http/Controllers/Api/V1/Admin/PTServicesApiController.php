@@ -18,6 +18,10 @@ use Symfony\Component\HttpFoundation\Response;
 
 class PTServicesApiController extends Controller
 {
+    private $setting;
+    public function __construct(){
+        $this->setting = MobileSetting::all()->first();
+    }
     public function pricelist()
     {
 //        abort_if(Gate::denies('service_access'), Response::HTTP_FORBIDDEN, '403 Forbidden');
@@ -84,13 +88,14 @@ class PTServicesApiController extends Controller
                     'name' => $trainer->employee->name,
                     'profile_photo' => $trainer->employee->profile_photo,
                     'branch_name' => $trainer->employee->branch->name ?? '-', // Fallback if branch is not available
-                    'price_list'=>$service_type->service_pricelists->map(function($price){
+                    'service_id'=>$service_type->id,
+                    'service_name'=>$service_type->name,
+                    'price_list'=>$service_type->service_pricelists->map(function($price) use ($service_type){
                         return [
                             'id'=>$price->id,
                             'amount'=>$price->amount,
                             'session_count'=>$price->session_count,
                             'name'=>$price->name,
-//                        'name'=>$price->name,
                         ];
                     }),
                 ];

@@ -44,15 +44,15 @@
                                         </span>
                                     @endif
 
-                                    {{-- <span class="font-weight-bold d-block">
+                                    <span class="font-weight-bold d-block">
                                         {{ trans('cruds.serviceType.title_singular') }} : {{ $membership->service_pricelist->service->service_type->name ?? '-' }}
-                                    </span> --}}
+                                    </span>
                                     <span class="font-weight-bold d-block">
                                         @if ($membership->service_pricelist->service->service_type->session_type == 'non_sessions')
                                         @else
-                                            {{ $membership->trainer_attendances->count() }} /
+                                            {{ $membership->attendances->count() }} /
                                             {{ $membership->service_pricelist->session_count }}
-                                            ({{ $membership->service_pricelist->session_count - $membership->trainer_attendances->count() }}
+                                            ({{ $membership->service_pricelist->session_count - $membership->attendances->count() }}
                                             Sessions Left)
                                         @endif
                                     </span>
