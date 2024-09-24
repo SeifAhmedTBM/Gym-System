@@ -20,10 +20,15 @@
                     <div class="input-group-prepend">
                         <button class="btn btn-primary" type="submit" >{{ trans('global.submit') }}</button>
                     </div>
+                    <div class="col-md-2">
+                        <a href="{{ route('admin.reports.customer-invitation') }}" class="btn btn-warning">
+                            <i class="fa fa-arrow-circle-left"></i> Reset
+                        </a>
+                    </div>
                 </div>
             </form>
         </div>
-        
+
         <div class="col-md-2">
             <h4 class="text-center">{{ $leads->count() }}</h4>
             <h4 class="text-center">Leads</h4>
@@ -33,7 +38,7 @@
         <div class="col-md-12">
             <div class="card">
                 <div class="card-header">
-                    <i class="fas fa-check-circle"></i> Customer Invitation 
+                    <i class="fas fa-check-circle"></i> Customer Invitation
                 </div>
                 <div class="card-body">
                     <div class="table-responsive">

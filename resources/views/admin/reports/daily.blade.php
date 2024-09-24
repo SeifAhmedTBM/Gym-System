@@ -30,6 +30,11 @@
                             <div class="input-group-prepend">
                                 <button class="btn btn-primary" type="submit" >{{ trans('global.submit') }}</button>
                             </div>
+                            <div class="col-md-2">
+                                <a href="{{ route('admin.reports.daily.report') }}" class="btn btn-warning">
+                                    <i class="fa fa-arrow-circle-left"></i> Reset
+                                </a>
+                            </div>
                         </div>
                     </div>
                 </div>

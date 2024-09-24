@@ -38,6 +38,11 @@
                 <div class="input-group-prepend">
                     <button class="btn btn-primary" type="submit" >{{ trans('global.submit') }}</button>
                 </div>
+                <div class="col-md-2">
+                    <a href="{{ route('admin.reports.monthlyFinance.report') }}" class="btn btn-warning">
+                        <i class="fa fa-arrow-circle-left"></i> Reset
+                    </a>
+                </div>
             </div>
         </div>
     </form>
@@ -93,7 +98,7 @@
                                        </td>
                                        <td>{{ number_format($month['total_income']) }} EGP</td>
                                        <td>{{ number_format($month['total_outcome']) }} EGP</td>
-                                       <td>{{ number_format($month['net_income']) }} EGP</td>                                       
+                                       <td>{{ number_format($month['net_income']) }} EGP</td>
                                    </tr>
                                @endforeach
                             </tbody>

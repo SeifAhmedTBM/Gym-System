@@ -13,7 +13,9 @@
                     <div class="input-group">
                         <input type="month" value="{{ request('date') ?? date('Y-m') }}" name="date" class="form-control">
                         <select name="branch_id" id="branch_id" class="form-control" {{ $employee && $employee->branch_id != NULL ? 'readonly' : '' }}>
-                            <option value="{{ NULL }}" selected >All Branches</option>
+
+                            <option value="{{ NULL }}" selected>All Branches</option>
+
                             @foreach (\App\Models\Branch::pluck('name','id') as $id => $name)
                                 <option value="{{ $id }}" {{ $branch_id == $id ? 'selected' : '' }}>{{ $name }}</option>
                             @endforeach
@@ -24,6 +26,11 @@
                             <button type="submit" class="btn btn-primary">
                                 <i class="fa fa-filter"></i>
                             </button>
+                        </div>
+                        <div class="col-md-2">
+                            <a href="{{ route('admin.reports.leadsSource') }}" class="btn btn-warning">
+                                <i class="fa fa-arrow-circle-left"></i> Reset
+                            </a>
                         </div>
                     </div>
                 </div>

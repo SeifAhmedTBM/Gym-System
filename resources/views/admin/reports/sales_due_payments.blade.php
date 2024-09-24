@@ -7,7 +7,7 @@
 
     <form method="GET" action="{{ route('admin.reports.sales_due_payments') }}">
         <div class="row align-items-end mb-5">
-            <div class="col-md-3">
+            <div class="col-md-2">
                 <div>
                     <label for="branch_id">Branch</label>
                     <select name="branch_id" id="branch_id" class="form-control">
@@ -20,7 +20,7 @@
                     </select>
                 </div>
             </div>
-            <div class="col-md-3">
+            <div class="col-md-2">
                 <div>
                     <label for="sales_id">Sales</label>
                     <select name="sales_id" id="sales_id" class="form-control">
@@ -48,9 +48,15 @@
                     <input type="date" name="end_date" id="end_date" class="form-control" value="{{request('end_date')??$endOfMonth }}">
                 </div>
             </div>
-            <div class="col-md-2">
-                <button type="submit" class="btn btn-primary">Filter</button>
+            <div class="col-md-1 d-flex justify-content-center">
+                <button type="submit" class="btn btn-primary px-4">Filter</button>
             </div>
+            <div class="col-md-2">
+                <a href="{{ route('admin.reports.sales_due_payments') }}" class="btn btn-warning">
+                    <i class="fa fa-arrow-circle-left"></i> Reset
+                </a>
+            </div>
+
         </div>
     </form>
 

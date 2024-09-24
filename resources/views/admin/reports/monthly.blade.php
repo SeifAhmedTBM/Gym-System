@@ -25,13 +25,18 @@
                             <div class="input-group-prepend">
                                 <button class="btn btn-primary" type="submit" >{{ trans('global.submit') }}</button>
                             </div>
+                            <div class="col-md-2">
+                                <a href="{{ route('admin.reports.monthly.report') }}" class="btn btn-warning">
+                                    <i class="fa fa-arrow-circle-left"></i> Reset
+                                </a>
+                            </div>
                         </div>
                     </div>
                 </div>
             </form>
         </div>
     </div>
-    
+
     <div id="DivIdToPrint">
         <div class="row">
             <div class="col-md-12">
@@ -57,7 +62,7 @@
                         </div>
                     </div>
 
-        
+
                     <div class="col-sm-4 col-lg-4">
                         <div class="card mb-2 text-center text-white bg-danger">
                             <div class="card-body">
@@ -82,12 +87,12 @@
                 </div>
             </div>
         </div>
-    
+
         {{-- <div class="card">
             <div class="card-header">
                 <h3><i class="fa fa-users"></i> {{ trans('global.members_analysis') }}</h3>
             </div>
-            
+
             <div class="card-body">
                 <div class="row">
                     <div class="col-sm-6 col-lg-6">
@@ -100,12 +105,12 @@
                             </div>
                         </div>
                     </div>
-        
+
                     <div class="col-sm-6 col-lg-6">
                         <div class="card mb-4 ">
                             <div class="card-body text-center">
                                 <div>
-                                    <h3>New Members <span class="badge badge-success badge-pill">{{ $new_payments_count }}</span></h3> 
+                                    <h3>New Members <span class="badge badge-success badge-pill">{{ $new_payments_count }}</span></h3>
                                     <h3>{{ number_format($new_payments).' EGP' }}</h3>
                                 </div>
                             </div>
@@ -114,7 +119,7 @@
                 </div>
             </div>
         </div> --}}
-        
+
         <div class="row">
             <div class="col-md-12">
                 <div class="card">
@@ -123,18 +128,18 @@
                             @foreach ($accounts as $account)
                                 @php
                                     $tran_payments = $account->transactions->where('transactionable_type', 'App\Models\Payment')->sum('amount');
-            
+
                                     $tran_externalPayments = $account->transactions->where('transactionable_type', 'App\Models\ExternalPayment')->sum('amount');
-            
+
                                     $tran_refunds = $account->transactions->where('transactionable_type', 'App\Models\Refund')->sum('amount');
 
                                     $tran_loans = $account->transactions->where('transactionable_type', 'App\Models\Loan')->sum('amount');
-            
+
                                     $tran_expenses = $account->transactions->where('transactionable_type', 'App\Models\Expense')->sum('amount');
-            
-                                    $total = ($tran_payments + $tran_externalPayments) - ($tran_refunds + $tran_expenses + $tran_loans); 
+
+                                    $total = ($tran_payments + $tran_externalPayments) - ($tran_refunds + $tran_expenses + $tran_loans);
                                 @endphp
-            
+
                                 <div class="col-12 col-lg-4 col-xl-3">
                                     <div class="card mb-2">
                                         <div class="card-body text-center  bg-secondary">
@@ -147,7 +152,7 @@
                                 </div>
                             @endforeach
                         </div>
-                        
+
                         <div class="row">
                             <div class="col-md-12">
                                 <div class="table-responsive">
@@ -205,9 +210,9 @@
                                                 <tr>
                                                     @php
                                                         $tran_payments = $acc->transactions->where('transactionable_type', 'App\Models\Payment')->sum('amount');
-                                                        
+
                                                         $tran_externalPayments = $acc->transactions->where('transactionable_type', 'App\Models\ExternalPayment')->sum('amount');
-                                                        
+
                                                         $income = ($tran_payments + $tran_externalPayments);
 
                                                         $tran_refunds = $acc->transactions->where('transactionable_type', 'App\Models\Refund')->sum('amount');
@@ -228,7 +233,7 @@
                                                         $total_loans += $tran_loans;
                                                         $total_income = ($total_payments + $total_revenues);
                                                         $total_outcome = ($total_refunds + $total_loans + $total_expenses + $total_commission_fees);
-        
+
                                                         $total = $income - $outcome;
                                                         $total_balance += $total;
 
@@ -292,8 +297,8 @@
                     </div>
                 </div>
             </div>
-        </div> 
-        
+        </div>
+
         <div class="row">
             @if ($expenses->count() > 0)
                 <div class="col-md-12">
@@ -325,7 +330,7 @@
                         </div>
                     </div>
                 </div>
-            @endif    
+            @endif
 
             @if ($loans->count() > 0)
                 <div class="col-md-12">
@@ -396,7 +401,7 @@
                 <div class="col-md-12">
                     <div class="card">
                         <div class="card-header">
-                            <strong>{{ $key }} - {{ trans('global.income') }} : <span class="text-white">{{ number_format($payment->sum('amount')) }} EGP ({{ $payment->count().' Payment' }})</span> </strong> 
+                            <strong>{{ $key }} - {{ trans('global.income') }} : <span class="text-white">{{ number_format($payment->sum('amount')) }} EGP ({{ $payment->count().' Payment' }})</span> </strong>
                         </div>
                         <div class="card-body table-responsive">
                             <table class="table table-striped table-hover table-bordered zero-configuration">
@@ -524,6 +529,6 @@
             $('#total_outcome_card').text($('#total_outcome').text());
             $('#net_income_card').text($('#net_income').text());
         })
-        
+
     </script>
 @endsection

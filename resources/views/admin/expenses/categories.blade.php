@@ -30,9 +30,13 @@
                 @endif
                 <span class="help-block">{{ trans('cruds.schedule.fields.date_helper') }}</span>
             </div>
-            <div class="col-lg-4">
-            <button type="submit" class="btn btn-primary" style="margin-top:30px;">{{ __('Filter') }}</button>
-
+            <div class="col-lg-1 ">
+            <button type="submit" class="btn btn-primary px-4" style="margin-top:30px;">{{ __('Filter') }}</button>
+            </div>
+            <div class="col-lg-2" style="margin-top:30px;">
+                <a href="{{ route('admin.expenses_categories') }}" class="btn btn-warning">
+                    <i class="fa fa-arrow-circle-left"></i> Reset
+                </a>
             </div>
         </div>
         

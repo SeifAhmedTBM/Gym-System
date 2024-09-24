@@ -20,6 +20,11 @@
                     <div class="input-group-prepend">
                         <button class="btn btn-primary" type="submit" >{{ trans('global.submit') }}</button>
                     </div>
+                    <div class="col-md-2">
+                        <a href="{{ route('admin.members.onhold') }}" class="btn btn-warning">
+                            <i class="fa fa-arrow-circle-left"></i> Reset
+                        </a>
+                    </div>
                 </div>
             </form>
         </div>
@@ -30,7 +35,7 @@
                 <a href="{{ route('admin.onhold.export',request()->all()) }}" class="btn btn-info"><i class="fa fa-download"></i> {{ trans('global.export_excel') }}</a>
             @endcan
         </div>
-        
+
         <div class="col-md-2">
             <h4 class="text-center">{{ $memberships->count() }}</h4>
             <h4 class="text-center">Onhold Members</h4>
@@ -75,7 +80,7 @@
                                             <span class="d-block font-weight-bold">
                                                 {{ $membership->member->phone ?? '-' }}
                                             </span>
-                                            
+
                                         </td>
                                         <td>{{ $membership->member->branch->name ?? '-' }}</td>
                                         <td>

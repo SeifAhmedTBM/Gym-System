@@ -7,13 +7,18 @@
             <div class="input-group">
                 <input type="month" class="form-control" name="date" value="{{ request('date') ?? date('Y-m') }}">
                 <select name="branch_id" id="branch_id" class="form-control" {{ $employee && $employee->branch_id != NULL ? 'readonly' : '' }}>
-                    <option value="{{ NULL }}" selected hidden disabled>All Branches</option>
+                    <option value="{{ NULL }}" selected>All Branches</option>
                     @foreach (\App\Models\Branch::pluck('name','id') as $id => $name)
                         <option value="{{ $id }}" {{ $branch_id == $id ? 'selected' : '' }}>{{ $name }}</option>
                     @endforeach
                 </select>
                 <div class="input-group-prepend">
                     <button class="btn btn-primary" type="submit" >{{ trans('global.submit') }}</button>
+                </div>
+                <div class="col-md-2">
+                    <a href="{{ route('admin.reports.external-payment-categories.report') }}" class="btn btn-warning">
+                        <i class="fa fa-arrow-circle-left"></i> Reset
+                    </a>
                 </div>
             </div>
         </div>
