@@ -7410,7 +7410,6 @@ html:not([dir="rtl"])
   height: 100%;
   overflow: hidden;
   outline: 0;
-  -webkit-overflow-scrolling: touch;
 }
 .modal-dialog {
   position: relative;
