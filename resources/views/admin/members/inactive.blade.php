@@ -5,7 +5,8 @@
             <form action="{{ route('admin.members.inactive') }}" method="get">
                 <label for="date">{{ trans('cruds.branch.title_singular') }}</label>
                 <div class="input-group">
-                    <select name="branch_id" id="branch_id" class="form-control" {{ $employee && $employee->branch_id != NULL ? 'readonly' : '' }}>
+                    <select name="branch_id" id="branch_id"
+                            class="form-control" {{ $employee && $employee->branch_id != NULL ? 'readonly' : '' }}>
                         <option value="{{ NULL }}" selected>All Branches</option>
                         @foreach (\App\Models\Branch::pluck('name','id') as $id => $name)
                             <option value="{{ $id }}" {{ $branch_id == $id ? 'selected' : '' }}>{{ $name }}</option>
@@ -18,7 +19,7 @@
                         @endforeach
                     </select>
                     <div class="input-group-prepend">
-                        <button class="btn btn-primary" type="submit" >{{ trans('global.submit') }}</button>
+                        <button class="btn btn-primary" type="submit">{{ trans('global.submit') }}</button>
                     </div>
                 </div>
             </form>
@@ -30,9 +31,9 @@
                 <a href="{{ route('admin.inactiveMembers.export',request()->all()) }}" class="btn btn-info"><i class="fa fa-download"></i> {{ trans('global.export_excel') }}</a>
             @endcan --}}
         </div>
-        
+
         <div class="col-md-2">
-            <h4 class="text-center">{{ $members->count() }}</h4>
+            <h4 class="text-center">{{ $membersCount }}</h4>
             <h4 class="text-center">{{ trans('global.inactive_members') }}</h4>
         </div>
     </div>
@@ -44,45 +45,104 @@
                 </div>
                 <div class="card-body">
                     <div class="table-responsive">
-                        <table class="table table-bordered table-striped table-hover zero-configuration">
+                        <div>
+                            <input type="text" id="customSearch" placeholder="Search members..."
+                                   class="form-control mb-3">
+                        </div>
+                        <table class="table table-bordered table-striped table-hover zero-configuration" id="inactiveMemberTable">
                             <thead>
-                                <tr>
-                                    <th>#</th>
-                                    <th>{{ trans('cruds.member.title_singular') }}</th>
-                                    <th>{{ trans('cruds.branch.title_singular') }}</th>
-                                    <th>Sport</th>
-                                    <th>{{ trans('cruds.membership.title') }}</th>
-                                </tr>
+                            <tr>
+                                <th>#</th>
+                                <th>{{ trans('cruds.member.title_singular') }}</th>
+                                <th>{{ trans('cruds.branch.title_singular') }}</th>
+                                <th>Sport</th>
+                                <th>{{ trans('cruds.membership.title') }}</th>
+                            </tr>
                             </thead>
-                            <tbody>
-                                @foreach ($members as $member)
-                                    <tr>
-                                        <td>{{ $loop->iteration }}</td>
-                                        <td>
-                                            <a href="{{ route('admin.members.show',$member->id) }}" target="_blank">
-                                                {{ $member->name ?? '-' }} <br>
-                                                {{ $member->phone }}
-                                            </a>
-                                        </td>
-                                        <td>{{ $member->branch->name ?? '-' }}</td>
-                                        <td>{{ $member->sport->name ?? '-' }}</td>
-                                        <td>
-                                            <a href="{{ route('admin.memberships.index',['member_id'=>$member->id]) }}" target="_blank">
-                                                {{ $member->memberships_count }}
-                                            </a>
-                                            {{-- @foreach ($member->memberships as $membership)
-                                                <span class="badge badge-info">
-                                                    {{ $membership->status ?? '-' }}
-                                                </span>
-                                            @endforeach --}}
-                                        </td>
-                                    </tr>
-                                @endforeach
+                            <tbody id="inactiveTableBody">
+                            @include('admin.members.partials.inactive', ['members' => $members])
                             </tbody>
                         </table>
+                        <div id="paginationLinks">
+                            {{ $members->links() }}
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
+@endsection
+@section('scripts')
+    <script>
+        $(document).ready(function () {
+            $('#inactiveMemberTable').DataTable({
+                destroy: true,
+                searching: false,
+                lengthChange: false,
+                paging: false,
+                info: true,
+                dom: 't<"bottom"p>',
+                select: false,
+                columnDefs: [{
+                    orderable: false,
+                    targets: 0
+                }]
+            });
+        });
+
+        document.getElementById('customSearch').addEventListener('input', function () {
+            let searchTerm = this.value.trim();
+
+            // Construct the URL based on whether there is a search term or not
+            let url = searchTerm
+                ? `{{ route('admin.members.inactive.search') }}?search=${encodeURIComponent(searchTerm)}`
+                : window.location.href;
+
+            // Fetch the data from the server
+            fetch(url, {
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            })
+                .then(response => response.json())
+                .then(data => {
+                    let tbody = document.getElementById('inactiveTableBody');
+                    tbody.innerHTML = '';  // Clear the table body before inserting new data
+
+                    let currentPage = data.members.current_page;
+                    let perPage = data.members.per_page;
+
+                    data.members.data.forEach((member, index) => {
+                        let iteration = index + 1 + (currentPage - 1) * perPage;
+
+                        tbody.innerHTML += `
+                <tr>
+                    <td>${iteration}</td>
+                    <td>
+                        <a href="{{ url('admin/members') }}/${member.id}" target="_blank" class="text-decoration-none">
+                            ${member.name ?? '-'} <br>
+                            ${member.phone ?? '-'}
+                        </a>
+                    </td>
+                    <td>${member.branch?.name ?? '-'}</td>
+                    <td>${member.sport?.name ?? '-'}</td>
+                    <td>
+                        <a href="{{ url('admin/memberships') }}?member_id=${member.id}" target="_blank">
+                            ${member.memberships_count ?? 0}
+                        </a>
+                    </td>
+                </tr>`;
+                    });
+
+                    // Handle the visibility of pagination links depending on whether there's a search term
+                    let paginationLinks = document.getElementById('paginationLinks');
+                    if (searchTerm) {
+                        paginationLinks.style.display = 'none';
+                    } else {
+                        paginationLinks.style.display = 'block';
+                    }
+                })
+                .catch(error => console.error('Error fetching search results:', error));
+        });
+    </script>
 @endsection

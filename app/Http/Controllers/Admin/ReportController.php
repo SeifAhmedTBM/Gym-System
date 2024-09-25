@@ -3067,10 +3067,60 @@ class ReportController extends Controller
             ->whereNotIn('type',['pt_session'])
             ->whereDate('due_date', '>=', $from)
             ->whereDate('due_date', '<=', $to)
-            ->get();
+            ->paginate(25);
+        if ($request->ajax()) {
+            return response()->json([
+                'reminder_actions' => $reminder_actions,
+                'links' => !$request->input('search') ? (string)$reminder_actions->links():'',
+            ]);
+        }
 
         return view('admin.reports.actions', compact('employee', 'branch_id','reminder_actions'));
     }
+    public function action_reportSearch(Request $request)
+    {
+        $employee = Auth()->user()->employee;
+
+        $branch_id = $employee && $employee->branch_id ? $employee->branch_id : ($request['branch_id'] ?? '');
+
+        $from = $request['from'] ?? date('Y-m-01');
+        $to = $request['to'] ?? date('Y-m-t');
+
+        $search = $request->get('search', '');
+        $query = Reminder::with([
+            'lead' => fn($q) => $q->with(['source', 'branch']),
+            'membership' => fn($q) => $q->with([
+                'invoice' => fn($q) => $q->withSum('payments', 'amount'),
+                'service_pricelist'
+            ]),
+            'user'
+        ])
+            ->whereHas('lead', fn($q) =>
+            $q->when($request['type'], fn($y) => $y->whereType($request['type']))
+                ->when($branch_id, fn($q) => $q->whereBranchId($branch_id))
+            )
+            ->when($request['sales_by_id'], fn($q) => $q->whereUserId($request['sales_by_id']))
+            ->when($request['reminder_action'], fn($q) => $q->whereAction($request['reminder_action']))
+            ->whereNotIn('type', ['pt_session'])
+            ->whereDate('due_date', '>=', $from)
+            ->whereDate('due_date', '<=', $to);
+        if ($search) {
+            $query->whereHas('lead', function ($q) use ($search) {
+                $q->where('name', 'LIKE', "$search%")
+                    ->orWhere('member_code', 'LIKE', "%$search%")
+                    ->orWhere('phone', 'LIKE', "%$search%");
+            });
+            $query->OrWhereHas('user', function ($q) use ($search) {
+                $q->where('name', 'LIKE', "$search%");
+            });
+        }
+        $reminder_actions = $query->paginate(25);
+        return response()->json([
+            'reminder_actions' => $reminder_actions,
+            'links' => (string)$reminder_actions->links(),
+        ]);
+    }
+
 
     public function export_actions_report(Request $request)
     {

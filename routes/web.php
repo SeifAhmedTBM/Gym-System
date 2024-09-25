@@ -306,6 +306,7 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.', 'namespace' => 'Admin', 'mi
         Route::get('daily-task-report', 'ReportController@daily_task_report')->name('daily-task-report');
 
         Route::get('actions-report', 'ReportController@action_report')->name('actions-report');
+        Route::get('actions-report/search', 'ReportController@action_reportSearch')->name('action.search');
         Route::get('actions-report/export', 'ReportController@export_actions_report')->name('actions-report.export');
 
         // Trainer Payments
@@ -510,10 +511,14 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.', 'namespace' => 'Admin', 'mi
 
     Route::get('active-members', 'MembersController@activeMembers')->name('members.active');
     Route::get('on-hold-members', 'MembersController@onHoldMembers')->name('members.onhold');
+    Route::get('/admin/members/onhold/search', 'MembersController@searchOnHoldMembers')->name('members.onhold.search');
+
+
 
     Route::get('active-members-export', 'MembersController@exportActiveMembers')->name('activeMembers.export');
 
     Route::get('inactive-members', 'MembersController@inactiveMembers')->name('members.inactive');
+    Route::get('inactive-members/search', 'MembersController@searchinactiveMembers')->name('members.inactive.search');
     Route::get('onhold-export', 'MembersController@exportOnhold')->name('onhold.export');
 
 

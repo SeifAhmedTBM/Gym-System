@@ -30,9 +30,9 @@
                 <a href="{{ route('admin.onhold.export',request()->all()) }}" class="btn btn-info"><i class="fa fa-download"></i> {{ trans('global.export_excel') }}</a>
             @endcan
         </div>
-        
+
         <div class="col-md-2">
-            <h4 class="text-center">{{ $memberships->count() }}</h4>
+            <h4 class="text-center">{{ $membershipsCount }}</h4>
             <h4 class="text-center">Onhold Members</h4>
         </div>
     </div>
@@ -44,86 +44,34 @@
                 </div>
                 <div class="card-body">
                     <div class="table-responsive">
-                        <table class="table table-bordered table-striped table-hover zero-configuration">
+                        <div>
+                            <input type="text" id="customSearch" placeholder="Search members..." class="form-control mb-3">
+                        </div>
+
+                        <table id="onHoldMembersTable" class="table table-bordered table-striped table-hover zero-configuration" id="membersTable">
                             <thead>
-                                <tr>
-                                    <th>#</th>
-                                    <th>{{ trans('cruds.member.title_singular') }}</th>
-                                    <th>{{ trans('cruds.branch.title_singular') }}</th>
-                                    <th>{{ trans('cruds.service.title_singular') }}</th>
-                                    <th>Sport</th>
-                                    <th>{{ trans('global.start_date') }}</th>
-                                    <th>{{ trans('global.end_date') }}</th>
-                                    <th>{{ trans('global.amount') }}</th>
-                                    <th>{{ trans('global.last_attendance') }}</th>
-                                    <th>{{ trans('cruds.lead.fields.sales_by') }}</th>
-                                    <th>{{ trans('global.action') }}</th>
-                                </tr>
+                            <tr>
+                                <th>#</th>
+                                <th>{{ trans('cruds.member.title_singular') }}</th>
+                                <th>{{ trans('cruds.branch.title_singular') }}</th>
+                                <th>{{ trans('cruds.service.title_singular') }}</th>
+                                <th>Sport</th>
+                                <th>{{ trans('global.start_date') }}</th>
+                                <th>{{ trans('global.end_date') }}</th>
+                                <th>{{ trans('global.amount') }}</th>
+                                <th>{{ trans('global.last_attendance') }}</th>
+                                <th>{{ trans('cruds.lead.fields.sales_by') }}</th>
+                                <th>{{ trans('global.action') }}</th>
+                            </tr>
                             </thead>
-                            <tbody>
-                                @forelse ($memberships as $membership)
-                                    <tr>
-                                        <td>{{ $loop->iteration }}</td>
-                                        <td>
-                                            <a href="{{ route('admin.members.show',$membership->member_id) }}" target="_blank">
-                                                {{ $membership->member->name ?? '-' }}
-                                            </a>
-                                            <span class="d-block font-weight-bold">
-                                                {{ $membership->member->member_code ?? '-' }}
-                                                {{-- {{ \App\Models\Setting::first()->member_prefix.$membership->member->member_code ?? '-' }} --}}
-                                            </span>
-                                            <span class="d-block font-weight-bold">
-                                                {{ $membership->member->phone ?? '-' }}
-                                            </span>
-                                            
-                                        </td>
-                                        <td>{{ $membership->member->branch->name ?? '-' }}</td>
-                                        <td>
-                                            <a href="{{ route('admin.memberships.show',$membership->id) }}" target="_blank">
-                                                {{ $membership->service_pricelist->name ?? '-' }}
-                                            </a>
-                                        </td>
-                                        <td>
-                                            {{ $membership->member->sport->name ?? '-' }}
-                                        </td>
-                                        <td>
-                                            {{ $membership->start_date ?? '-' }}
-                                        </td>
-                                        <td>
-                                            {{ $membership->end_date ?? '-' }}
-                                        </td>
-                                        <td>
-                                            <a href="{{route('admin.invoices.show',$membership->invoice->id)}}">
-                                                <span class="d-block">
-                                                    {{ trans('global.total') }} : {{ number_format($membership->invoice->net_amount) ?? 0 }}
-                                                </span>
-                                                <span class="d-block">
-                                                    {{ trans('invoices::invoice.paid') }} : {{ number_format($membership->invoice->payments_sum_amount) ?? 0 }}
-                                                </span>
-                                                <span class="d-block">
-                                                    {{ trans('global.rest') }} : {{ number_format($membership->invoice->rest) ?? 0 }}
-                                                </span>
-                                            </a>
-                                        </td>
-                                        <td>
-                                            {{-- {{ $membership->lastAttend()->created_at }} --}}
-                                            {!! $membership->last_attendance ?? '<span class="badge badge-danger">No attendance</span>' !!}
-                                        </td>
-                                        <td>
-                                            {{ $membership->sales_by->name ?? '-' }}
-                                        </td>
-                                        <td>
-                                            <button type="button" data-toggle="modal" data-target="#takeMemberAction"
-                                                onclick="takeMemberAction({{ $membership->member_id }})" class="btn btn-info btn-xs"><i class="fa fa-phone"></i>
-                                                &nbsp; {{ trans('cruds.reminder.fields.action') }}</button>
-                                        </td>
-                                    </tr>
-                                @empty
-                                    <td colspan="5" class="text-center">{{ trans('global.no_data_available') }}</td>
-                                @endforelse
+                            <tbody id="membersTableBody">
+                            @include('admin.members.partials.memberships', ['memberships' => $memberships])
                             </tbody>
                         </table>
-                    </div>
+
+                        <div id="paginationLinks">
+                            {{ $memberships->links() }}
+                        </div>
                 </div>
             </div>
         </div>
@@ -176,6 +124,95 @@
 @endsection
 @section('scripts')
     <script>
+        $(document).ready(function() {
+            $('#onHoldMembersTable').DataTable({
+                destroy: true,  // Allow reinitialization without errors
+                searching: false,  // Disable the default search box
+                lengthChange: false,  // Disable the rows per page selector
+                paging: false,  // Enable pagination
+                info: true,  // Show table information
+                dom: 't<"bottom"p>',  // Only show the table and pagination at the bottom
+                select: false,
+                columnDefs: [{
+                    orderable: false,
+                    targets: 0
+                }]
+            });
+        });
+
+
+
+        document.getElementById('customSearch').addEventListener('input', function() {
+            let searchTerm = this.value.trim();
+
+            let url = searchTerm ? `{{ route('admin.members.onhold.search') }}?search=${searchTerm}` : `${window.location.href}`;
+
+            fetch(url, {
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest'  // This tells the server it's an AJAX request
+                }
+            })
+                .then(response => response.json())
+                .then(data => {
+                    let tbody = document.getElementById('membersTableBody');
+                    tbody.innerHTML = '';
+
+                    // Get current page and per page values from the server's response
+                    let currentPage = data.memberships.current_page;  // e.g., 1
+                    let perPage = data.memberships.per_page;  // e.g., 25
+
+                    data.memberships.data.forEach((membership, index) => {
+                        let iteration = index + 1 + (currentPage - 1) * perPage;
+
+                        tbody.innerHTML += `
+            <tr>
+                <td>${iteration}</td>  <!-- Here we use the calculated iteration value -->
+                <td>
+                    <a href="{{ url('admin/members') }}/${membership.member_id}" target="_blank">
+                        ${membership.member.name ?? '-'}
+                    </a>
+                    <span class="d-block font-weight-bold">${membership.member.member_code ?? '-'}</span>
+                    <span class="d-block font-weight-bold">${membership.member.phone ?? '-'}</span>
+                </td>
+                <td>${membership.member.branch?.name ?? '-'}</td>
+                <td>
+                    <a href="{{ url('admin/memberships') }}/${membership.id}" target="_blank">
+                        ${membership.service_pricelist?.name ?? '-'}</a>
+                </td>
+                <td>${membership.member.sport?.name ?? '-'}</td>
+                <td>${membership.start_date ?? '-'}</td>
+                <td>${membership.end_date ?? '-'}</td>
+                <td>
+                    <a href="{{ url('admin/invoices') }}/${membership.invoice?.id}">
+                        <span class="d-block">{{ trans('global.total') }}: ${membership.invoice?.net_amount ?? 0}</span>
+                        <span class="d-block">{{ trans('invoices::invoice.paid') }}: ${membership.invoice?.payments_sum_amount ?? 0}</span>
+                        <span class="d-block">{{ trans('global.rest') }}: ${membership.invoice?.rest ?? 0}</span>
+                    </a>
+                </td>
+                <td>${membership.last_attendance ?? '<span class="badge badge-danger">No attendance</span>'}</td>
+                <td>${membership.sales_by?.name ?? '-'}</td>
+                <td>
+                    <button type="button" data-toggle="modal" data-target="#takeMemberAction"
+                        onclick="takeMemberAction(${membership.member_id})" class="btn btn-info btn-xs">
+                        <i class="fa fa-phone"></i> &nbsp; {{ trans('cruds.reminder.fields.action') }}
+                        </button>
+                    </td>
+                </tr>
+`;
+                    });
+
+                    let paginationLinks = document.getElementById('paginationLinks');
+                    if (searchTerm) {
+                        paginationLinks.style.display = 'none';
+                    } else {
+                        paginationLinks.style.display = 'block';
+                    }
+                })
+                .catch(error => console.error('Error fetching search results:', error));
+        });
+
+
+
         function takeMemberAction(id) {
             var id = id;
             var url = "{{ route('admin.reminders.takeMemberAction', ':id') }}";
