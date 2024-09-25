@@ -1,4 +1,104 @@
+<style>
+    .modal {
+        z-index: 1050;
+        -webkit-overflow-scrolling: touch;
+        overflow-y: auto; /* Allow scrolling within the modal on touch devices */
+    }
 
+    .modal-dialog {
+        z-index: 1050;
+        width: 50%; /* Default width for larger screens */
+        margin: auto;
+        max-height: 90vh; /* Ensure the modal doesn't exceed 90% of the viewport height */
+    }
+
+    .modal-backdrop {
+        z-index: 1040;
+    }
+
+    .modal-content {
+        z-index: 1051;
+        max-height: 85vh; /* Set a maximum height for the modal content */
+        overflow-y: auto; /* Enables scrolling if content overflows */
+    }
+
+    .select2-container--default .select2-results__options {
+        z-index: 1060;
+    }
+
+    /* Modal scrolling for iOS */
+    body.modal-open {
+        overflow-y: hidden;
+        position: fixed;
+        width: 100%;
+    }
+
+    .modal-lg {
+        max-width: 100%;
+    }
+
+    /* Adjust buttons to be fully visible */
+    .modal-footer {
+        display: flex;
+        justify-content: space-between;
+        padding: 15px; /* Add padding to ensure buttons are not cut off */
+        flex-wrap: wrap; /* Allows the buttons to stack if necessary */
+    }
+
+    .modal-footer button {
+        width: 30%; /* Adjust button width for mobile */
+        margin: 5px; /* Add margin between buttons */
+    }
+
+    /* Form input styles */
+    select, input, button {
+        -webkit-appearance: none;
+        -webkit-tap-highlight-color: transparent;
+    }
+
+    select:focus, input:focus, button:focus {
+        outline: none;
+    }
+
+    select {
+        touch-action: manipulation;
+    }
+
+    input, select, textarea {
+        font-size: 16px;
+    }
+
+    .select2-container .select2-selection--single .select2-selection__rendered {
+        font-size: 16px;
+    }
+
+
+    @media (max-width: 800.98px) {
+        .modal-dialog {
+            width: 95%;
+            margin: auto;
+        }
+
+        .modal-content {
+            max-height: 85vh;
+        }
+
+        .modal-body {
+            max-height: 70vh;
+            overflow-y: auto;
+        }
+
+        .modal-footer {
+            flex-direction: column;
+            padding-bottom: 15px;
+        }
+
+        /*.modal-footer button {*/
+        /*    width: 50%; !* Full-width buttons on smaller screens *!*/
+        /*    margin-bottom: 10px; !* Add some space between buttons *!*/
+        /*}*/
+    }
+</style>
 <button class="btn btn-primary" data-target="#filterModal" data-toggle="modal" type="button">
     <i class="fa fa-filter"></i> Filter
 </button>
@@ -129,106 +229,6 @@
         </div>
     </div>
 </div>
-<style>
-    .modal {
-        z-index: 1050;
-        -webkit-overflow-scrolling: touch;
-        overflow-y: auto; /* Allow scrolling within the modal on touch devices */
-    }
 
-    .modal-dialog {
-        z-index: 1050;
-        width: 50%; /* Default width for larger screens */
-        margin: auto;
-        max-height: 90vh; /* Ensure the modal doesn't exceed 90% of the viewport height */
-    }
-
-    .modal-backdrop {
-        z-index: 1040;
-    }
-
-    .modal-content {
-        z-index: 1051;
-        max-height: 85vh; /* Set a maximum height for the modal content */
-        overflow-y: auto; /* Enables scrolling if content overflows */
-    }
-
-    .select2-container--default .select2-results__options {
-        z-index: 1060;
-    }
-
-    /* Modal scrolling for iOS */
-    body.modal-open {
-        overflow-y: hidden;
-        position: fixed;
-        width: 100%;
-    }
-
-    .modal-lg {
-        max-width: 100%;
-    }
-
-    /* Adjust buttons to be fully visible */
-    .modal-footer {
-        display: flex;
-        justify-content: space-between;
-        padding: 15px; /* Add padding to ensure buttons are not cut off */
-        flex-wrap: wrap; /* Allows the buttons to stack if necessary */
-    }
-
-    .modal-footer button {
-        width: 30%; /* Adjust button width for mobile */
-        margin: 5px; /* Add margin between buttons */
-    }
-
-    /* Form input styles */
-    select, input, button {
-        -webkit-appearance: none;
-        -webkit-tap-highlight-color: transparent;
-    }
-
-    select:focus, input:focus, button:focus {
-        outline: none;
-    }
-
-    select {
-        touch-action: manipulation;
-    }
-
-    input, select, textarea {
-        font-size: 16px;
-    }
-
-    .select2-container .select2-selection--single .select2-selection__rendered {
-        font-size: 16px;
-    }
-
-    /* Adjustments for Mobile Devices */
-    @media (max-width: 800.98px) {
-        .modal-dialog {
-            width: 95%;  /* Take up most of the screen on mobile devices */
-            margin: auto;
-        }
-
-        .modal-content {
-            max-height: 85vh; /* Limit the height of the modal on mobile */
-        }
-
-        .modal-body {
-            max-height: 70vh; /* Ensure the modal body is scrollable */
-            overflow-y: auto; /* Enable scrolling within the modal body */
-        }
-
-        .modal-footer {
-            flex-direction: column; /* Stack buttons vertically on smaller screens */
-            padding-bottom: 15px;
-        }
-
-        /*.modal-footer button {*/
-        /*    width: 50%; !* Full-width buttons on smaller screens *!*/
-        /*    margin-bottom: 10px; !* Add some space between buttons *!*/
-        /*}*/
-    }
-</style>
 
 
