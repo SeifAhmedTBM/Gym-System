@@ -122,12 +122,10 @@
         document.getElementById('customSearch').addEventListener('input', function () {
             let searchTerm = this.value.trim();
 
-            // Construct the URL based on whether there is a search term or not
             let url = searchTerm
                 ? `{{ route('admin.reports.action.search') }}?search=${searchTerm}`
                 : `${window.location.href}`;
 
-            // Fetch the data from the server
             fetch(url, {
                 headers: {
                     'X-Requested-With': 'XMLHttpRequest'
@@ -197,7 +195,6 @@
                                             </tr>`;
                     });
 
-                    // Handle the visibility of pagination links depending on whether there's a search term
                     let paginationLinks = document.getElementById('paginationLinks');
                     if (searchTerm) {
                         paginationLinks.style.display = 'none';

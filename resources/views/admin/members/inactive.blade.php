@@ -93,12 +93,10 @@
         document.getElementById('customSearch').addEventListener('input', function () {
             let searchTerm = this.value.trim();
 
-            // Construct the URL based on whether there is a search term or not
             let url = searchTerm
                 ? `{{ route('admin.members.inactive.search') }}?search=${encodeURIComponent(searchTerm)}`
                 : window.location.href;
 
-            // Fetch the data from the server
             fetch(url, {
                 headers: {
                     'X-Requested-With': 'XMLHttpRequest'
@@ -107,7 +105,7 @@
                 .then(response => response.json())
                 .then(data => {
                     let tbody = document.getElementById('inactiveTableBody');
-                    tbody.innerHTML = '';  // Clear the table body before inserting new data
+                    tbody.innerHTML = '';
 
                     let currentPage = data.members.current_page;
                     let perPage = data.members.per_page;
@@ -134,7 +132,6 @@
                 </tr>`;
                     });
 
-                    // Handle the visibility of pagination links depending on whether there's a search term
                     let paginationLinks = document.getElementById('paginationLinks');
                     if (searchTerm) {
                         paginationLinks.style.display = 'none';

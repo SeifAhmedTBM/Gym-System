@@ -1633,6 +1633,9 @@ class MembersController extends Controller
                     ->orWhere('member_code', 'LIKE', "%$search%")
                     ->orWhere('phone', 'LIKE', "%$search%");
             });
+            $query->OrwhereHas('sales_by', function ($q) use ($search) {
+                $q->where('name', 'LIKE', "$search%");
+            });
         }
 
         $memberships = $query->latest()->paginate(25);

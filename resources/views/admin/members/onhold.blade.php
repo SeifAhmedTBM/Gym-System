@@ -126,12 +126,12 @@
     <script>
         $(document).ready(function() {
             $('#onHoldMembersTable').DataTable({
-                destroy: true,  // Allow reinitialization without errors
-                searching: false,  // Disable the default search box
-                lengthChange: false,  // Disable the rows per page selector
-                paging: false,  // Enable pagination
-                info: true,  // Show table information
-                dom: 't<"bottom"p>',  // Only show the table and pagination at the bottom
+                destroy: true,
+                searching: false,
+                lengthChange: false,
+                paging: false,
+                info: true,
+                dom: 't<"bottom"p>',
                 select: false,
                 columnDefs: [{
                     orderable: false,
@@ -149,7 +149,7 @@
 
             fetch(url, {
                 headers: {
-                    'X-Requested-With': 'XMLHttpRequest'  // This tells the server it's an AJAX request
+                    'X-Requested-With': 'XMLHttpRequest'
                 }
             })
                 .then(response => response.json())
@@ -157,7 +157,7 @@
                     let tbody = document.getElementById('membersTableBody');
                     tbody.innerHTML = '';
 
-                    // Get current page and per page values from the server's response
+
                     let currentPage = data.memberships.current_page;  // e.g., 1
                     let perPage = data.memberships.per_page;  // e.g., 25
 
