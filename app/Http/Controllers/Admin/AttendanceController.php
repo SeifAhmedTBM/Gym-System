@@ -333,9 +333,8 @@ class AttendanceController extends Controller
                         ->where('member_code',$request['card_number'])
                         ->whereBranchId($request['member_branch_id'])
                         ->first();
-//        dd($request->all());
 
-//         dd($request->all(),$member);
+        // dd($request->all(),$member);
         $branch_id = Auth()->user()->employee ? Auth()->user()->employee->branch_id : $request['member_branch_id'];
                     
         if (isset($member->id)) 
