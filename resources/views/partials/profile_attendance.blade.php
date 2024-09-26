@@ -31,7 +31,7 @@
                         </div>
                     </div>
                     <br>
-                    
+
                 @else
                     <form action="{{ route('admin.take.attend') }}" method="post" id="memberAttendanceForm">
                         @csrf
@@ -55,7 +55,7 @@
                             </div>
                         </div>
                     </form>
-                    
+
                 @endif
             </div>
         </div>
