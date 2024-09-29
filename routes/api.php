@@ -61,6 +61,7 @@ Route::group(['prefix' => 'v1', 'as' => 'api.', 'namespace' => 'Api\V1\Admin'], 
         Route::get('classes/pricelist', 'ClassesServicesApiController@pricelist');
         Route::get('classes/', 'ClassesServicesApiController@classes');
         Route::get('classes/current', 'ClassesServicesApiController@my_classes');
+        Route::post('attendance', 'ServicesApiController@takeAttend');
 
         Route::get('memberships/current', 'MembershipsServicesApiController@my_membership');
         Route::get('memberships', 'MembershipsServicesApiController@memberships');
