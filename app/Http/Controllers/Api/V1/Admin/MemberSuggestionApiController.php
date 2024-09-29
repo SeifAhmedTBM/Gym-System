@@ -12,7 +12,7 @@ class MemberSuggestionApiController extends Controller
 {
     public function store(Request $request)
     {
-        if (auth('sanctum')->id) 
+        if (auth('sanctum')->user()->id)
         {
             $member = Lead::whereUserId(auth('sanctum')->user()->id)->first();
     
@@ -22,7 +22,10 @@ class MemberSuggestionApiController extends Controller
             ]);
     
             return response()->json([
-                'message' => 'Suggestion sent successfully'
+                'message' => 'Suggestion sent successfully',
+                'data'=> [
+                    'suggestion' => $suggestion
+                ]
             ],201);
         }else{
             return response()->json([
