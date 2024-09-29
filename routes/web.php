@@ -304,7 +304,6 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.', 'namespace' => 'Admin', 'mi
 
 
         Route::get('daily-task-report', 'ReportController@daily_task_report')->name('daily-task-report');
-        Route::get('daily-task-report-search', 'ReportController@daily_task_report_search')->name('daily-task-report-search');
 
         Route::get('actions-report', 'ReportController@action_report')->name('actions-report');
         Route::get('actions-report/export', 'ReportController@export_actions_report')->name('actions-report.export');

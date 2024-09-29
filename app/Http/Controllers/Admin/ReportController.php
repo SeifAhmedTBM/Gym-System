@@ -2735,53 +2735,7 @@ class ReportController extends Controller
         $to = isset($request['to']) ? $request['to'] : date('Y-m-d');
 
 
-        $reminder_sources   = LeadRemindersHistory::with([
-            'lead' => fn ($q) => $q->with(['source', 'branch']),
-            'membership' => fn ($q) => $q->with([
-                'invoice'           => fn ($q) => $q->withSum('payments', 'amount'),
-                'service_pricelist'
-            ]),
-            'user'
-        ])
-            ->whereHas(
-                'lead',
-                fn ($q) => $q
-                    ->when($request['type'], fn ($y) => $y->whereType($request['type']))
-                    ->when($branch_id, fn ($q) => $q->whereBranchId($branch_id))
-            )
-            ->whereHas('user.employee',fn($q) => $q->whereStatus('active'))
-            ->when($request['sales_by_id'], fn ($q) => $q->whereUserId($request['sales_by_id']))
-            ->whereDate('created_at', '>=', $from)
-            ->whereDate('created_at', '<=', $to)
-            ->paginate(25);
-
-        if ($request->ajax()) {
-            return response()->json([
-                'reminder_sources' => $reminder_sources,
-                'links' => !$request->input('search') ? (string)$reminder_sources->links():'',
-            ]);
-        }
-
-
-
-        return view('admin.reports.sources', compact('employee', 'reminder_sources', 'branch_id'));
-    }
-    public function daily_task_report_search(Request $request)
-    {
-        $employee = Auth()->user()->employee;
-
-        if ($employee && $employee->branch_id != NULL) {
-            $branch_id = $employee->branch_id;
-        } else {
-            $branch_id = $request['branch_id'] != NULL ? $request['branch_id'] : '';
-        }
-
-        $from = isset($request['from']) ? $request['from'] : date('Y-m-d');
-        $to = isset($request['to']) ? $request['to'] : date('Y-m-d');
-
-        $search = $request->get('search', '');
-
-        $query  = LeadRemindersHistory::with([
+        $query   = LeadRemindersHistory::with([
             'lead' => fn ($q) => $q->with(['source', 'branch']),
             'membership' => fn ($q) => $q->with([
                 'invoice'           => fn ($q) => $q->withSum('payments', 'amount'),
@@ -2800,19 +2754,26 @@ class ReportController extends Controller
             ->whereDate('created_at', '>=', $from)
             ->whereDate('created_at', '<=', $to);
 
-        if ($search) {
-            $query->whereHas('lead', function ($q) use ($search) {
-                $q->where('name', 'LIKE', "$search%")
-                    ->orWhere('member_code', 'LIKE', "%$search%")
-                    ->orWhere('phone', 'LIKE', "%$search%");
-            });
+        if ($request->ajax()) {
+            $search = $request->search ?? null ;
+            if ($search) {
+                $query->whereHas('lead', function ($q) use ($search) {
+                    $q->where('name', 'LIKE', "$search%")
+                        ->orWhere('member_code', 'LIKE', "%$search%")
+                        ->orWhere('phone', 'LIKE', "%$search%");
+                });
 
+            }
+            $reminder_sources = $query->paginate(25);
+            return response()->json([
+                'reminder_sources' => $reminder_sources,
+                'links' => !$request->input('search') ? (string)$reminder_sources->links():'',
+            ]);
         }
-        $reminder_sources = $query->paginate(25);
-        return response()->json([
-            'reminder_sources' => $reminder_sources,
-            'links' => !$request->input('search') ? (string)$reminder_sources->links():'',
-        ]);
+
+            $reminder_sources = $query->paginate(25);
+
+        return view('admin.reports.sources', compact('employee', 'reminder_sources', 'branch_id'));
     }
 
     public function assignedCoachesReport(Request $request)

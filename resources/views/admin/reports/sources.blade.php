@@ -124,7 +124,7 @@
             } else {
                 params.delete('search');
             }
-            let url = `{{ route('admin.reports.daily-task-report-search') }}?${params.toString()}`;
+            let url = `{{ route('admin.reports.daily-task-report') }}?${params.toString()}`;
             console.log(url);
 
             fetch(url, {
