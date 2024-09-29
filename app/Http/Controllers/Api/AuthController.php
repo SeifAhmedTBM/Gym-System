@@ -116,7 +116,7 @@ class AuthController extends Controller
             ],403);
         }
 
-        $memberships_query = Membership::with(['service_pricelist'])
+        $memberships_query = Membership::with(['service_pricelist','invoice'])
                         ->withCount('attendances')
                         ->withSum('freezeRequests','freeze')
                         ->whereMemberId($member->id);
