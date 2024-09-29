@@ -677,9 +677,9 @@ class EmployeesController extends Controller
 
     public function add_loan($id)
     {
-        $employee = Employee::findOrFail($id);
-
-        return view('admin.loans.add_loan', compact('employee'));
+        $employee = Employee::with('branch.accounts')->find($id);
+        $selected_branch = $employee->branch;
+        return view('admin.loans.add_loan', compact('selected_branch','employee'));
     }
 
     public function add_vacation($id)
