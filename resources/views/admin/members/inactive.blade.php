@@ -64,7 +64,7 @@
                             </tbody>
                         </table>
                         <div id="paginationLinks">
-                            {{ $members->links() }}
+                            {{ $members->appends(request()->query())->links() }}
                         </div>
                     </div>
                 </div>
@@ -93,9 +93,18 @@
         document.getElementById('customSearch').addEventListener('input', function () {
             let searchTerm = this.value.trim();
 
-            let url = searchTerm
-                ? `{{ route('admin.members.inactive.search') }}?search=${encodeURIComponent(searchTerm)}`
-                : window.location.href;
+            let currentUrl = new URL(window.location.href);
+
+            let params = new URLSearchParams(currentUrl.search);
+
+            if (searchTerm) {
+                params.set('search', searchTerm);
+                params.delete('page');
+            } else {
+                params.delete('search');
+            }
+
+            let url = `{{ route('admin.members.inactive') }}?${params.toString()}`;
 
             fetch(url, {
                 headers: {

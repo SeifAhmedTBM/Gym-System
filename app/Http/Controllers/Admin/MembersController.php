@@ -1546,7 +1546,7 @@ class MembersController extends Controller
 
         $branch_id = $employee && $employee->branch_id ? $employee->branch_id : $request['branch_id'] ?? '';
 
-        $memberships = Membership::with([
+        $query = Membership::with([
             'member',
             'member.sport',
             'service_pricelist',
@@ -1564,14 +1564,26 @@ class MembersController extends Controller
                         $x->whereMainService(true);
                     });
                 });
-            })
-            ->latest()->paginate(25);
+            });
         if ($request->ajax()) {
+            $search = $request->search ?? null ;
+            if ($search) {
+                $query->whereHas('member', function ($q) use ($search) {
+                    $q->where('name', 'LIKE', "$search%")
+                        ->orWhere('member_code', 'LIKE', "%$search%")
+                        ->orWhere('phone', 'LIKE', "%$search%");
+                })->OrwhereHas('sales_by', function ($q) use ($search) {
+                    $q->where('name', 'LIKE', "$search%");
+                });
+            }
+
+            $memberships = $query->latest()->paginate(25);
             return response()->json([
                 'memberships' => $memberships,
                 'links' => !$request->input('search') ? (string) $memberships->links() : '',
             ]);
         }
+        $memberships = $query->latest()->paginate(25);
 
         $membershipsCount = Membership::with([
             'member',
@@ -1600,52 +1612,6 @@ class MembersController extends Controller
         return view('admin.members.onhold', compact('membershipsCount','memberships', 'statuses', 'employee', 'branch_id'));
     }
 
-    public function searchOnHoldMembers(Request $request)
-    {
-        $setting = Setting::first()->inactive_members_days ?? 7;
-        $sport_id = $request['sport_id'] ?? null;
-        $branch_id = $request['branch_id'] ?? '';
-        $search = $request->get('search', '');
-
-        $query = Membership::with([
-            'member',
-            'member.sport',
-            'service_pricelist',
-            'service_pricelist.service',
-            'invoice' => fn($q) => $q->withSum('payments', 'amount'),
-            'member.branch',
-            'sales_by'
-        ])
-            ->whereDate('last_attendance', '<', date('Y-m-d', strtotime('-' . $setting . ' Days')))
-            ->whereHas('member', fn($q) => $q->when($sport_id, fn($q) => $q->whereSportId($sport_id))->when($branch_id, fn($y) => $y->whereBranchId($branch_id)))
-            ->whereIn('status', ['current', 'expiring'])
-            ->whereHas('service_pricelist', function ($y) {
-                $y->whereHas('service', function ($b) {
-                    $b->whereHas('service_type', function ($x) {
-                        $x->whereMainService(true);
-                    });
-                });
-            });
-
-        if ($search) {
-            $query->whereHas('member', function ($q) use ($search) {
-                $q->where('name', 'LIKE', "$search%")
-                    ->orWhere('member_code', 'LIKE', "%$search%")
-                    ->orWhere('phone', 'LIKE', "%$search%");
-            });
-            $query->OrwhereHas('sales_by', function ($q) use ($search) {
-                $q->where('name', 'LIKE', "$search%");
-            });
-        }
-
-        $memberships = $query->latest()->paginate(25);
-
-        return response()->json([
-            'memberships' => $memberships,
-            'links' => (string)$memberships->links()
-        ]);
-    }
-
 
     public function inactiveMembers(Request $request)
     {
@@ -1659,13 +1625,12 @@ class MembersController extends Controller
 
         $sport_id = $request['sport_id'] ?? NULL;
 
-        $members = Lead::whereType('member')
+        $query = Lead::whereType('member')
             ->whereDoesntHave('memberships', fn($q) => $q->whereIn('status', ['expiring', 'current']))
             ->with(['memberships', 'branch', 'sport'])
             ->when($branch_id, fn($q) => $q->whereBranchId($branch_id))
             ->when($sport_id, fn($q) => $q->whereSportId($sport_id))
-            ->withCount(['memberships'])
-            ->paginate(25);
+            ->withCount(['memberships']);
 
         $membersCount = Lead::whereType('member')
             ->whereDoesntHave('memberships', fn($q) => $q->whereIn('status', ['expiring', 'current']))
@@ -1676,53 +1641,22 @@ class MembersController extends Controller
             ->count();
 
         if ($request->ajax()) {
+            $search = $request->search ?? null;
+            $query->when($search, function ($q) use ($search) {
+                $q->where(function ($query) use ($search) {
+                    $query->where('name', 'LIKE', "$search%")
+                        ->orWhere('phone', 'LIKE', "%$search%");
+                });
+            });
+            $members = $query->paginate(25);
             return response()->json([
                 'members' => $members,
                 'links' => !$request->input('search') ? (string) $members->links() : '',
             ]);
         }
-
+            $members = $query->paginate(25);
 
         return view('admin.members.inactive', compact('membersCount','members', 'employee', 'branch_id'));
-    }
-    public function searchinactiveMembers(Request $request)
-    {
-        $employee = Auth()->user()->employee;
-
-        if ($employee && $employee->branch_id != NULL) {
-            $branch_id = $employee->branch_id;
-        } else {
-            $branch_id = $request['branch_id'] != NULL ? $request['branch_id'] : '';
-        }
-
-        $sport_id = $request['sport_id'] ?? NULL;
-
-        $search = $request->get('search') ?? null;
-
-        $members = Lead::where('type', 'member')
-            ->whereDoesntHave('memberships', function ($q) {
-                $q->whereIn('status', ['expiring', 'current']);
-            })
-            ->with(['memberships', 'branch', 'sport'])
-            ->when($branch_id, function ($q) use ($branch_id) {
-                $q->where('branch_id', $branch_id);
-            })
-            ->when($sport_id, function ($q) use ($sport_id) {
-                $q->where('sport_id', $sport_id);
-            })
-            ->when($search, function ($q) use ($search) {
-                $q->where(function ($query) use ($search) {
-                    $query->where('name', 'LIKE', "$search%")
-                        ->orWhere('phone', 'LIKE', "%$search%");
-                });
-            })
-            ->withCount(['memberships'])
-            ->paginate(25);
-
-        return response()->json([
-            'members' => $members,
-            'links' => (string)$members->links()
-        ]);
     }
 
     public function createPopMessage($id)

@@ -70,7 +70,7 @@
                         </table>
 
                         <div id="paginationLinks">
-                            {{ $memberships->links() }}
+                            {{ $memberships->appends(request()->query())->links() }}
                         </div>
                 </div>
             </div>
@@ -145,7 +145,18 @@
         document.getElementById('customSearch').addEventListener('input', function() {
             let searchTerm = this.value.trim();
 
-            let url = searchTerm ? `{{ route('admin.members.onhold.search') }}?search=${searchTerm}` : `${window.location.href}`;
+            let currentUrl = new URL(window.location.href);
+
+            let params = new URLSearchParams(currentUrl.search);
+
+            if (searchTerm) {
+                params.set('search', searchTerm);
+                params.delete('page');
+            } else {
+                params.delete('search');
+            }
+
+            let url = `{{ route('admin.members.onhold') }}?${params.toString()}`;
 
             fetch(url, {
                 headers: {
