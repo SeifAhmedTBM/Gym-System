@@ -11,16 +11,6 @@
             @csrf
             <div class="form-group row">
                 <input type="hidden" name="employee_id" value="{{ $employee->id }}">
-{{--                <div class="col-md-6">--}}
-{{--                    <label class="required" for="name">{{ trans('cruds.loan.fields.name') }}</label>--}}
-{{--                    <input class="form-control {{ $errors->has('name') ? 'is-invalid' : '' }}" type="text" name="name" id="name" value="{{ old('name', '') }}" required>--}}
-{{--                    @if($errors->has('name'))--}}
-{{--                        <div class="invalid-feedback">--}}
-{{--                            {{ $errors->first('name') }}--}}
-{{--                        </div>--}}
-{{--                    @endif--}}
-{{--                    <span class="help-block">{{ trans('cruds.loan.fields.name_helper') }}</span>--}}
-{{--                </div>--}}
                 <div class="col-md-6">
                     <label class="required" for="name">{{ trans('cruds.loan.fields.description') }}</label>
                     <textarea class="form-control {{ $errors->has('name') ? 'is-invalid' : '' }}" type="text" name="name" id="name" value="{{ old('name', '') }}" required>{{ old('name') }}</textarea>
