@@ -146,8 +146,8 @@ class LoansController extends Controller
             'created_at'    => $request['created_at'],
             'created_by_id' => Auth()->user()->id,
         ]);
-
         
+
         $transaction = Transaction::create([
             'transactionable_type' => 'App\\Models\\Loan',
             'transactionable_id' => $loan->id,
