@@ -128,7 +128,7 @@
                 retrieve: true,
                 searching:true,
                 aaSorting: [],
-                ajax: "{{ route('admin.withdrawals.index',request()->all()) }}",
+                ajax: "{!! route('admin.withdrawals.index',request()->all()) !!}",
                 columns: [{
                         data: 'placeholder',
                         name: 'placeholder'

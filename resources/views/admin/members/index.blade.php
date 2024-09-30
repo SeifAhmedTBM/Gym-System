@@ -234,7 +234,7 @@
                 responsive: true,
                 searching:true,
                 aaSorting: [],
-                ajax: "{{ route('admin.members.index',request()->all()) }}",
+                ajax: "{!! route('admin.members.index',request()->all()) !!}",
                 columns: [{
                         data: 'placeholder',
                         name: 'placeholder'

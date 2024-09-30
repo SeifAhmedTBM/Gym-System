@@ -148,7 +148,7 @@
                 retrieve: true,
                 searching:true,
                 aaSorting: [],
-                ajax: "{{ route('admin.payments.index',request()->all()) }}",
+                ajax: "{!! route('admin.payments.index',request()->all()) !!}",
                 columns: [{
                         data: 'placeholder',
                         name: 'placeholder'
