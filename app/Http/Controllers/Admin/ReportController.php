@@ -2432,9 +2432,8 @@ class ReportController extends Controller
 
     public function taxAccountant(Request $request)
     {
-        $from = $request['from'] != NULL ? $request['from'] : date('Y-m-01');
-        $to = $request['to'] != NULL ? $request['to'] : date('Y-m-t');
-
+        $from = (!empty($request['created_at']) && !empty($request['created_at']['from']))  ? $request['created_at']['from'] : date('Y-m-01');
+        $to = (!empty($request['created_at']) && !empty($request['created_at']['to']))  ? $request['created_at']['to'] : date('Y-m-t');
         $branch_id = $request['branch_id'] != NULL ? $request['branch_id'] : NULL;
         $accounts = [
             ''=>'All',

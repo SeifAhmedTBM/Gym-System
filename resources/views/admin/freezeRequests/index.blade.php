@@ -121,7 +121,7 @@
                 retrieve: true,
                 searching:true,
                 aaSorting: [],
-                ajax: "{{ route('admin.freeze-requests.index',request()->all()) }}",
+                ajax: "{!! route('admin.freeze-requests.index',request()->all()) !!}",
                 columns: [{
                         data: 'placeholder',
                         name: 'placeholder'
