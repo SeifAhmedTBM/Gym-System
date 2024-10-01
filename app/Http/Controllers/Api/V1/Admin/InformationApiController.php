@@ -32,6 +32,18 @@ class InformationApiController extends Controller
             ]
         ];
     }
+    public function contact_us() {
+        return [
+            'message'=>'success',
+            'data'=>[
+                'phone_number'=>$this->setting->phone_number,
+                'whatsapp_number'=>$this->setting->whatsapp_number,
+                'facebook_url'=>$this->setting->facebook_url,
+                'instagram_url'=>$this->setting->instagram_url,
+                'tiktok_url'=>$this->setting->tiktok_url,
+            ]
+        ];
+    }
     public function rules() {
         return [
             'message'=>'success',

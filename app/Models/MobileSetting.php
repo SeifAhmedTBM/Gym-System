@@ -12,9 +12,15 @@ class MobileSetting extends Model
         'privacy_setting',
         'about_us',
         'rules',
+        'account_id',
         'terms_conditions',
         'pt_service_type',
         'classes_service_type',
         'membership_service_type',
+        'phone_number',
+        'whatsapp_number',
+        'facebook_url',
+        'instagram_url',
+        'tiktok_url',
     ];
 }

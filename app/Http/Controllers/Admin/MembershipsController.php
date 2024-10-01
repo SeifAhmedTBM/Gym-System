@@ -647,8 +647,8 @@ class MembershipsController extends Controller
 
     public function storeRenew(Request $request)
     {
-        $selected_branch = Auth()->user()->employee->branch ?? $request['branch_id'];
-
+        $selected_branch_id = Auth()->user()->employee->branch ? Auth()->user()->employee->branch : (int)$request['branch_id'];
+//        dd($selected_branch_id);
         try {
             DB::beginTransaction();
             $service_type_id = Pricelist::find($request->service_pricelist_id)->service->service_type_id;
@@ -685,7 +685,7 @@ class MembershipsController extends Controller
                 'service_fee'       => $request['membership_fee'],
                 'net_amount'        => $request->membership_fee - $request->discount_amount,
                 'membership_id'     => $membership->id,
-                'branch_id'         => $selected_branch->id,
+                'branch_id'         => $selected_branch_id,
                 'sales_by_id'       => $request['sales_by_id'],
                 'status'            => ($request->membership_fee - $request->discount_amount) == $request->received_amount ? 'fullpayment' : 'partial',
                 'created_by_id'     => Auth()->user()->id,
@@ -801,7 +801,7 @@ class MembershipsController extends Controller
 
             DB::commit();
         } catch (\Exception $e) {
-            dd($e->getMessage());
+            dd($e);
             DB::rollback();
         }
 

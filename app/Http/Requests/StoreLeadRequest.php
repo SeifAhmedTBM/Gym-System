@@ -46,10 +46,11 @@ class StoreLeadRequest extends FormRequest
             'gender' => [
                 'required',
             ],
-            // 'sales_by_id' => [
-            //     'required',
-            //     'integer',
-            // ],
+             'branch_id' => [
+                 'required',
+                 'integer',
+                 'exists:branches,id',
+             ],
         ];
     }
 }

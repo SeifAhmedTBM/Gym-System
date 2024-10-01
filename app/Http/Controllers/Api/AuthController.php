@@ -116,16 +116,19 @@ class AuthController extends Controller
             ],403);
         }
 
-        $memberships = Membership::with(['service_pricelist'])
+        $memberships_query = Membership::with(['service_pricelist','invoice'])
                         ->withCount('attendances')
                         ->withSum('freezeRequests','freeze')
-                        ->whereMemberId($member->id)
-                        ->get();
+                        ->whereMemberId($member->id);
+                        //->get();
+        $memberships = $memberships_query->get();
+        $current_membership =$memberships_query->where('status','current')->first();
     
         return response()->json([
             'message'=>'Successfully',
             'data'=>[
                 'member'        => $member,
+                'current_membership'=>$current_membership,
                 'memberships'   => $memberships,
             ]
         ],200);
@@ -226,7 +229,7 @@ class AuthController extends Controller
             return response()->json(['message' => 'Current membership is expired'], 402);
         }
 
-        return response()->json(['message'=>'completed','data'=>['trainer' => $membership->trainer]], 200);
+        return response()->json(['message'=>'completed','data'=>['trainer' => $membership->trainer,'membership'=>$membership    ]], 200);
     }
 
     public function contact()

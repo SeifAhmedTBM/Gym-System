@@ -21,13 +21,15 @@
                         <tr>
                             <tbody>
                                 @foreach ($suggestions as $suggestion)
-                                    <td>{{ $loop->iteration }}</td>
-                                    <td>
-                                        <b class="d-block">{{ $suggestion->member->name ?? '' }}</b>
-                                        <span class="d-block">{{ $suggestion->member->phone ?? '' }}</span>
-                                        <span class="d-block">{{ $suggestion->member->user->email ?? '' }}</span>
-                                    </td>
-                                    <td>{{ $suggestion->description ?? '' }}</td>
+                                    <tr>
+                                        <td>{{ $loop->iteration }}</td>
+                                        <td>
+                                            <b class="d-block">{{ $suggestion->member->name ?? '' }}</b>
+                                            <span class="d-block">{{ $suggestion->member->phone ?? '' }}</span>
+                                            <span class="d-block">{{ $suggestion->member->user->email ?? '' }}</span>
+                                        </td>
+                                        <td>{{ $suggestion->description ?? '' }}</td>
+                                    </tr>
                                 @endforeach
                             </tbody>
                         </tr>
