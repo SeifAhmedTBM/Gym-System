@@ -52,6 +52,7 @@ Route::group(['prefix' => 'v1', 'as' => 'api.', 'namespace' => 'Api\V1\Admin'], 
     Route::get('info/about-us/', 'InformationApiController@about_us');
     Route::get('info/rules/', 'InformationApiController@rules');
     Route::get('info/terms-conditions/', 'InformationApiController@terms_conditions');
+    Route::get('info/contact-us/', 'InformationApiController@contact_us');
 
     Route::group(['prefix' => 'services', 'as' => 'services.'], function () {
         Route::apiResource('', 'ServicesApiController');
@@ -65,6 +66,8 @@ Route::group(['prefix' => 'v1', 'as' => 'api.', 'namespace' => 'Api\V1\Admin'], 
 
         Route::get('memberships/current', 'MembershipsServicesApiController@my_membership');
         Route::get('memberships', 'MembershipsServicesApiController@memberships');
+        Route::post('subscription', 'SubscriptionApiController@subscribe');
+        Route::post('subscription/guest', 'SubscriptionApiController@guest_subscribe');
     });
 
 
