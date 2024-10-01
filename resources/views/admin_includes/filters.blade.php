@@ -1,3 +1,4 @@
+@php use Illuminate\Support\Carbon; @endphp
 
 <button class="btn btn-primary" data-target="#filterModal" data-toggle="modal" type="button">
     <i class="fa fa-filter"></i> Filter
@@ -22,14 +23,21 @@
                             <input type="hidden" name="filter_by" value="{{ $data['filter_by'] }}">
                         @endisset
                         <div class="form-group col-md-4">
-                            @if ($data['type'] != 'select' && $data['type'] != 'date')
+                            @if ($data['type'] != 'select' && $data['type'] != 'date' && $data['type'] != 'category')
                                 {!! Form::label($column_name, Str::ucfirst($data['label']), ['class' => 'font-weight-bold']) !!}
                                 @isset ($data['related_to'])
                                     <input type="{{ $data['type'] }}" value="{{ request()->get('relations')[$data['related_to']][$column_name] ?? '' }}" name="relations[{{ $data['related_to'] }}][{{ $column_name }}]" class="form-control" placeholder="Type here">
                                 @else
                                     <input type="{{ $data['type'] }}" value="{{ request()->get($column_name) }}" name="{{ $column_name }}" class="form-control" placeholder="Type here">
                                 @endisset
-                            @elseif($data['type'] == 'select' && !isset($data['related_to']))
+                            @elseif($data['type'] == 'category')
+                                {!! Form::label($column_name, Str::ucfirst($data['label']), ['class' => 'font-weight-bold']) !!}
+                                <select name="expenses_category" id="{{ $column_name }}" class="form-control select2" {{ $column_name == 'trainer_id' && Auth()->user()->roles[0]->title == 'Trainer' ? 'readonly' : '' }} readonly>
+                                    @foreach ($data['data'] as $id => $col)
+                                        <option  value="{{ $id }}" selected >{{ $col }}</option>
+                                    @endforeach
+                                </select>
+                             @elseif($data['type'] == 'select' && !isset($data['related_to']))
                             {{-- {{dd($column_name,request()->get($column_name))}} --}}
                             {!! Form::label($column_name, Str::ucfirst($data['label']), ['class' => 'font-weight-bold']) !!}
                             <select name="{{ $column_name }}[]" id="{{ $column_name }}" class="form-control select2" {{ $column_name == 'trainer_id' && Auth()->user()->roles[0]->title == 'Trainer' ? 'readonly' : '' }} multiple>
@@ -80,6 +88,26 @@
                                             <input type="date" value="{{ request()->get('relations')[$data['related_to']][$column_name]['to'] ?? '' }}" name="relations[{{ $data['related_to'] }}][{{ $column_name }}][to]" id="date_to" class="form-control">
                                         </div>
                                     </div>
+                            @elseif(request()->has('month'))
+                                @php
+                                    $startdate = Carbon::createFromFormat('Y-m', request()->month)->startOfMonth()->format('Y-m-d');
+                                    $enddate = Carbon::createFromFormat('Y-m', request()->month)->endOfMonth()->format('Y-m-d');
+                                @endphp
+                                {!! Form::label($col_name, Str::ucfirst($col_data['label']), ['class' => 'font-weight-bold']) !!}
+                                <div class="form-row">
+                                    <div class="form-group col-md-6">
+                                        <small class="text-success font-weight-bold">
+                                            <i class="fa fa-exclamation-triangle"></i> From
+                                        </small>
+                                        <input type="date" value="{{ $startdate }}" name="{{ $col_name }}[from]" id="date_from" class="form-control">
+                                    </div>
+                                    <div class="form-group col-md-6">
+                                        <small class="text-success font-weight-bold">
+                                            <i class="fa fa-exclamation-triangle"></i> To
+                                        </small>
+                                        <input type="date" value="{{ $enddate }}" name="{{ $col_name }}[to]" id="date_to" class="form-control">
+                                    </div>
+                                </div>
                             @else
                                 {!! Form::label($col_name, Str::ucfirst($col_data['label']), ['class' => 'font-weight-bold']) !!}
                                     <div class="form-row">
@@ -113,7 +141,7 @@
             </div>
             <div class="modal-footer">
 
-                <a href="{{ route($route) }}" class="btn btn-warning">
+                <a href="{{ route($route) }}" class="btn btn-warning @if($status) d-none @endif ">
                     <i class="fa fa-arrow-circle-left"></i> Reset
                 </a>
                 <button type="button" class="btn btn-danger" data-dismiss="modal">
