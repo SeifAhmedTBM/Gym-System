@@ -88,7 +88,7 @@ class PTServicesApiController extends Controller
             })
             ->whereHas('employee.branch', function ($b) use ($member) {
                  // all_branches
-                $b->where('id', $member->branch->id);
+                $b->where('employee.branch.id', $member->branch->id);
             })
             ->whereHas('employee', function ($i) {
                 $i->whereStatus('active')->where('mobile_visibility', true);
