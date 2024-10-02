@@ -225,9 +225,6 @@ class AuthController extends Controller
             ->latest()
             ->first();
 
-        if (!$membership) {
-            return response()->json(['message' => 'Current membership is expired'], 402);
-        }
 
         return response()->json(['message'=>'completed','data'=>['trainer' => $membership->trainer,'membership'=>$membership    ]], 200);
     }
