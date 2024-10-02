@@ -80,6 +80,7 @@ class SubscriptionApiController extends Controller
                 })
                 ->latest()
                 ->first();
+            $branch = Branch::find($request['branch_id']);
 
             $user = User::create([
                 'name' => $request->name,
@@ -162,7 +163,7 @@ class SubscriptionApiController extends Controller
             // Create payment if payment amount is greater than 0
             if ($request->payment_amount > 0) {
                 $payment = Payment::create([
-                    'account_id' => $mobile_settings->account_id,
+                    'account_id' =>  $branch->online_account?$branch->online_account->id : $mobile_settings->account_id,
                     'amount' => $request->payment_amount,
                     'invoice_id' => $invoice->id,
                     'sales_by_id' => $member->sales_by_id,
@@ -179,7 +180,7 @@ class SubscriptionApiController extends Controller
                     'transactionable_type' => Payment::class,
                     'transactionable_id' => $payment->id,
                     'amount' => $request->payment_amount,
-                    'account_id' => $mobile_settings->account_id,
+                    'account_id' =>  $branch->online_account?$branch->online_account->id : $mobile_settings->account_id,
                     'created_by' => $member->user->id,
                     'created_at' => now(),
                 ]);
@@ -312,6 +313,7 @@ class SubscriptionApiController extends Controller
                 $end_date = $startDate->addMonths($expiry);
             }
 
+            $branch = Branch::find($request['branch_id']);
             // Create membership
             $membership = Membership::create([
                 'start_date' => $request['start_date'],
@@ -342,9 +344,10 @@ class SubscriptionApiController extends Controller
             $mobile_settings = MobileSetting::first();
 
             // Create payment if payment amount is greater than 0
+
             if ($request->payment_amount > 0) {
                 $payment = Payment::create([
-                    'account_id' => $mobile_settings->account_id,
+                    'account_id' => $branch->online_account?$branch->online_account->id : $mobile_settings->account_id,
                     'amount' => $request->payment_amount,
                     'invoice_id' => $invoice->id,
                     'sales_by_id' => $member->sales_by_id,
@@ -361,7 +364,7 @@ class SubscriptionApiController extends Controller
                     'transactionable_type' => Payment::class,
                     'transactionable_id' => $payment->id,
                     'amount' => $request->payment_amount,
-                    'account_id' => $mobile_settings->account_id,
+                    'account_id' => $branch->online_account?$branch->online_account->id : $mobile_settings->account_id,
                     'created_by' => $member->user->id,
                     'created_at' => now(),
                 ]);
