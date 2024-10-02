@@ -208,12 +208,7 @@ class ClassesServicesApiController extends Controller
             })
             ->latest()->get();
 
-        // Check if memberships exist
-        if ($memberships->isEmpty()) {
-            return response()->json([
-                'message' => 'Current membership is expired'
-            ], 402);
-        }
+
 
         // Adjust memberships
         foreach ($memberships as $membership) {
