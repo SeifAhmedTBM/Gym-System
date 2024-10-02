@@ -31,6 +31,7 @@ class Branch extends Model
         'invoice_prefix',
         'primary_color',
         'address',
+        'online_account_id',
         'sales_manager_id',
         'fitness_manager_id',
         'partner_percentage',
@@ -42,6 +43,11 @@ class Branch extends Model
     public function accounts() : HasMany
     {
         return $this->hasMany(Account::class, 'branch_id');
+    }
+
+    public function online_account(): BelongsTo
+    {
+        return $this->belongsTo(Account::class, 'online_account_id');
     }
 
     public function sales_manager() : BelongsTo
