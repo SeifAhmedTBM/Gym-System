@@ -90,12 +90,16 @@ class PTServicesApiController extends Controller
                     'branch_name' => $trainer->employee->branch->name ?? '-', // Fallback if branch is not available
                     'service_id'=>$service_type->id,
                     'service_name'=>$service_type->name,
-                    'price_list'=>$service_type->service_pricelists->map(function($price) use ($service_type){
+                    'price_list'=>$service_type->service_pricelists->map(function($price) use ($service_type,$trainer){
                         return [
                             'id'=>$price->id,
                             'amount'=>$price->amount,
                             'session_count'=>$price->session_count,
                             'name'=>$price->name,
+                            'branches' =>[[
+                                'id'=>$trainer->employee->branch->id,
+                                'name'=> $trainer->employee->branch->name,
+                            ]],
                         ];
                     }),
                 ];
