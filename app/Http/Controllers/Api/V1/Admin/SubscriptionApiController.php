@@ -12,6 +12,7 @@ use App\Models\MobileSetting;
 use App\Models\Payment;
 use App\Models\Pricelist;
 use App\Models\Reminder;
+use App\Models\Source;
 use App\Models\Status;
 use App\Models\Transaction;
 use App\Models\User;
@@ -90,7 +91,10 @@ class SubscriptionApiController extends Controller
             $last_member_code = Lead::whereType('member') ->when('branch', function ($q) use ($request) {
                 $q->whereBranchId($request->branch_id);
             })->whereDeletedAt(Null)->orderBy('member_code', 'desc')->first()->member_code ?? 1;
-
+            $source = Source::where('name','Mobile App')->latest()->first();
+            if (!$source){
+                $source = Source::all()->first();
+            }
             $last_member_code  = $last_member_code + 001;
             $member = Lead::create([
                 'name'              => $request['name'],
@@ -98,7 +102,7 @@ class SubscriptionApiController extends Controller
                 'national'          => $request['national'],
                 'status_id'         => Status::first()->id,
                 'member_code' =>    $last_member_code,
-                'source_id'         => 12,
+                'source_id'         => $source->id,
                 'address_id'        => $request['address_id'],
                 'dob'               => $request['dob'],
                 'gender'            => $request['gender'],
