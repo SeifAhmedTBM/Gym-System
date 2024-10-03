@@ -221,7 +221,7 @@ class AuthController extends Controller
             ->with(['trainer' => function ($query) {
                 $query->withSum('ratings', 'rate')->withCount('ratings');
             }])
-            ->where('status', 'current')
+            ->whereIn('status', ['current','pending'])
             ->latest()
             ->first();
         if (!$membership) {
