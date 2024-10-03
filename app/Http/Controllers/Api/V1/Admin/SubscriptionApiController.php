@@ -223,7 +223,7 @@ class SubscriptionApiController extends Controller
                 'message' => 'Transaction completed successfully',
                'data'=>[
                    'member'=>$member,
-                   'member_code'=>$member->member_code,
+                   'member_code'=>$last_member_code,
                    'membership' => $membership,
                    'invoice' => $invoice
                ]
