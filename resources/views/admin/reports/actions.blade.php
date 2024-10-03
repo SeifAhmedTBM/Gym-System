@@ -8,9 +8,9 @@
                         <label for="date">{{ trans('global.filter') }}</label>
                         <div class="input-group">
                             <input type="date" class="form-control" name="from"
-                                value="{{ request('from') ?? date('Y-m-01') }}">
+                                   value="{{ request('from') ?? date('Y-m-01') }}">
                             <input type="date" class="form-control" name="to"
-                                value="{{ request('to') ?? date('Y-m-t') }}">
+                                   value="{{ request('to') ?? date('Y-m-t') }}">
                             <select name="branch_id" id="branch_id" class="form-control">
                                 <option value="{{ null }}" selected>All Branches</option>
                                 @foreach (App\Models\Branch::pluck('name', 'id') as $id => $name)
@@ -22,7 +22,7 @@
                                 <option value="{{ null }}" selected>Action</option>
                                 @foreach (App\Models\Reminder::ACTION as $reminder_id => $reminder_action)
                                     <option value="{{ $reminder_id }}"
-                                        {{ request('reminder_action') == $reminder_id ? 'selected' : '' }}>{{ $reminder_action }}
+                                            {{ request('reminder_action') == $reminder_id ? 'selected' : '' }}>{{ $reminder_action }}
                                     </option>
                                 @endforeach
                             </select>
@@ -30,7 +30,7 @@
                                 <option value="{{ null }}" selected>Sales By</option>
                                 @foreach (App\Models\User::whereRelation('roles','title','Sales')->pluck('name', 'id') as $id => $name)
                                     <option value="{{ $id }}"
-                                        {{ request('sales_by_id') == $id ? 'selected' : '' }}>{{ $name }}</option>
+                                            {{ request('sales_by_id') == $id ? 'selected' : '' }}>{{ $name }}</option>
                                 @endforeach
                             </select>
                             <select name="type" id="type" class="form-control">
@@ -43,7 +43,8 @@
                             </select>
                             <div class="input-group-prepend">
                                 <button class="btn btn-primary" type="submit">{{ trans('global.submit') }}</button>
-                                <a href="{{ route('admin.reports.actions-report.export',request()->all()) }}" class="btn btn-info">
+                                <a href="{{ route('admin.reports.actions-report.export',request()->all()) }}"
+                                   class="btn btn-info">
                                     <i class="fa fa-download"></i>
                                 </a>
                             </div>
@@ -55,8 +56,12 @@
     </div>
 
     <div class="form-group">
-        <table class="table table-bordered table-striped table-hover zero-configuration">
-            <thead>
+        <div class="table-responsive">
+            <div>
+                <input type="text" id="customSearch" placeholder="Search leads..." class="form-control mb-3">
+            </div>
+            <table class="table table-bordered table-striped table-hover zero-configuration" id="actionsTable">
+                <thead>
                 <tr>
                     <th>#</th>
                     <th>
@@ -84,82 +89,142 @@
                     <th>{{ trans('global.action_date') }}</th>
                     <th>{{ trans('global.action') }}</th>
                 </tr>
-            </thead>
-            <tbody>
-                @foreach ($reminder_actions as $reminder)
-                    <tr>
-                        <td>{{ $loop->iteration }}</td>
-                        <td>
-                            @if ($reminder->lead->type == 'member')
-                                <a href="{{ route('admin.members.show', $reminder->lead_id) }}" target="_blank"
-                                    class="text-decoration-none">
-                                    {{ \App\Models\Setting::first()->member_prefix . $reminder->lead->member_code ?? '-' }}
-                                    <span class="d-block">
-                                        {{ $reminder->lead->name }}
-                                    </span>
-                                    <span class="d-block">
-                                        {{ $reminder->lead->phone }}
-                                    </span>
-                                </a>
-                            @else
-                                <a href="{{ route('admin.leads.show', $reminder->lead_id) }}" target="_blank"
-                                    class="text-decoration-none">
-                                    <span class="d-block">
-                                        {{ $reminder->lead->name }}
-                                    </span>
-                                    <span class="d-block">
-                                        {{ $reminder->lead->phone }}
-                                    </span>
-                                </a>
-                            @endif
-                            {{ $reminder->lead->type ?? '-' }}
-                        </td>
-                        <td>{{ $reminder->lead->branch->name ?? '-' }}</td>
-                        <td>
-                            {{ \App\Models\Reminder::TYPE[$reminder->type] ?? '' }}
-                        </td>
-                        <td>
-                            {{ \App\Models\Reminder::ACTION[$reminder->action] ?? '' }}
-                        </td>
-                        <td>
-                            <span class="d-block">
-                                {{ $reminder->membership->service_pricelist->name ?? '-' }}
-                            </span>
-                            @if ($reminder->type == 'due_payment')
-                                <span class="d-block">
-                                    {{ trans('global.total') }} :
-                                    {{ $reminder->membership->invoice->net_amount ?? 0 }}
-                                </span>
-                                <span class="d-block">
-                                    Paid :
-                                    {{ $reminder->membership->invoice->payments_sum_amount ?? 0 }}
-                                </span>
-                                <span class="d-block">
-                                    {{ trans('global.rest') }} :
-                                    {{ $reminder->membership->invoice->rest ?? 0 }}
-                                </span>
-                            @endif
-                        </td>
-                        <td>{{ $reminder->due_date ?? '' }}</td>
-                        <td>{{ $reminder->user->name ?? '-' }}</td>
-                        <td>{{ $reminder->notes }}</td>
-                        <td>{{ $reminder->created_at }}</td>
-                        <td>
-                            @can('reminder_delete')
-                                <form action="{{ route('admin.reminderHistory.destroy', $reminder->id) }}" method="post"
-                                    onsubmit="return confirm('Are you sure?');" style="display: inline-block;">
-                                    @csrf
-                                    @method('DELETE')
-                                    <button class="btn btn-danger btn-sm" type="submit">
-                                        <i class="fa fa-trash"></i>
-                                        {{ trans('global.delete') }}
-                                    </button>
-                                </form>
-                            @endcan
-                        </td>
-                    </tr>
-                @endforeach
-            </tbody>
-        </table>
+                </thead>
+                <tbody id="actionsTableBody">
+                @include('admin.reports.partials.actions_table', ['reminder_actions' => $reminder_actions])
+                </tbody>
+            </table>
+            <div id="paginationLinks">
+                {{ $reminder_actions->appends(request()->query())->links() }}
+            </div>
+        </div>
     </div>
+@endsection
+@section('scripts')
+    <script>
+        $(document).ready(function () {
+            $('#actionsTable').DataTable({
+                destroy: true,
+                searching: false,
+                lengthChange: false,
+                paging: false,
+                info: true,
+                dom: 't<"bottom"p>',
+                select: false,
+                columnDefs: [{
+                    orderable: false,
+                    targets: 0
+                }]
+            });
+        });
+
+
+        document.getElementById('customSearch').addEventListener('input', function () {
+            let searchTerm = this.value.trim();
+
+            let currentUrl = new URL(window.location.href);
+
+            let params = new URLSearchParams(currentUrl.search);
+
+            if (searchTerm) {
+                params.set('search', searchTerm);
+                params.delete('page');
+            } else {
+                params.delete('search');
+            }
+
+            let url = `{{ route('admin.reports.actions-report') }}?${params.toString()}`;
+
+            fetch(url, {
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            })
+                .then(response => response.json())
+                .then(data => {
+                    const reminderTypes = @json(\App\Models\Reminder::TYPE);
+                    const reminderActions = @json(\App\Models\Reminder::ACTION);
+                    let tbody = document.getElementById('actionsTableBody');
+                    tbody.innerHTML = '';
+
+                    let currentPage = data.reminder_actions.current_page;
+                    let perPage = data.reminder_actions.per_page;
+
+                    data.reminder_actions.data.forEach((reminder, index) => {
+                        let iteration = index + 1 + (currentPage - 1) * perPage;
+
+                        tbody.innerHTML += `
+                <tr>
+                    <td>${iteration}</td>
+                    <td>
+                        ${reminder.lead.type === 'member' ? `
+                            <a href="{{ url('admin/members') }}/${reminder.lead_id}" target="_blank" class="text-decoration-none">
+                                {{ \App\Models\Setting::first()->member_prefix }}${reminder.lead.member_code ?? '-'}
+                                <span class="d-block">${reminder.lead.name}</span>
+                                <span class="d-block">${reminder.lead.phone}</span>
+                            </a>
+                        ` : `
+                            <a href="{{ url('admin/leads') }}/${reminder.lead_id}" target="_blank" class="text-decoration-none">
+                                <span class="d-block">${reminder.lead.name}</span>
+                                <span class="d-block">${reminder.lead.phone}</span>
+                            </a>
+                        `}
+                        ${reminder.lead.type ?? '-'}
+                    </td>
+                    <td>${reminder.lead.branch?.name ?? '-'}</td>
+                    <td>${reminder.type ? reminderTypes[reminder.type] || '' : ''}</td>
+                    <td>${reminder.action ? reminderActions[reminder.action] || '' : ''}</td>
+
+                    <td>
+                        <span class="d-block">${reminder.membership?.service_pricelist?.name ?? '-'}</span>
+                        ${reminder.type === 'due_payment' ? `
+                            <span class="d-block">{{ trans('global.total') }}: ${reminder.membership?.invoice?.net_amount ?? 0}</span>
+                            <span class="d-block">{{ trans('invoices::invoice.paid') }}: ${reminder.membership?.invoice?.payments_sum_amount ?? 0}</span>
+                            <span class="d-block">{{ trans('global.rest') }}: ${reminder.membership?.invoice?.rest ?? 0}</span>
+                        ` : ''}
+                    </td>
+                    <td>${reminder.due_date ?? ''}</td>
+                    <td>${reminder.user?.name ?? '-'}</td>
+                    <td>${reminder.notes ?? ''}</td>
+                    <td>${reminder.created_at}</td>
+                    <td>
+                     @can('reminder_delete')
+                        <form action="{{ route('admin.reminderHistory.destroy', '') }}/${reminder.id}" method="post"
+                      onsubmit="return confirm('Are you sure?');" style="display: inline-block;">
+                    @csrf
+                        @method('DELETE')
+                        <button class="btn btn-danger btn-sm" type="submit">
+                            <i class="fa fa-trash"></i>
+{{ trans('global.delete') }}
+                        </button>
+                    </form>
+@endcan
+                    </td>
+
+                                            </tr>`;
+                    });
+
+                    let paginationLinks = document.getElementById('paginationLinks');
+                    if (searchTerm) {
+                        paginationLinks.style.display = 'none';
+                    } else {
+                        paginationLinks.style.display = 'block';
+                    }
+                })
+                .catch(error => console.error('Error fetching search results:', error));
+        });
+
+
+
+        function takeMemberAction(id) {
+            var id = id;
+            var url = "{{ route('admin.reminders.takeMemberAction', ':id') }}";
+            url = url.replace(':id', id);
+            $(".modalForm2").attr('action', url);
+        }
+
+        function formSubmit() {
+            $('modalForm2').submit();
+        }
+    </script>
 @endsection

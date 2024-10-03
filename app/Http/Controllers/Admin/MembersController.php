@@ -61,11 +61,11 @@ class MembersController extends Controller
 
     public function index(Request $request)
     {
-        
+
         abort_if(Gate::denies('member_access'), Response::HTTP_FORBIDDEN, '403 Forbidden');
 
         $data = $request->except(['draw', 'columns', 'order', 'start', 'length', 'search', 'change_language', '_']);
-        
+
         $settings = Setting::first();
 
         $employee = Auth()->user()->employee;
@@ -92,15 +92,15 @@ class MembersController extends Controller
             //             ->select(sprintf('%s.*', (new Lead())->table));
             //     }
             // } else {
-                $query = Lead::index($data)
-                    ->with(['status', 'source', 'sales_by', 'address', 'created_by', 'branch'])
-                    ->whereType('member')
-                    ->orderBy('member_code', 'desc')
-                    ->select(sprintf('%s.*', (new Lead())->table));
+            $query = Lead::index($data)
+                ->with(['status', 'source', 'sales_by', 'address', 'created_by', 'branch'])
+                ->whereType('member')
+                ->orderBy('member_code', 'desc')
+                ->select(sprintf('%s.*', (new Lead())->table));
             // }
 
             $table = Datatables::eloquent($query);
-            
+
             $table->addColumn('placeholder', '&nbsp;');
             $table->addColumn('actions', '&nbsp;');
 
@@ -252,7 +252,7 @@ class MembersController extends Controller
             $today_birthdays = Lead::whereType('member')->whereMonth('dob', date('m'))->whereDay('dob', date('d'))->get(['name', 'id', 'dob']);
         }
 
-        return view('admin.members.index', compact('statuses', 'sources', 'addresses', 'sales', 'members', 'today_birthdays', 'branches','data'));
+        return view('admin.members.index', compact('statuses', 'sources', 'addresses', 'sales', 'members', 'today_birthdays', 'branches', 'data'));
     }
 
     public function create()
@@ -365,39 +365,39 @@ class MembersController extends Controller
             ]);
 
             $member = Lead::create([
-                'name'              => $request['name'],
-                'type'              => 'member',
-                'phone'             => isset($request->minor) ? $phone : $request['phone'],
-                'member_code'       => $request['member_code'],
-                'card_number'       => $request['card_number'],
-                'national'          => $request['national'],
-                'status_id'         => $request['status_id'],
-                'source_id'         => $request['source_id'],
-                'address_id'        => $request['address_id'],
-                'dob'               => $request['dob'],
-                'gender'            => $request['gender'],
-                'sales_by_id'       => $request['sales_by_id'],
-                'referral_member'   => $request['referral_member'],
-                'address_details'   => $request['address_details'],
-                'whatsapp_number'   => $request['whatsapp_number'],
-                'notes'             => $request['notes'],
-                'branch_id'         => $selected_branch->id,
-                'created_by_id'     => Auth()->user()->id,
-                'parent_phone'      => isset($request->minor) ? $request['parent_phone'] : null,
-                'parent_details'    => isset($request->minor) ? $request['parent_details'] : null,
-                'user_id'           => $user->id,
+                'name' => $request['name'],
+                'type' => 'member',
+                'phone' => isset($request->minor) ? $phone : $request['phone'],
+                'member_code' => $request['member_code'],
+                'card_number' => $request['card_number'],
+                'national' => $request['national'],
+                'status_id' => $request['status_id'],
+                'source_id' => $request['source_id'],
+                'address_id' => $request['address_id'],
+                'dob' => $request['dob'],
+                'gender' => $request['gender'],
+                'sales_by_id' => $request['sales_by_id'],
+                'referral_member' => $request['referral_member'],
+                'address_details' => $request['address_details'],
+                'whatsapp_number' => $request['whatsapp_number'],
+                'notes' => $request['notes'],
+                'branch_id' => $selected_branch->id,
+                'created_by_id' => Auth()->user()->id,
+                'parent_phone' => isset($request->minor) ? $request['parent_phone'] : null,
+                'parent_details' => isset($request->minor) ? $request['parent_details'] : null,
+                'user_id' => $user->id,
             ]);
 
             $membership = Membership::create([
-                'start_date'            => $request->start_date,
-                'end_date'              => $request->end_date,
-                'member_id'             => $member->id,
-                'trainer_id'            => $request->trainer_id,
-                'service_pricelist_id'  => $request->service_pricelist_id,
-                'sport_id'              => $request->sport_id ?? null,
-                'notes'                 => $request->notes,
-                'sales_by_id'           => $request->sales_by_id,
-                'membership_status'     => 'new',
+                'start_date' => $request->start_date,
+                'end_date' => $request->end_date,
+                'member_id' => $member->id,
+                'trainer_id' => $request->trainer_id,
+                'service_pricelist_id' => $request->service_pricelist_id,
+                'sport_id' => $request->sport_id ?? null,
+                'notes' => $request->notes,
+                'sales_by_id' => $request->sales_by_id,
+                'membership_status' => 'new',
             ]);
 
             TrackMembership::create([
@@ -406,16 +406,16 @@ class MembersController extends Controller
             ]);
 
             $invoice = Invoice::create([
-                'discount'              => $request->discount_amount,
-                'discount_notes'        => $request->discount_notes,
-                'service_fee'           => $request->membership_fee,
-                'net_amount'            => $request->membership_fee - $request->discount_amount,
-                'membership_id'         => $membership->id,
-                'branch_id'             => $selected_branch->id,
-                'sales_by_id'           => $request->sales_by_id,
-                'status'                => ($request->membership_fee - $request->discount_amount) == $request->received_amount ? 'fullpayment' : 'partial',
-                'created_by_id'         => Auth()->user()->id,
-                'created_at'            => $request['created_at'] . date('H:i:s')
+                'discount' => $request->discount_amount,
+                'discount_notes' => $request->discount_notes,
+                'service_fee' => $request->membership_fee,
+                'net_amount' => $request->membership_fee - $request->discount_amount,
+                'membership_id' => $membership->id,
+                'branch_id' => $selected_branch->id,
+                'sales_by_id' => $request->sales_by_id,
+                'status' => ($request->membership_fee - $request->discount_amount) == $request->received_amount ? 'fullpayment' : 'partial',
+                'created_by_id' => Auth()->user()->id,
+                'created_at' => $request['created_at'] . date('H:i:s')
             ]);
 
             // Venom System
@@ -690,8 +690,7 @@ class MembersController extends Controller
     {
         abort_if(Gate::denies('member_show'), Response::HTTP_FORBIDDEN, '403 Forbidden');
 
-        if ($member->type == 'lead') 
-        {
+        if ($member->type == 'lead') {
             return redirect()->route('admin.leads.show', $member->id);
         }
 
@@ -701,28 +700,27 @@ class MembersController extends Controller
             'source',
             'sales_by',
             'user',
-            'invoices'              => fn($q) => $q->with(['membership.service_pricelist','sales_by','created_by'])
-                            ->withSum('payments','amount')->latest(),
-            'membership_attendances' => fn($q) => $q->with(['membership.service_pricelist'])->whereHas('membership',fn($q) => $q->where('status','!=','expired'))->latest(),
-            'memberships'           => fn($q) => $q->with(['freezeRequests','assigned_coach'])->latest(),
-            'messages'              => fn($q) => $q->latest(),
-            'invitations'           => fn($q) => $q->latest(),
-            'Notes'                 => fn($q) => $q->latest(),
-            'memberRequests'        => fn($q) => $q->latest(),
-            'freeSessions'          => fn($q) => $q->latest(),
+            'invoices' => fn($q) => $q->with(['membership.service_pricelist', 'sales_by', 'created_by'])
+                ->withSum('payments', 'amount')->latest(),
+            'membership_attendances' => fn($q) => $q->with(['membership.service_pricelist'])->whereHas('membership', fn($q) => $q->where('status', '!=', 'expired'))->latest(),
+            'memberships' => fn($q) => $q->with(['freezeRequests', 'assigned_coach'])->latest(),
+            'messages' => fn($q) => $q->latest(),
+            'invitations' => fn($q) => $q->latest(),
+            'Notes' => fn($q) => $q->latest(),
+            'memberRequests' => fn($q) => $q->latest(),
+            'freeSessions' => fn($q) => $q->latest(),
             // 'leadReminders'         => fn($q) => $q->orderBy('due_date', 'desc'),
-            'sales_reminders'       => fn($q) => $q->orderBy('due_date', 'desc'),
-            'trainer_reminders'     => fn($q) => $q->orderBy('due_date', 'desc'),
-            'reminderHistory'       => fn($q) => $q->latest(),
-            'freezeRequests'        => fn($q) => $q->latest(),
-            'membership_schedules'  => fn($q) => $q->with(['membership' => fn($y) => $y->withCount('trainer_attendances')])->latest(),
-            'trainer_attendants'    => fn($q) => $q->latest(),
+            'sales_reminders' => fn($q) => $q->orderBy('due_date', 'desc'),
+            'trainer_reminders' => fn($q) => $q->orderBy('due_date', 'desc'),
+            'reminderHistory' => fn($q) => $q->latest(),
+            'freezeRequests' => fn($q) => $q->latest(),
+            'membership_schedules' => fn($q) => $q->with(['membership' => fn($y) => $y->withCount('trainer_attendances')])->latest(),
+            'trainer_attendants' => fn($q) => $q->latest(),
         ]);
 
         $status = Status::whereName('Block')->first();
-        
-        if ($member->status_id != NULL && $status && $status->id == $member->status_id) 
-        {
+
+        if ($member->status_id != NULL && $status && $status->id == $member->status_id) {
             $member_blocked = true;
         } else {
             $member_blocked = false;
@@ -774,33 +772,32 @@ class MembersController extends Controller
             ->first();
 
         $invoices = Invoice::withSum('payments', 'amount')
-            ->whereHas('membership',fn($q) => $q->whereMemberId($member->id))
+            ->whereHas('membership', fn($q) => $q->whereMemberId($member->id))
             ->latest()
             ->get();
 
         $invoices_without_refunds = Invoice::withSum('payments', 'amount')
-            ->whereHas('membership',fn($q) => $q->whereMemberId($member->id))
+            ->whereHas('membership', fn($q) => $q->whereMemberId($member->id))
             ->where('status', '!=', 'refunded')
             ->latest()
             ->get();
 
 
-        $trainers = User::whereRelation('roles','title','Trainer')
-                        ->whereHas(
-                            'employee',fn($q) => $q->whereStatus('active')->when(Auth()->user()->employee && Auth()->user()->employee->branch_id != NULL,fn($q) => $q->whereBranchId(Auth()->user()->employee->branch->id))
-                        )
-                        ->orderBy('name')
-                        ->pluck('name', 'id');
+        $trainers = User::whereRelation('roles', 'title', 'Trainer')
+            ->whereHas(
+                'employee', fn($q) => $q->whereStatus('active')->when(Auth()->user()->employee && Auth()->user()->employee->branch_id != NULL, fn($q) => $q->whereBranchId(Auth()->user()->employee->branch->id))
+            )
+            ->orderBy('name')
+            ->pluck('name', 'id');
 
-        return view('admin.members.show',compact('member','member_blocked','trainers','main_membership','membership','last_membership','invoices','invoices_without_refunds'));
+        return view('admin.members.show', compact('member', 'member_blocked', 'trainers', 'main_membership', 'membership', 'last_membership', 'invoices', 'invoices_without_refunds'));
     }
 
     public function show_old(Lead $member)
     {
         abort_if(Gate::denies('member_show'), Response::HTTP_FORBIDDEN, '403 Forbidden');
 
-        if ($member->type == 'lead') 
-        {
+        if ($member->type == 'lead') {
             return redirect()->route('admin.leads.show', $member->id);
         }
 
@@ -809,19 +806,19 @@ class MembersController extends Controller
             'source',
             'sales_by',
             'user',
-            'memberships'           => fn($q) => $q->with(['freezeRequests','assigned_coach'])->latest(),
-            'messages'              => fn($q) => $q->latest(),
-            'invitations'           => fn($q) => $q->latest(),
-            'Notes'                 => fn($q) => $q->latest(),
-            'memberRequests'        => fn($q) => $q->latest(),
-            'freeSessions'          => fn($q) => $q->latest(),
+            'memberships' => fn($q) => $q->with(['freezeRequests', 'assigned_coach'])->latest(),
+            'messages' => fn($q) => $q->latest(),
+            'invitations' => fn($q) => $q->latest(),
+            'Notes' => fn($q) => $q->latest(),
+            'memberRequests' => fn($q) => $q->latest(),
+            'freeSessions' => fn($q) => $q->latest(),
             // 'leadReminders'         => fn($q) => $q->orderBy('due_date', 'desc'),
-            'sales_reminders'       => fn($q) => $q->orderBy('due_date', 'desc'),
-            'trainer_reminders'     => fn($q) => $q->orderBy('due_date', 'desc'),
-            'reminderHistory'       => fn($q) => $q->latest(),
-            'freezeRequests'        => fn($q) => $q->latest(),
-            'membership_schedules'  => fn($q) => $q->with(['membership' => fn($y) => $y->withCount('trainer_attendances')])->latest(),
-            'trainer_attendants'    => fn($q) => $q->latest(),
+            'sales_reminders' => fn($q) => $q->orderBy('due_date', 'desc'),
+            'trainer_reminders' => fn($q) => $q->orderBy('due_date', 'desc'),
+            'reminderHistory' => fn($q) => $q->latest(),
+            'freezeRequests' => fn($q) => $q->latest(),
+            'membership_schedules' => fn($q) => $q->with(['membership' => fn($y) => $y->withCount('trainer_attendances')])->latest(),
+            'trainer_attendants' => fn($q) => $q->latest(),
         ]);
         // $birthday = $member->whereMonth('dob',date('m'))->whereDay('dob',date('d'))->first()->dob;
 
@@ -923,20 +920,20 @@ class MembersController extends Controller
 
         foreach ($member->invoices as $key => $invoice) {
             if ($invoice->status != 'refunded' && $invoice->status != 'settlement') {
-                $invoice->net_amount    = $invoice->service_fee - $invoice->discount;
-                $invoice->status        = $invoice->payments->sum('amount') == ($invoice->service_fee - $invoice->discount) ? 'fullpayment' : 'partial';
+                $invoice->net_amount = $invoice->service_fee - $invoice->discount;
+                $invoice->status = $invoice->payments->sum('amount') == ($invoice->service_fee - $invoice->discount) ? 'fullpayment' : 'partial';
                 $invoice->save();
             }
         }
 
-        $trainers = User::whereRelation('roles','title','Trainer')
-                        ->whereHas(
-                            'employee',fn($q) => $q->whereStatus('active')->when(Auth()->user()->employee && Auth()->user()->employee->branch_id != NULL,fn($q) => $q->whereBranchId(Auth()->user()->employee->branch->id))
-                        )
-                        ->orderBy('name')
-                        ->pluck('name', 'id');
+        $trainers = User::whereRelation('roles', 'title', 'Trainer')
+            ->whereHas(
+                'employee', fn($q) => $q->whereStatus('active')->when(Auth()->user()->employee && Auth()->user()->employee->branch_id != NULL, fn($q) => $q->whereBranchId(Auth()->user()->employee->branch->id))
+            )
+            ->orderBy('name')
+            ->pluck('name', 'id');
 
-        return view('admin.members.show', compact('member', 'attendances', 'invoices', 'invoices_without_refunds', 'membership', 'main_membership', 'last_membership', 'total_attendances', 'statuses', 'member_blocked','trainers'));
+        return view('admin.members.show', compact('member', 'attendances', 'invoices', 'invoices_without_refunds', 'membership', 'main_membership', 'last_membership', 'total_attendances', 'statuses', 'member_blocked', 'trainers'));
     }
 
     public function destroy(Lead $member)
@@ -991,7 +988,7 @@ class MembersController extends Controller
         $sales_bies = User::whereHas('roles', function ($q) {
             $q->where('title', 'Sales');
         })->whereHas('employee', function ($i) use ($selected_branch) {
-            $i->whereStatus('active') ->when($selected_branch, function ($q) use ($selected_branch) {
+            $i->whereStatus('active')->when($selected_branch, function ($q) use ($selected_branch) {
                 $q->whereBranchId($selected_branch->id);
             });
         })->pluck('name', 'id');
@@ -1001,12 +998,12 @@ class MembersController extends Controller
         $trainers = User::whereHas('roles', function ($q) {
             $q->where('title', 'Trainer');
         })->whereHas('employee', function ($i) use ($selected_branch) {
-            $i->whereStatus('active') ->when($selected_branch, function ($q) use ($selected_branch) {
+            $i->whereStatus('active')->when($selected_branch, function ($q) use ($selected_branch) {
                 $q->whereBranchId($selected_branch->id);
             });
         })->pluck('name', 'id');
 
-        $last_member_code = Lead::whereType('member') ->when($selected_branch, function ($q) use ($selected_branch) {
+        $last_member_code = Lead::whereType('member')->when($selected_branch, function ($q) use ($selected_branch) {
             $q->whereBranchId($selected_branch->id);
         })->whereDeletedAt(Null)->orderBy('member_code', 'desc')->first()->member_code ?? 1;
 
@@ -1544,18 +1541,12 @@ class MembersController extends Controller
     public function onHoldMembers(Request $request)
     {
         $setting = Setting::first()->inactive_members_days ?? 7;
-
-        $sport_id = $request['sport_id'] ?? NULL;
-
+        $sport_id = $request['sport_id'] ?? null;
         $employee = Auth()->user()->employee;
 
-        if ($employee && $employee->branch_id != NULL) {
-            $branch_id = $employee->branch_id;
-        } else {
-            $branch_id = $request['branch_id'] != NULL ? $request['branch_id'] : '';
-        }
+        $branch_id = $employee && $employee->branch_id ? $employee->branch_id : $request['branch_id'] ?? '';
 
-        $memberships = Membership::with([
+        $query = Membership::with([
             'member',
             'member.sport',
             'service_pricelist',
@@ -1564,10 +1555,47 @@ class MembersController extends Controller
             'member.branch',
             'sales_by'
         ])
-            ->whereDate('last_attendance', '<', date('Y-m-d', strtotime('-' . $setting . 'Days')))
+            ->whereDate('last_attendance', '<', date('Y-m-d', strtotime('-' . $setting . ' Days')))
             ->whereHas('member', fn($q) => $q->when($sport_id, fn($q) => $q->whereSportId($sport_id))->when($branch_id, fn($y) => $y->whereBranchId($branch_id)))
-            // ->whereHas('attendances')
-            // ->orWhere('last_attendance',NULL)
+            ->whereIn('status', ['current', 'expiring'])
+            ->whereHas('service_pricelist', function ($y) {
+                $y->whereHas('service', function ($b) {
+                    $b->whereHas('service_type', function ($x) {
+                        $x->whereMainService(true);
+                    });
+                });
+            });
+        if ($request->ajax()) {
+            $search = $request->search ?? null ;
+            if ($search) {
+                $query->whereHas('member', function ($q) use ($search) {
+                    $q->where('name', 'LIKE', "$search%")
+                        ->orWhere('member_code', 'LIKE', "%$search%")
+                        ->orWhere('phone', 'LIKE', "%$search%");
+                })->OrwhereHas('sales_by', function ($q) use ($search) {
+                    $q->where('name', 'LIKE', "$search%");
+                });
+            }
+
+            $memberships = $query->latest()->paginate(25);
+            return response()->json([
+                'memberships' => $memberships,
+                'links' => !$request->input('search') ? (string) $memberships->links() : '',
+            ]);
+        }
+        $memberships = $query->latest()->paginate(25);
+
+        $membershipsCount = Membership::with([
+            'member',
+            'member.sport',
+            'service_pricelist',
+            'service_pricelist.service',
+            'invoice' => fn($q) => $q->withSum('payments', 'amount'),
+            'member.branch',
+            'sales_by'
+        ])
+            ->whereDate('last_attendance', '<', date('Y-m-d', strtotime('-' . $setting . ' Days')))
+            ->whereHas('member', fn($q) => $q->when($sport_id, fn($q) => $q->whereSportId($sport_id))->when($branch_id, fn($y) => $y->whereBranchId($branch_id)))
             ->whereIn('status', ['current', 'expiring'])
             ->whereHas('service_pricelist', function ($y) {
                 $y->whereHas('service', function ($b) {
@@ -1576,13 +1604,14 @@ class MembersController extends Controller
                     });
                 });
             })
-            ->latest()
-            ->get();
+            ->latest()->count();
+
 
         $statuses = Status::pluck('name', 'id');
 
-        return view('admin.members.onhold', compact('memberships', 'statuses', 'employee', 'branch_id'));
+        return view('admin.members.onhold', compact('membershipsCount','memberships', 'statuses', 'employee', 'branch_id'));
     }
+
 
     public function inactiveMembers(Request $request)
     {
@@ -1596,15 +1625,38 @@ class MembersController extends Controller
 
         $sport_id = $request['sport_id'] ?? NULL;
 
-        $members = Lead::whereType('member')
+        $query = Lead::whereType('member')
+            ->whereDoesntHave('memberships', fn($q) => $q->whereIn('status', ['expiring', 'current']))
+            ->with(['memberships', 'branch', 'sport'])
+            ->when($branch_id, fn($q) => $q->whereBranchId($branch_id))
+            ->when($sport_id, fn($q) => $q->whereSportId($sport_id))
+            ->withCount(['memberships']);
+
+        $membersCount = Lead::whereType('member')
             ->whereDoesntHave('memberships', fn($q) => $q->whereIn('status', ['expiring', 'current']))
             ->with(['memberships', 'branch', 'sport'])
             ->when($branch_id, fn($q) => $q->whereBranchId($branch_id))
             ->when($sport_id, fn($q) => $q->whereSportId($sport_id))
             ->withCount(['memberships'])
-            ->get();
+            ->count();
 
-        return view('admin.members.inactive', compact('members', 'employee', 'branch_id'));
+        if ($request->ajax()) {
+            $search = $request->search ?? null;
+            $query->when($search, function ($q) use ($search) {
+                $q->where(function ($query) use ($search) {
+                    $query->where('name', 'LIKE', "$search%")
+                        ->orWhere('phone', 'LIKE', "%$search%");
+                });
+            });
+            $members = $query->paginate(25);
+            return response()->json([
+                'members' => $members,
+                'links' => !$request->input('search') ? (string) $members->links() : '',
+            ]);
+        }
+            $members = $query->paginate(25);
+
+        return view('admin.members.inactive', compact('membersCount','members', 'employee', 'branch_id'));
     }
 
     public function createPopMessage($id)
@@ -1679,13 +1731,13 @@ class MembersController extends Controller
 
     public function transfer_to_branch(Lead $member)
     {
-        return response()->json($member);    
+        return response()->json($member);
     }
 
-    public function store_transfer_to_branch(Request $request,Lead $member)
+    public function store_transfer_to_branch(Request $request, Lead $member)
     {
         $member->update([
-            'branch_id'     => $request['branch_id']
+            'branch_id' => $request['branch_id']
         ]);
 
         $this->sent_successfully();

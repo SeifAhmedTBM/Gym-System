@@ -3047,7 +3047,7 @@ class ReportController extends Controller
         $from = isset($request['from']) ? $request['from'] : date('Y-m-01');
         $to = isset($request['to']) ? $request['to'] : date('Y-m-t');
 
-        $reminder_actions   = Reminder::with([
+        $query   = Reminder::with([
                 'lead' => fn ($q) => $q->with(['source', 'branch']),
                 'membership' => fn ($q) => $q->with([
                     'invoice'           => fn ($q) => $q->withSum('payments', 'amount'),
@@ -3065,11 +3065,30 @@ class ReportController extends Controller
             ->when($request['reminder_action'], fn ($q) => $q->whereAction($request['reminder_action']))
             ->whereNotIn('type',['pt_session'])
             ->whereDate('due_date', '>=', $from)
-            ->whereDate('due_date', '<=', $to)
-            ->get();
+            ->whereDate('due_date', '<=', $to);
+        if ($request->ajax()) {
+            $search = $request->search ?? null;
+            if ($search) {
+                $query->whereHas('lead', function ($q) use ($search) {
+                    $q->where('name', 'LIKE', "$search%")
+                        ->orWhere('member_code', 'LIKE', "%$search%")
+                        ->orWhere('phone', 'LIKE', "%$search%");
+                })
+                ->OrWhereHas('user', function ($q) use ($search) {
+                    $q->where('name', 'LIKE', "$search%");
+                });
+            }
+            $reminder_actions =$query->paginate(25);
+            return response()->json([
+                'reminder_actions' => $reminder_actions,
+                'links' => !$request->input('search') ? (string)$reminder_actions->links():'',
+            ]);
+        }
+            $reminder_actions =$query->paginate(25);
 
         return view('admin.reports.actions', compact('employee', 'branch_id','reminder_actions'));
     }
+
 
     public function export_actions_report(Request $request)
     {
