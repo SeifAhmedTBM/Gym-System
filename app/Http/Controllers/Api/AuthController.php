@@ -122,7 +122,7 @@ class AuthController extends Controller
                         ->whereMemberId($member->id);
                         //->get();
         $memberships = $memberships_query->get();
-        $current_membership =$memberships_query->where('status','current')->first();
+        $current_membership =$memberships_query->whereIn('status',['current','pending'])->first();
     
         return response()->json([
             'message'=>'Successfully',
