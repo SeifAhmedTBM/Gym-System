@@ -49,26 +49,33 @@ class EmployeesController extends Controller
 
     public function index(Request $request)
     {
+        
         abort_if(Gate::denies('employee_access'), Response::HTTP_FORBIDDEN, '403 Forbidden');
 
         $data = $request->except(['draw', 'columns', 'order', 'start', 'length', 'search', 'change_language', '_']);
 
 
-        $employees = Employee::all();
+        $employees = Employee::where('status' , 'active')->get();
         foreach ($employees as $employee) {
             $employee->finger_print_id = $employee->id;
             $employee->save();
         }
 
         $employee = Auth()->user()->employee;
-
+        if($request->status){
+            $status = $request->status ;
+        }
+        else{
+            $status = 'active';
+        }
         if ($request->ajax()) {
             if ($employee && $employee->branch_id != NULL) {
                 $query = Employee::index($data)->with(['user', 'branch'])
+                    ->where('status' , $status)
                     ->whereBranchId($employee->branch_id)
                     ->select(sprintf('%s.*', (new Employee())->table));
             } else {
-                $query = Employee::index($data)->with(['user', 'branch'])->select(sprintf('%s.*', (new Employee())->table));
+                $query = Employee::index($data)->where('status' , $status)->with(['user', 'branch'])->select(sprintf('%s.*', (new Employee())->table));
             }
 
             $table = Datatables::of($query);
