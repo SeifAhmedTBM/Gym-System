@@ -121,7 +121,7 @@ class ClassesServicesApiController extends Controller
             ->whereHas('service_pricelist.service', function ($query) {
                 $query->where('service_type_id', $this->mobile_setting->classes_service_type);
             })
-            ->where('status', 'current')
+            ->whereIn('status', ['current','pending'])
             ->latest()->get();
 
         // Adjust memberships
