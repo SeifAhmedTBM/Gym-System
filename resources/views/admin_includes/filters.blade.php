@@ -29,6 +29,14 @@
                                 @else
                                     <input type="{{ $data['type'] }}" value="{{ request()->get($column_name) }}" name="{{ $column_name }}" class="form-control" placeholder="Type here">
                                 @endisset
+                            @elseif($data['type'] == 'select' && !isset($data['related_to']) &&$data['label']=='Select Member')
+                            {{-- {{dd($column_name,request()->get($column_name))}} --}}
+                            {!! Form::label($column_name, Str::ucfirst($data['label']), ['class' => 'font-weight-bold']) !!}
+                            <select name="{{ $column_name }}[]" id="Select-Member" class="form-control select2 select2-ajax" {{ $column_name == 'trainer_id' && Auth()->user()->roles[0]->title == 'Trainer' ? 'readonly' : '' }} multiple>
+                                @foreach ($data['data'] as $id => $col)
+                                        <option  value="{{ $id }}" {{ (request()->get($column_name) ? in_array($id,request()->get($column_name)) : NULL) ? 'selected' : '' }}>{{ $col }}</option>
+                                    @endforeach
+                                </select>
                             @elseif($data['type'] == 'select' && !isset($data['related_to']))
                             {{-- {{dd($column_name,request()->get($column_name))}} --}}
                             {!! Form::label($column_name, Str::ucfirst($data['label']), ['class' => 'font-weight-bold']) !!}

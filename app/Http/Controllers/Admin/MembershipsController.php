@@ -1534,6 +1534,13 @@ class MembershipsController extends Controller
 
     public function assigned_memberships(Request $request)
     {
+        if (isset($request->q)){
+           $results = Lead::whereType('member')->where('name', 'LIKE', "{$request->q}%")->limit(10)->get();
+        return response()->json($results->map(function($item) {
+            return ['id' => $item->id, 'name' => $item->name];
+        }));
+        }
+
         abort_if(Gate::denies('membership_access'), Response::HTTP_FORBIDDEN, '403 Forbidden');
         $data = $request->except(['draw', 'columns', 'order', 'start', 'length', 'search', 'change_language', '_']);
 
@@ -1701,7 +1708,7 @@ class MembershipsController extends Controller
 
         $lockers = Locker::pluck('code', 'id');
 
-        $members = Lead::whereType('member')->whereHas('memberships')->pluck('name', 'id');
+//        $members = Lead::whereType('member')->whereHas('memberships')->pluck('name', 'id');
 
         $sales = User::whereHas('roles', function ($q) {
             $q = $q->whereTitle('sales');
@@ -1719,10 +1726,10 @@ class MembershipsController extends Controller
 
         $memberStatuses = MemberStatus::pluck('name', 'id');
 
-        $members = Lead::whereType('member')->pluck('name', 'id');
+        $members = Lead::whereType('member')->limit(20)->pluck('name', 'id');
 
         $branches = Branch::pluck('name', 'id');
 
-        return view('admin.memberships.assigned_memberships', compact('members', 'locker_statuses', 'lockers', 'members', 'sales', 'services', 'trainers', 'memberStatuses', 'counter', 'service_types', 'branches'));
+        return view('admin.memberships.assigned_memberships', compact( 'locker_statuses', 'lockers', 'members', 'sales', 'services', 'trainers', 'memberStatuses', 'counter', 'service_types', 'branches'));
     }
 }
