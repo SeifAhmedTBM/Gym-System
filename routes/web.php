@@ -626,6 +626,7 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.', 'namespace' => 'Admin', 'mi
 
     Route::get('payment-invoice/{id}', 'InvoiceController@payment')->name('invoice.payment');
     Route::post('payment-invoice/{id}', 'InvoiceController@storePayment')->name('invoice.storePayment');
+    Route::get('paymentDuePayments-invoice/{id}', 'InvoiceController@paymentDuePayments')->name('invoice.paymentDuePayments');
 
     // Payment
     Route::delete('payments/destroy', 'PaymentController@massDestroy')->name('payments.massDestroy');

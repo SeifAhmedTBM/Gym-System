@@ -33,6 +33,7 @@ class Lead extends Model implements HasMedia
 
     public const GENDER_SELECT = [
         'male'   => 'Male',
+        'Male'   => 'Male',
         'female' => 'Female',
     ];
 

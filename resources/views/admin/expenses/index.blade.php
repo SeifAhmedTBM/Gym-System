@@ -19,15 +19,23 @@
                 @can('expenses_filter')
                     @include('admin_includes.filters', [
                     'columns' => [
-                        'name' => ['label' => 'Name', 'type' => 'text'],
+//                        'name' => ['label' => 'Name', 'type' => 'text'],
+//                        'expenses_category_id' => ['label' => 'Expenses Category', 'type' => 'text','data' => 'Rent'],
                         'amount' => ['label' => 'Amount', 'type' => 'number'],
                         'account_id' => ['label' => 'Account', 'type' => 'select' , 'data' => $accounts],
-                        'expenses_category_id'  => ['label' => 'Expenses Category', 'type' => 'select' , 'data' => $expenses_categories ,'related_to' => 'expenses_category'],
+                        'expenses_category_id' => $status ? [
+                                'label' => 'Expenses Category',
+                                'type' => 'category',
+                                'data' => $expenses_categories,
+                            ] : [
+                                'label' => 'Expenses Category',
+                                'type' => 'select',
+                                'data' => $expenses_categories,
+                                'related_to' => 'expenses_category'],
                         'created_by_id' => ['label' => 'Created By', 'type' => 'select', 'data' => $users],
                         'date' => ['label' => 'Date', 'type' => 'date','from_and_to' => true],
-                        'created_at' => ['label' => 'Created at', 'type' => 'date', 'from_and_to' => true]
                     ],
-                        'route' => 'admin.expenses.index'
+                        'route' =>'admin.expenses.index'
                     ])
                     @include('csvImport.modal', ['model' => 'Expense', 'route' => 'admin.expenses.parseCsvImport'])
                 @endcan
@@ -144,7 +152,9 @@
                 retrieve: true,
                 searching:true,
                 aaSorting: [],
-                ajax: "{!! route('admin.expenses.index', request()->all()) !!}",
+
+                ajax: "{!!  route('admin.expenses.index', request()->all()) !!}",
+
                 columns: [{
                         data: 'placeholder',
                         name: 'placeholder'

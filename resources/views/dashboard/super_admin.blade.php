@@ -27,7 +27,7 @@
             {{ trans('cruds.branch.title') }}
         </div>
         <div class="card-body">
-            <table class="table table-striped table-hover table-bordered zero-configuration">
+            <table class="table table-striped table-hover table-bordered ">
                 <thead>
                     <tr>
                         <th>#</th>
@@ -50,7 +50,7 @@
                             $tran_payments = $branch->transactions->where('transactionable_type', 'App\Models\Payment')->sum('amount');
                             $tran_externalPayments = $branch->transactions->where('transactionable_type', 'App\Models\ExternalPayment')->sum('amount');
                             $income = ($tran_payments + $tran_externalPayments);
-                            
+
                             $tran_refunds = $branch->transactions->where('transactionable_type', 'App\Models\Refund')->sum('amount');
                             $tran_loans = $branch->transactions->where('transactionable_type', 'App\Models\Loan')->sum('amount');
                             $tran_expenses = $branch->transactions->where('transactionable_type', 'App\Models\Expense')->sum('amount');
@@ -95,7 +95,7 @@
             Last Month Stat Start from {{$startOfLastMonth->format('Y-m-d')}} To : {{$endOfLastMonth->format('Y-m-d')}}
         </div>
         <div class="card-body">
-            <table class="table table-striped table-hover table-bordered zero-configuration">
+            <table class="table table-striped table-hover table-bordered ">
                 <thead>
                     <tr>
                         <th>#</th>
@@ -118,7 +118,7 @@
                             $tran_payments = $branch->transactions->where('transactionable_type', 'App\Models\Payment')->sum('amount');
                             $tran_externalPayments = $branch->transactions->where('transactionable_type', 'App\Models\ExternalPayment')->sum('amount');
                             $income = ($tran_payments + $tran_externalPayments);
-                            
+
                             $tran_refunds = $branch->transactions->where('transactionable_type', 'App\Models\Refund')->sum('amount');
                             $tran_loans = $branch->transactions->where('transactionable_type', 'App\Models\Loan')->sum('amount');
                             $tran_expenses = $branch->transactions->where('transactionable_type', 'App\Models\Expense')->sum('amount');

@@ -124,7 +124,7 @@
                                     <a href="{{ route('admin.invoice.payments', $due_payment->id) }}" class="btn btn-info btn-sm">
                                         <i class="fa fa-eye"></i> {{ trans('cruds.payment.title') }}
                                     </a>
-                                    <a href="{{ route('admin.invoice.payment', $due_payment->id) }}" class="btn btn-success btn-sm">
+                                    <a href="{{ route('admin.invoice.paymentDuePayments', $due_payment->id) }}" class="btn btn-success btn-sm">
                                         <i class="fa fa-plus-circle"></i> {{ trans('cruds.payment.title_singular') }}
                                     </a>
                                     @if (config('domains')[config('app.url')]['settlement_invoices'] == true)

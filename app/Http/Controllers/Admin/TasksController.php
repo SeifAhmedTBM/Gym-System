@@ -338,7 +338,7 @@ class TasksController extends Controller
 
     public function my_tasks(Request $request)
     {
-        abort_if(Gate::denies('task_access'), Response::HTTP_FORBIDDEN, '403 Forbidden');
+        abort_if(Gate::denies('task_access' , 'all_tasks_access' ), Response::HTTP_FORBIDDEN, '403 Forbidden');
         $todayDate = Carbon::today()->toDateString();
      
         if ($request->ajax()) {

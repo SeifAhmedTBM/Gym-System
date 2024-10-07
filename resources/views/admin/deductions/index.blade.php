@@ -32,7 +32,7 @@
                     <div class="card">
                         <div class="card-body">
                             <h2 class="text-center">{{ trans('cruds.deduction.title_singular') }}</h2>
-                            <h2 class="text-center">{{ number_format($deductions->where('created_at','>=',date('Y-m-1'))->where('created_at','<=',date('Y-m-t'))->count(),2) }}</h2>
+                            <h2 class="text-center">{{ $deductions_count }}</h2>
                         </div>
                     </div>
                 </div>
@@ -40,7 +40,7 @@
                     <div class="card">
                         <div class="card-body">
                             <h2 class="text-center">{{ trans('cruds.deduction.fields.amount') }}</h2>
-                            <h2 class="text-center">{{ number_format($deductions->where('created_at','>=',date('Y-m-1'))->where('created_at','<=',date('Y-m-t'))->sum('amount'),2) }}</h2>
+                            <h2 class="text-center">{{ $deductions_sum }}</h2>
                         </div>
                     </div>
                 </div>

@@ -359,35 +359,35 @@ class ReportController extends Controller
         } else {
             $branch_id = $request['branch_id'] != NULL ? $request['branch_id'] : '';
         }
-
+        $type = Auth()->user()->roles[0]->title;
         $sales = User::when($request['sales_by_id'],fn($q) => $q->whereId($request['sales_by_id']))
             ->with([
-            'memberships' => fn ($q) => $q->where('status', '!=', 'refunded')
-                ->whereHas('invoice', function ($x) {
-                    $x->where('status', '!=', 'refund');
-                })
-                ->whereHas('service_pricelist', function ($i) {
-                    $i->whereHas('service', function ($q) {
-                        $q->whereSalesCommission(1);
-                    });
-                })
-                ->whereYear('created_at', date('Y-m', strtotime($date)))
-                ->whereMonth('created_at', date('m', strtotime($date))),
-            'payments'    => fn ($i) => $i->whereHas('invoice', function ($x) {
-                $x->where('status', '!=', 'refund')
-                    ->whereHas('membership', function ($i) {
-                        $i->where('status', '!=', 'refunded')
-                            ->whereHas('service_pricelist', function ($i) {
-                                $i->whereHas('service', function ($q) {
-                                    $q->whereSalesCommission(1);
+                'memberships' => fn ($q) => $q->where('status', '!=', 'refunded')
+                    ->whereHas('invoice', function ($x) {
+                        $x->where('status', '!=', 'refund');
+                    })
+                    ->whereHas('service_pricelist', function ($i) {
+                        $i->whereHas('service', function ($q) {
+                            $q->whereSalesCommission(1);
+                        });
+                    })
+                    ->whereYear('created_at', date('Y-m', strtotime($date)))
+                    ->whereMonth('created_at', date('m', strtotime($date))),
+                'payments'    => fn ($i) => $i->whereHas('invoice', function ($x) {
+                    $x->where('status', '!=', 'refund')
+                        ->whereHas('membership', function ($i) {
+                            $i->where('status', '!=', 'refunded')
+                                ->whereHas('service_pricelist', function ($i) {
+                                    $i->whereHas('service', function ($q) {
+                                        $q->whereSalesCommission(1);
+                                    });
                                 });
-                            });
-                    });
-            })
-                ->whereYear('created_at', date('Y-m', strtotime($date)))
-                ->whereMonth('created_at', date('m', strtotime($date)))
-                ->get()
-        ])
+                        });
+                })
+                    ->whereYear('created_at', date('Y-m', strtotime($date)))
+                    ->whereMonth('created_at', date('m', strtotime($date)))
+                    ->get()
+            ])
             ->withCount([
                 'memberships' => fn ($q) => $q
                     ->where('status', '!=', 'refunded')
@@ -419,8 +419,11 @@ class ReportController extends Controller
                     ->whereMonth('created_at', date('m', strtotime($date)))
             ], 'amount')
             ->whereRelation('roles', 'title', 'Sales')
-            ->whereHas('employee', fn ($q) => $q->when($branch_id, fn ($y) => $y->whereBranchId($branch_id)))
-            ->get();
+            ->whereHas('employee', fn ($q) => $q->when($branch_id, fn ($y) => $y->whereBranchId($branch_id)));
+        if($type == 'Sales'){
+            $sales = $sales->where('id',Auth()->user()->id);
+        }
+                $sales = $sales->get();
 
         $due = [];
         $collected = [];
@@ -2434,7 +2437,10 @@ class ReportController extends Controller
     {
         $from = (!empty($request['created_at']) && !empty($request['created_at']['from']))  ? $request['created_at']['from'] : date('Y-m-01');
         $to = (!empty($request['created_at']) && !empty($request['created_at']['to']))  ? $request['created_at']['to'] : date('Y-m-t');
-        $branch_id = $request['branch_id'] != NULL ? $request['branch_id'] : NULL;
+
+        $employee = Auth()->user()->employee;
+
+
         $accounts = [
             ''=>'All',
             'instapay' => 'Instapay',
@@ -2450,15 +2456,19 @@ class ReportController extends Controller
                 ->where('name', 'NOT LIKE', '%vodafone%')
                 ->orderBy('name')
                 ->pluck('name', 'id')->toArray();
-//        $accounts = Account::where('name', 'NOT LIKE', '%cash%')
-//                                ->where('name', 'NOT LIKE', '%vodafone%')
-//                                ->orderBy('name')
-//                                ->pluck('name', 'id');
 
 
         $branches = Branch::pluck('name', 'id');
+        if ($employee && $employee->branch_id != NULL)
+        {
+            $branch_id = $employee->branch_id;
+            $branches = Branch::where('id',$branch_id)->pluck('name', 'id');
+        } else {
+            $branch_id = isset($request['branch_id']) ? $request['branch_id'] : '';
+        }
 
-        $payments = Payment::index($request->all())
+        $data = $request->except('branch_id');
+        $payments = Payment::index($data)
             ->with([
                 'invoice',
                 'invoice.membership',
@@ -2481,8 +2491,13 @@ class ReportController extends Controller
                 // ->when($branch_id, fn ($y) => $y->whereIn('branch_id',$branch_id))
                     )
             // ->when($request['account_id'], fn ($q) => $q->whereIn('account_id',$request['account_id']))
-            ->latest()
-            ->get();
+            ->latest();
+
+        if ($branch_id !=''){
+            $branch_ids = Account::where('branch_id',$branch_id)->pluck('id','name');
+            $payments = $payments->whereIn('account_id',$branch_ids);
+        }
+        $payments = $payments->get();
 
         return view('admin.reports.tax_accountant', compact('payments', 'accounts', 'branches'));
     }
@@ -2751,8 +2766,12 @@ class ReportController extends Controller
             ->whereHas('user.employee',fn($q) => $q->whereStatus('active'))
             ->when($request['sales_by_id'], fn ($q) => $q->whereUserId($request['sales_by_id']))
             ->whereDate('created_at', '>=', $from)
-            ->whereDate('created_at', '<=', $to)
-            ->get();
+            ->whereDate('created_at', '<=', $to);
+
+        if (Auth()->user()->roles[0]->title == 'Sales'){
+            $reminder_sources = $reminder_sources->where('user_id',Auth()->user()->id);
+        }
+        $reminder_sources = $reminder_sources->get();
 
 
 
@@ -3065,8 +3084,12 @@ class ReportController extends Controller
             ->when($request['reminder_action'], fn ($q) => $q->whereAction($request['reminder_action']))
             ->whereNotIn('type',['pt_session'])
             ->whereDate('due_date', '>=', $from)
-            ->whereDate('due_date', '<=', $to)
-            ->get();
+            ->whereDate('due_date', '<=', $to);
+
+        if (Auth()->user()->roles[0]->title == 'Sales'){
+            $reminder_actions = $reminder_actions->where('user_id',Auth()->user()->id);
+        }
+            $reminder_actions = $reminder_actions->get();
 
         return view('admin.reports.actions', compact('employee', 'branch_id','reminder_actions'));
     }
@@ -3373,15 +3396,16 @@ class ReportController extends Controller
         } else {
             $branch_id = $request['branch_id'] != NULL ? $request['branch_id'] : '';
         }
+        $type = Auth()->user()->roles[0]->title;
 
         $sales_service          = new SalesService;
-        $invoices               = $sales_service->invoices($from,$to,$branch_id)->sum('net_amount');
-        $payments_sum_amount    = $sales_service->invoices($from,$to,$branch_id)->sum('payments_sum_amount');
-        $refunds                = $sales_service->refunds($from,$to,$branch_id)->sum('amount');
+        $invoices               = $sales_service->invoices($from,$to,$branch_id,$type)->sum('net_amount');
+        $payments_sum_amount    = $sales_service->invoices($from,$to,$branch_id,$type)->sum('payments_sum_amount');
+        $refunds                = $sales_service->refunds($from,$to,$branch_id,$type)->sum('amount');
         $pending                = $invoices - $payments_sum_amount;
-        $payments               = $sales_service->payments($from,$to,$branch_id)->sum('amount');
-        $service_payments       = $sales_service->service_payments($from,$to,$branch_id);
-        $service_refunds        = $sales_service->service_refunds($from,$to,$branch_id);
+        $payments               = $sales_service->payments($from,$to,$branch_id,$type)->sum('amount');
+        $service_payments       = $sales_service->service_payments($from,$to,$branch_id,$type);
+        $service_refunds        = $sales_service->service_refunds($from,$to,$branch_id,$type);
 
         return view('admin.reports.sales_daily',compact('employee','branch_id','invoices','payments_sum_amount','refunds','pending','payments','service_payments','service_refunds'));
     }
@@ -3392,7 +3416,7 @@ class ReportController extends Controller
         $to     = isset($request['to']) ? $request['to'] : date('Y-m-t');
 
         $employee = Auth()->user()->employee;
-
+//        dd(Auth()->user()->id);
         if ($employee && $employee->branch_id != NULL) 
         {
             $branch_id = $employee->branch_id;
@@ -3430,7 +3454,7 @@ class ReportController extends Controller
         if ($employee && $employee->branch_id != NULL) 
         {
             $branch_id = $employee->branch_id;
-        } 
+        }
         else 
         {
             $branch_id = $request['branch_id'] != NULL ? $request['branch_id'] : '';
@@ -3440,12 +3464,19 @@ class ReportController extends Controller
             'accounts',
             'transactions' => fn ($q) => $q->whereYear('transactions.created_at', date('Y', strtotime($date)))
                 ->whereMonth('transactions.created_at', date('m', strtotime($date)))
-        ])->get();
-
-        //Over All Report
+        ]);
         $lastMonthBranchesTransactions = Branch::with(['transactions' => function($query) use ($startOfLastMonth, $endOfLastMonth, $today ,$today2) {
             $query->whereDate('transactions.created_at', '>=', $startOfLastMonth)->whereDate('transactions.created_at', '<=', $endOfLastMonth);
-        }])->get();
+        }]);
+
+        if ($branch_id != ''){
+            $branches = $branches->where('id',$branch_id);
+            $lastMonthBranchesTransactions = $lastMonthBranchesTransactions->where('id',$branch_id);
+        }
+        $branches = $branches->get();
+        $lastMonthBranchesTransactions = $lastMonthBranchesTransactions->get();
+        //Over All Report
+
 
 
         //Sales Report

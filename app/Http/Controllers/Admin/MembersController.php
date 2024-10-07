@@ -92,7 +92,12 @@ class MembersController extends Controller
             //             ->select(sprintf('%s.*', (new Lead())->table));
             //     }
             // } else {
-                $query = Lead::index($data)
+                $query = $employee->branch_id ? Lead::index($data)
+                    ->with(['status', 'source', 'sales_by', 'address', 'created_by', 'branch'])
+                    ->whereType('member')
+                    ->whereBranchId($employee->branch_id)
+                    ->orderBy('member_code', 'desc')
+                    ->select(sprintf('%s.*', (new Lead())->table)):Lead::index($data)
                     ->with(['status', 'source', 'sales_by', 'address', 'created_by', 'branch'])
                     ->whereType('member')
                     ->orderBy('member_code', 'desc')
@@ -209,8 +214,7 @@ class MembersController extends Controller
 
             return $table->make(true);
         }
-
-        $branches = Branch::pluck('name', 'id');
+        $branches =$employee->branch_id ? Branch::where('id', $employee->branch_id)->pluck('name', 'id'):Branch::pluck('name', 'id');
 
         $statuses = Status::pluck('name', 'id');
 
@@ -218,9 +222,17 @@ class MembersController extends Controller
 
         $addresses = Address::pluck('name', 'id');
 
-        $sales = User::whereHas('roles', function ($q) {
+        $sales = $employee->branch_id ? User::whereHas('roles', function ($q) {
+            $q->where('title', 'Sales');
+        })->whereHas('employee', function ($q) use($employee) {
+                $q->whereHas('branch', function ($x) use($employee) {
+                    $x->where('id', $employee->branch_id); // Use where for a single value
+                });
+            })
+            ->pluck('name', 'id'):User::whereHas('roles', function ($q) {
             $q->where('title', 'Sales');
         })->pluck('name', 'id');
+
 
         if ($employee && $employee->branch_id != NULL) {
             if ($user->roles[0]->title == 'Sales') {

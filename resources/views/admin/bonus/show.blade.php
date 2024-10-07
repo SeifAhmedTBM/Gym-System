@@ -36,7 +36,7 @@
                             {{ trans('cruds.bonu.fields.name') }}
                         </th>
                         <td>
-                            {{ $bonu->name }}
+                            {{ $bonu->employee->name }}
                         </td>
                     </tr>
                     <tr>
