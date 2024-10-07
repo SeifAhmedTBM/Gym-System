@@ -1,3 +1,4 @@
+
 @extends('layouts.admin')
 @section('content')
 <link rel="stylesheet" href="https://cdn.datatables.net/2.1.4/css/dataTables.dataTables.css" />
@@ -21,21 +22,21 @@
                     </a>
                 @endcan
 
-                @can('expenses_filter')
-                    @include('admin_includes.filters', [
-                    'columns' => [
-                        'name' => ['label' => 'Name', 'type' => 'text'],
-                        'amount' => ['label' => 'Amount', 'type' => 'number'],
-                        'account_id' => ['label' => 'Account', 'type' => 'select' , 'data' => $accounts],
-                        'expenses_category_id'  => ['label' => 'Expenses Category', 'type' => 'select' , 'data' => $expenses_categories ,'related_to' => 'expenses_category'],
-                        'created_by_id' => ['label' => 'Created By', 'type' => 'select', 'data' => $users],
-                        'date' => ['label' => 'Date', 'type' => 'date','from_and_to' => true],
-                        'created_at' => ['label' => 'Created at', 'type' => 'date', 'from_and_to' => true]
-                    ],
-                        'route' => 'admin.expenses.index'
-                    ])
-                    @include('csvImport.modal', ['model' => 'Expense', 'route' => 'admin.expenses.parseCsvImport'])
-                @endcan
+                    @can('expenses_filter')
+                        @include('admin_includes.filters', [
+                        'columns' => [
+//                            'name' => ['label' => 'Name', 'type' => 'text'],
+                            'amount' => ['label' => 'Amount', 'type' => 'number'],
+                            'account_id' => ['label' => 'Account', 'type' => 'select' , 'data' => $accounts],
+//                            'expenses_category_id'  => ['label' => 'Expenses Category', 'type' => 'select' , 'data' => $expenses_categories ,'related_to' => 'expenses_category', 'value'=>2],
+                            'created_by_id' => ['label' => 'Created By', 'type' => 'select', 'data' => $users],
+                            'date' => ['label' => 'Date', 'type' => 'date','from_and_to' => true],
+//                            'created_at' => ['label' => 'Created at', 'type' => 'date', 'from_and_to' => true]
+                        ],
+                            'route' => 'admin.expenses_categories_show_by_filter'
+                        ])
+                        @include('csvImport.modal', ['model' => 'Expense', 'route' => 'admin.expenses.parseCsvImport'])
+                    @endcan
             </div>
             @can('expenses_counter')
             <div class="col-lg-3 col-md-3 col-sm-12 col-xs-12">
@@ -58,7 +59,7 @@
             </div>
             @endcan
         </div>
-    
+
     <div class="card">
         <div class="card-header">
             <h5>{{ trans('cruds.expense.title_singular') }} {{ trans('global.list') }}</h5>
@@ -68,7 +69,7 @@
             <table class=" table table-bordered table-striped table-hover ajaxTable datatable datatable-Expense" id="myTable">
                 <thead>
                     <tr>
-                     
+
                         <th>
                             {{ trans('cruds.expense.fields.id') }}
                         </th>
@@ -117,7 +118,7 @@
                                 <div class="dropdown-menu" aria-labelledby="dropdownMenuLink">
                                     <a class="dropdown-item" href="/admin/expenses/{{$expense->id}}">
                                         <i class="fa fa-eye"></i> &nbsp; View
-                                    </a>                                   
+                                    </a>
                                     <a class="dropdown-item" href="/admin/expenses/{{$expense->id}}/edit">
                                         <i class="fa fa-edit"></i> &nbsp; Edit
                                     </a>
@@ -128,7 +129,7 @@
                                             <i class="fa fa-trash"></i> &nbsp; Delete
                                         </button>
                                     </form>
-                            
+
                                 </div>
                             </div>
                         </td>
