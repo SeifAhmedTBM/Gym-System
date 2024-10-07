@@ -141,7 +141,7 @@
             </div>
             <div class="modal-footer">
 
-                <a href="{{ route($route) }}" class="btn btn-warning @if($status) d-none @endif ">
+                <a href="{{ route($route) }}" class="btn btn-warning @if(isset($status) && $status==true) d-none @endif ">
                     <i class="fa fa-arrow-circle-left"></i> Reset
                 </a>
                 <button type="button" class="btn btn-danger" data-dismiss="modal">
