@@ -24,7 +24,10 @@ class DeductionsController extends Controller
         abort_if(Gate::denies('deduction_access'), Response::HTTP_FORBIDDEN, '403 Forbidden');
 
         $data = $request->except(['draw', 'columns', 'order', 'start', 'length', 'search', 'change_language','_']);
-        
+        $data['created_at']['from'] = $data['created_at']['from'] ?? date('Y-m-01');
+        $data['created_at']['to'] = $data['created_at']['to'] ?? date('Y-m-t');
+
+
         $employee = Auth()->user()->employee;
 
         if ($request->ajax()) {
@@ -99,8 +102,10 @@ class DeductionsController extends Controller
         })->pluck('name', 'id');
 
         $deductions = Deduction::index($data);
+        $deductions_sum = number_format($deductions->where('created_at','>=',$data['created_at']['from'])->where('created_at','<=',$data['created_at']['to'])->sum('amount'),2);
+        $deductions_count = $deductions->where('created_at','>=',$data['created_at']['from'])->where('created_at','<=',$data['created_at']['to'])->count();
 
-        return view('admin.deductions.index',compact('created_bies','deductions'));
+        return view('admin.deductions.index',compact('created_bies','deductions','deductions_sum','deductions_count'));
     }
 
     public function create()
