@@ -15,7 +15,7 @@ class ScheduleApiController extends Controller
 {
     public function index()
     {
-        abort_if(Gate::denies('schedule_access'), Response::HTTP_FORBIDDEN, '403 Forbidden');
+        //abort_if(Gate::denies('schedule_access'), Response::HTTP_FORBIDDEN, '403 Forbidden');
 
         return new ScheduleResource(Schedule::with(['session', 'timeslot', 'trainer'])->get());
     }
