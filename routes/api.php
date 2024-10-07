@@ -192,6 +192,7 @@ Route::group(['prefix' => 'v1', 'as' => 'api.', 'namespace' => 'Api\V1\Admin'], 
     // External Payment
     Route::apiResource('external-payments', 'ExternalPaymentApiController');
 
+    
     // Withdrawal
     Route::apiResource('withdrawals', 'WithdrawalApiController');
 
