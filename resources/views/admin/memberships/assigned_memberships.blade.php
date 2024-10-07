@@ -16,7 +16,7 @@
                         'phone'             => ['label' => 'Member Phone', 'type' => 'number', 'related_to' => 'member'],
                         'member_code'       => ['label' => 'Member Code', 'type' => 'text', 'related_to' => 'member'],
                         // 'email' => ['label' => 'Member Email', 'type' => 'email', 'related_to' => 'member.user'],
-                        'member_id'         => ['label' => 'Member', 'type' => 'select', 'data' => $members],
+                        'member_id'         => ['label' => 'Select Member', 'type' => 'select', 'data' => $members],
                         'sales_by_id'       => ['label' => 'Sales By', 'type' => 'select', 'data' => $sales],
                         'trainer_id'        => ['label' => 'Trainer', 'type' => 'select', 'data' => $trainers],
                         'service_pricelist_id' => ['label' => 'Service', 'type' => 'select', 'data' => $services],
@@ -324,4 +324,34 @@
 
         });
     </script>
+        <script>
+
+            $(document).ready(function() {
+                $('#Select-Member').select2({
+                    ajax: {
+                        url: '{{ route("admin.assigned-memberships") }}',
+                        dataType: 'json',
+                        delay: 150,
+                        data: function (params) {
+                            return {
+                                q: params.term
+                            };
+                        },
+                        processResults: function (data) {
+                            return {
+                                results: $.map(data, function (item) {
+                                    return {
+                                        id: item.id,
+                                        text: item.name
+                                    };
+                                })
+                            };
+                        },
+                        cache: true
+                    },
+                    placeholder: 'Select an option',
+                    minimumInputLength: 1
+                });
+            });
+        </script>
 @endsection
