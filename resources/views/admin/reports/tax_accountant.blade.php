@@ -35,7 +35,7 @@
                 <div class="col-md-10">
                     @include('admin_includes.filters', [
                         'columns' => [
-                            'branch_id'  => ['label' => 'Branch', 'type' => 'select', 'data' => $branches,'related_to' => 'account'],
+                            'branch_id'  => ['label' => 'Branch', 'type' => 'select', 'data' => $branches],
                             'account_id' => ['label' => 'Account', 'type' => 'select', 'data' => $accounts,'related_to' => 'account'],
                             'created_at' => ['label' => trans('global.created_at'), 'type' => 'date', 'from_and_to' => true]
                         ],

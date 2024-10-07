@@ -2434,7 +2434,10 @@ class ReportController extends Controller
     {
         $from = (!empty($request['created_at']) && !empty($request['created_at']['from']))  ? $request['created_at']['from'] : date('Y-m-01');
         $to = (!empty($request['created_at']) && !empty($request['created_at']['to']))  ? $request['created_at']['to'] : date('Y-m-t');
-        $branch_id = $request['branch_id'] != NULL ? $request['branch_id'] : NULL;
+
+        $employee = Auth()->user()->employee;
+
+
         $accounts = [
             ''=>'All',
             'instapay' => 'Instapay',
@@ -2450,15 +2453,19 @@ class ReportController extends Controller
                 ->where('name', 'NOT LIKE', '%vodafone%')
                 ->orderBy('name')
                 ->pluck('name', 'id')->toArray();
-//        $accounts = Account::where('name', 'NOT LIKE', '%cash%')
-//                                ->where('name', 'NOT LIKE', '%vodafone%')
-//                                ->orderBy('name')
-//                                ->pluck('name', 'id');
 
 
         $branches = Branch::pluck('name', 'id');
+        if ($employee && $employee->branch_id != NULL)
+        {
+            $branch_id = $employee->branch_id;
+            $branches = Branch::where('id',$branch_id)->pluck('name', 'id');
+        } else {
+            $branch_id = isset($request['branch_id']) ? $request['branch_id'] : '';
+        }
 
-        $payments = Payment::index($request->all())
+        $data = $request->except('branch_id');
+        $payments = Payment::index($data)
             ->with([
                 'invoice',
                 'invoice.membership',
@@ -2481,8 +2488,13 @@ class ReportController extends Controller
                 // ->when($branch_id, fn ($y) => $y->whereIn('branch_id',$branch_id))
                     )
             // ->when($request['account_id'], fn ($q) => $q->whereIn('account_id',$request['account_id']))
-            ->latest()
-            ->get();
+            ->latest();
+
+        if ($branch_id !=''){
+            $branch_ids = Account::where('branch_id',$branch_id)->pluck('id','name');
+            $payments = $payments->whereIn('account_id',$branch_ids);
+        }
+        $payments = $payments->get();
 
         return view('admin.reports.tax_accountant', compact('payments', 'accounts', 'branches'));
     }
