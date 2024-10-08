@@ -1535,10 +1535,10 @@ class MembershipsController extends Controller
     public function assigned_memberships(Request $request)
     {
         if (isset($request->q)){
-           $results = Lead::whereType('member')->where('name', 'LIKE', "{$request->q}%")->limit(10)->get();
-        return response()->json($results->map(function($item) {
-            return ['id' => $item->id, 'name' => $item->name];
-        }));
+           $results = Lead::whereType('member')->where('name', 'LIKE', "{$request->q}%")->orWhere('member_code','LIKE',"{$request->q}%")->limit(10)->get();
+            return response()->json($results->map(function($item) {
+                return ['id' => $item->id, 'name' => $item->name,'member_code'=>$item->branch->member_prefix.$item->member_code];
+            }));
         }
 
         abort_if(Gate::denies('membership_access'), Response::HTTP_FORBIDDEN, '403 Forbidden');
