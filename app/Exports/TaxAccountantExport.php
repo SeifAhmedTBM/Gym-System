@@ -2,6 +2,7 @@
 
 namespace App\Exports;
 
+use App\Models\Account;
 use App\Models\Payment;
 use Maatwebsite\Excel\Concerns\FromCollection;
 use Maatwebsite\Excel\Concerns\WithHeadings;
@@ -13,13 +14,15 @@ class TaxAccountantExport implements FromCollection,WithHeadings
     */
     public function collection()
     {
-        $from = request('from') != NULL ? request('from') : date('Y-m-01');
+        $created_at = request('created_at') ?? [];
 
-        $to = request('to') != NULL ? request('to') : date('Y-m-t');
+        $from = isset($created_at['from']) ? $created_at['from'] : date('Y-m-01');
+        $to = isset($created_at['to']) ? $created_at['to'] : date('Y-m-t');
+
 
         $branch_id = request('branch_id') != NULL ? request('branch_id') : NULL;
-
-        $payments = Payment::index(request()->all())
+        $data = request()->except('branch_id');
+        $payments = Payment::index($data)
                                 ->with([
                                     'invoice',
                                     'invoice.membership',
@@ -40,8 +43,13 @@ class TaxAccountantExport implements FromCollection,WithHeadings
                                         ->where('name','NOT LIKE','%cash%')
                                         ->where('name','NOT LIKE','%vodafone%')
                                 )
-                                ->latest()
-                                ->get();
+                                ->latest();
+        if (!empty($branch_id)) {
+            $branch_id = is_array($branch_id) ? $branch_id : [$branch_id];
+            $branch_ids = Account::whereIn('branch_id', $branch_id)->pluck('id', 'name');
+            $payments = $payments->whereIn('account_id', $branch_ids);
+        }
+        $payments = $payments->get();
 
         $payments = $payments->map(function ($payment) {
             return [

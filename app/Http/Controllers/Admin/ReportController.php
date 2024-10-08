@@ -2506,9 +2506,10 @@ class ReportController extends Controller
             // ->when($request['account_id'], fn ($q) => $q->whereIn('account_id',$request['account_id']))
             ->latest();
 
-        if ($branch_id !=''){
-            $branch_ids = Account::where('branch_id',$branch_id)->pluck('id','name');
-            $payments = $payments->whereIn('account_id',$branch_ids);
+        if (!empty($branch_id)) {
+            $branch_id = is_array($branch_id) ? $branch_id : [$branch_id];
+            $branch_ids = Account::whereIn('branch_id', $branch_id)->pluck('id', 'name');
+            $payments = $payments->whereIn('account_id', $branch_ids);
         }
         $payments = $payments->get();
 
