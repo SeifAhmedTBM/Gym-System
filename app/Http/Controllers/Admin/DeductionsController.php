@@ -102,8 +102,8 @@ class DeductionsController extends Controller
         })->pluck('name', 'id');
 
         $deductions = Deduction::index($data);
-        $deductions_sum = number_format($deductions->where('created_at','>=',$data['created_at']['from'])->where('created_at','<=',$data['created_at']['to'])->sum('amount'),2);
-        $deductions_count = $deductions->where('created_at','>=',$data['created_at']['from'])->where('created_at','<=',$data['created_at']['to'])->count();
+        $deductions_sum = number_format($deductions->where('created_at','>=',$data['created_at']['from'])->where('created_at','<=',$data['created_at']['to'] . ' 23:59:59')->sum('amount'),2);
+        $deductions_count = $deductions->where('created_at','>=',$data['created_at']['from'])->where('created_at','<=',$data['created_at']['to'] . ' 23:59:59')->count();
 
         return view('admin.deductions.index',compact('created_bies','deductions','deductions_sum','deductions_count'));
     }
