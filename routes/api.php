@@ -206,6 +206,8 @@ Route::group(['prefix' => 'v1', 'as' => 'api.', 'namespace' => 'Api\V1\Admin'], 
     // Schedule
     Route::apiResource('schedules', 'ScheduleApiController');
 
+
+
     // Ratings
     Route::apiResource('rate', 'RatingsApiController')->middleware('auth:sanctum');
 
@@ -224,4 +226,11 @@ Route::group(['prefix' => 'v1', 'as' => 'api.', 'namespace' => 'Api\V1\Admin'], 
 
     // Master Card
     Route::apiResource('master-cards', 'MasterCardApiController');
+
+
+    // Free Private Trainer Requests
+    
+    Route::post('requestPrivateTrainer' , 'FreePtRequestsController@Request_free_pt');
+    Route::post('available_free_pt' , 'FreePtRequestsController@free_pt');
 });
+ 

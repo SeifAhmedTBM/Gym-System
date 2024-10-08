@@ -60,6 +60,15 @@
                     'linkUrl' => 'admin.membership-attendances.index',
                     'type' => '',
                 ],
+
+                [
+                    'can' => 'membership_attendance_access',
+                    'title' => 'Free Pt Requests',
+                    'imageUrl' => 'Attends-List.png',
+                    'linkUrl' => 'admin.free-requests.index',
+                    'type' => '',
+                ],
+
                 //
                 [
                     'can' => 'freeze_request_access',

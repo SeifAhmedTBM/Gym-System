@@ -1004,6 +1004,11 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.', 'namespace' => 'Admin', 'mi
     // zoom 
     Route::resource('zoom','Marketing\ZoomController');
     Route::put('zoom-end/{meeting_id}','Marketing\ZoomController@end_meeting')->name('zoom.end');
+
+
+    //Free Pt Requests
+    Route::resource('free-requests', 'FreePtRequestsController');
+    Route::post('assign_free_pt_coaches' , 'FreePtRequestsController@assign_free_pt_coache')->name('assign_free_pt_coache');
 });
 
 Route::group(['prefix' => 'profile', 'as' => 'profile.', 'namespace' => 'Auth', 'middleware' => ['auth']], function () {
