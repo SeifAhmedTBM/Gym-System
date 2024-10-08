@@ -35,11 +35,13 @@ class FreezeRequestController extends Controller
             $query = FreezeRequest::index($data)
                                     ->whereIn('status',['pending','confirmed','rejected'])
                                     ->with(['membership', 'created_by','membership.service_pricelist','membership.member','membership.member.branch'])
-                                    ->whereHas('membership.member.branch', function ($q) use ($request) {
-                                        $q->whereIn('id', $request->branch_id);})
                                     ->latest()
                                     ->select(sprintf('%s.*', (new FreezeRequest())->table));
-//            dd($query->limit(1)->get());
+            if(isset($request->branch_id)){
+                $query=$query->whereHas('membership.member.branch', function ($q) use ($request) {
+                    $q->whereIn('id', $request->branch_id);});
+            }
+            //            dd($query->limit(1)->get());
             $table = Datatables::of($query);
 
             $table->addColumn('placeholder', '&nbsp;');
