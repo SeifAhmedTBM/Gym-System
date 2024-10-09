@@ -84,6 +84,8 @@ Route::group(['prefix' => 'v1', 'as' => 'api.', 'namespace' => 'Api\V1\Admin'], 
     // Memberships
     Route::apiResource('memberships', 'MembershipsApiController');
 
+    Route::post('member_ship_statistics' , 'MembershipsApiController@member_ship_statistics');
+
     // Locker
     Route::apiResource('lockers', 'LockerApiController');
 
