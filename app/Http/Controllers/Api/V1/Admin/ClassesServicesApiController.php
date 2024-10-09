@@ -25,6 +25,7 @@ use Symfony\Component\HttpFoundation\Response;
 class ClassesServicesApiController extends Controller
 {
     private $mobile_setting;
+
     public function __construct(){
         $this->mobile_setting = MobileSetting::all()->first();
     }
@@ -113,23 +114,22 @@ class ClassesServicesApiController extends Controller
             ], 403);
         }
 
-        // Fetch the authenticated member
+
         $member = auth('sanctum')->user()->lead;
 
-        // Get active memberships based on service type
         $memberships = $member->memberships()
             ->whereHas('service_pricelist.service', function ($query) {
-                $query->where('service_type_id', $this->mobile_setting->classes_service_type);
+                $query->where('service_type_id', $this->mobile_setting?->classes_service_type);
             })
             ->whereIn('status', ['current','pending'])
             ->latest()->get();
 
-        // Adjust memberships
+      
         foreach ($memberships as $membership) {
             $this->adjustMembership($membership);
         }
 
-        // Fetch the latest note for the member
+    
         $last_note = $member->notes()->latest()->first();
 
 //         Get today's schedules with related session, timeslot, and trainer
@@ -150,15 +150,15 @@ class ClassesServicesApiController extends Controller
                     return [
                     'class_cover' =>
                          [
-                            'url'=>$membership->service_pricelist->service->cover->url,
-                            'thumbnail'=>$membership->service_pricelist->service->cover->thumbnail,
-                            'preview'=>$membership->service_pricelist->service->cover->preview,
+                            'url'=>$membership->service_pricelist->service->cover->url ?? null,
+                            'thumbnail'=>$membership->service_pricelist->service->cover->thumbnail ?? null,
+                            'preview'=>$membership->service_pricelist->service->cover->preview ?? null,
                         ]
                   ,
                     'class_logo' =>         [
-                        'url'=>$membership->service_pricelist->service->logo->url,
-                        'thumbnail'=>$membership->service_pricelist->service->logo->thumbnail,
-                        'preview'=>$membership->service_pricelist->service->logo->preview,
+                        'url'=>$membership->service_pricelist->service->logo->url ?? null,
+                        'thumbnail'=>$membership->service_pricelist->service->logo->thumbnail ?? null,
+                        'preview'=>$membership->service_pricelist->service->logo->preview ?? null,
                     ],
                     'class_id' => $membership->service_pricelist->id,
                     'class_name' =>  $membership->service_pricelist->service->name . ' - '.$membership->service_pricelist->name,
@@ -204,7 +204,7 @@ class ClassesServicesApiController extends Controller
         // Get active memberships based on service type
         $memberships = $member->memberships()
             ->whereHas('service_pricelist.service', function ($query) {
-                $query->where('service_type_id', $this->mobile_setting->classes_service_type);
+                $query->where('service_type_id', $this->mobile_setting?->classes_service_type);
             })
             ->latest()->get();
 
