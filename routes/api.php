@@ -230,7 +230,8 @@ Route::group(['prefix' => 'v1', 'as' => 'api.', 'namespace' => 'Api\V1\Admin'], 
 
     // Free Private Trainer Requests
     
-    Route::post('requestPrivateTrainer' , 'FreePtRequestsController@Request_free_pt');
-    Route::post('available_free_pt' , 'FreePtRequestsController@free_pt');
+
+    Route::middleware('auth:sanctum')->get('requestPrivateTrainer' , 'FreePtRequestsController@Request_free_pt');
+    Route::middleware('auth:sanctum')->get('available_free_pt' , 'FreePtRequestsController@free_pt');
 });
  
