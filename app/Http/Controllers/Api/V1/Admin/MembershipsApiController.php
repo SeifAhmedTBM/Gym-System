@@ -12,6 +12,10 @@ use App\Http\Requests\UpdateMembershipRequest;
 use Symfony\Component\HttpFoundation\Response;
 use App\Http\Resources\Admin\MembershipResource;
 use App\Models\FreezeRequest;
+use App\Models\MembershipServiceOptions;
+use App\Models\Invitation;
+
+use App\Models\ServiceOptionsPricelist;
 
 class MembershipsApiController extends Controller
 {
@@ -59,4 +63,52 @@ class MembershipsApiController extends Controller
             ],200);
         }
     }
+
+
+
+    public function member_ship_statistics(Request $request){
+        $Lead = Lead::where('user_id' , $request->user_id)->first();
+
+        $latest_membership = Membership::where('member_id', $Lead->id)->latest()->first();
+
+
+        $main_membership = Membership::with([
+            'member',
+            'invitations',
+        ])->whereId($latest_membership->id)->whereIn('status', ['current', 'expiring'])
+            ->with([
+                'service_pricelist' => fn($q) => $q
+                    ->with([
+                        'service' => fn($x) => $x->with([
+                            'service_type' => fn($i) => $i->whereMainService(true)
+                        ])
+                    ])
+            ])->whereHas('service_pricelist', function ($q) {
+                $q->whereHas('service', function ($x) {
+                    $x->whereHas('service_type', function ($i) {
+                        $i->whereMainService(true);
+                    });
+                });
+            })
+            ->withCount('invitations')
+            ->first();
+
+            
+        $counter = MembershipServiceOptions::where('service_option_pricelist_id', 1)->where('membership_id', $latest_membership->id)->count();
+        
+
+        $invitation_counter = Invitation::where('membership_id' , $latest_membership->id)->count();
+        
+        $pricelist_inbody = ServiceOptionsPricelist::where('pricelist_id' , $main_membership->service_pricelist_id)->where('service_option_id',1)->first();
+        $total_inbody_numer = $pricelist_inbody->count;
+
+        
+
+            return response()->json([
+                'status'              => true ,
+                'inbody_count'        => $counter .'/'. $total_inbody_numer,
+                'invitations_counter' => $main_membership->invitations_count .'/'. $main_membership->service_pricelist->invitation ,
+            ],200);
+        }
+    
 }
