@@ -123,7 +123,7 @@ class MembershipsApiController extends Controller
                 ->whereHas('service_pricelist.service.service_type', function ($query) {
                     $query->where('main_service', 0);
                 })
-                ->with('service_pricelist')
+                ->with(['service_pricelist','trainer'])
                 ->latest()
                 ->get();
             foreach($latest_memberships as $membership){
