@@ -23,7 +23,10 @@
 {{--                    @endif--}}
 {{--                @else--}}
 {{--                @endif--}}
+                @if ($key != 'done' && $key != 'not_interested')
                     <option value="{{ $key }}">{{ $value }}</option>
+                @endif
+{{--                    <option value="{{ $key }}">{{ $value }}</option>--}}
             @endforeach
 
         </select>

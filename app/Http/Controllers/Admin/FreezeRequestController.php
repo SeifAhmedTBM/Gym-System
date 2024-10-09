@@ -29,15 +29,19 @@ class FreezeRequestController extends Controller
     public function index(Request $request)
     {
         abort_if(Gate::denies('freeze_request_access'), Response::HTTP_FORBIDDEN, '403 Forbidden');
-        $data = $request->except(['draw', 'columns', 'order', 'start', 'length', 'search', 'change_language','_']);
+        $data = $request->except(['draw', 'columns', 'order', 'start', 'length', 'search', 'change_language','branch_id','_']);
         $settings = Setting::first();
         if ($request->ajax()) {
             $query = FreezeRequest::index($data)
                                     ->whereIn('status',['pending','confirmed','rejected'])
-                                    ->with(['membership', 'created_by','membership.service_pricelist','membership.member'])
+                                    ->with(['membership', 'created_by','membership.service_pricelist','membership.member','membership.member.branch'])
                                     ->latest()
                                     ->select(sprintf('%s.*', (new FreezeRequest())->table));
-
+            if(isset($request->branch_id)){
+                $query=$query->whereHas('membership.member.branch', function ($q) use ($request) {
+                    $q->whereIn('id', $request->branch_id);});
+            }
+            //            dd($query->limit(1)->get());
             $table = Datatables::of($query);
 
             $table->addColumn('placeholder', '&nbsp;');
@@ -90,7 +94,7 @@ class FreezeRequestController extends Controller
             });
 
             $table->addColumn('branch_name', function ($row) {
-                return $row->member && $row->member->branch ? $row->member->branch->name : '-';
+                return $row->membership->member && $row->membership->member->branch ? $row->membership->member->branch->name : '-';
             });
 
             $table->addColumn('is_retroactive', function ($row) {

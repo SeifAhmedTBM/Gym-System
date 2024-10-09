@@ -741,6 +741,7 @@ class AttendanceController extends Controller
 
     public function takeManualAttend(Request $request,$id)
     {
+        
         $membership = Membership::with('attendances')->findOrFail($id);
 
         $last_attend    = $membership->attendances()->whereDate('created_at',date('Y-m-d'))->latest()->first();
@@ -762,7 +763,8 @@ class AttendanceController extends Controller
                     'membership_status' => $membership->status
                 ]);
             }
-        }else{
+        }
+        else{
             $attend = MembershipAttendance::create([
                 'sign_in'                   => $request['time'],
                 'sign_out'                  => $request['time'],

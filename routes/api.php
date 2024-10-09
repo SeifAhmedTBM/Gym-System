@@ -84,6 +84,10 @@ Route::group(['prefix' => 'v1', 'as' => 'api.', 'namespace' => 'Api\V1\Admin'], 
     // Memberships
     Route::apiResource('memberships', 'MembershipsApiController');
 
+    Route::middleware('auth:sanctum')->get('member_ship_statistics' , 'MembershipsApiController@member_ship_statistics');
+
+    Route::middleware('auth:sanctum')->get('get_pt_memberships' , 'MembershipsApiController@get_pt_memberships');
+
     // Locker
     Route::apiResource('lockers', 'LockerApiController');
 
@@ -233,5 +237,8 @@ Route::group(['prefix' => 'v1', 'as' => 'api.', 'namespace' => 'Api\V1\Admin'], 
 
     Route::middleware('auth:sanctum')->get('requestPrivateTrainer' , 'FreePtRequestsController@Request_free_pt');
     Route::middleware('auth:sanctum')->get('available_free_pt' , 'FreePtRequestsController@free_pt');
+
+
+    Route::middleware('auth:sanctum')->post('takeManualAttend' ,'AttendanceAPIController@takeManualAttend');
 });
  

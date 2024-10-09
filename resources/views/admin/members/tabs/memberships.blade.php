@@ -47,6 +47,7 @@
                                     <span class="font-weight-bold d-block">
                                         {{ trans('cruds.serviceType.title_singular') }} : {{ $membership->service_pricelist->service->service_type->name ?? '-' }}
                                     </span>
+                                    
                                     <span class="font-weight-bold d-block">
                                         @if ($membership->service_pricelist->service->service_type->session_type == 'non_sessions')
                                         @else
