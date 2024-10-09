@@ -223,4 +223,6 @@ class Membership extends Model
     {
         return $this->belongsTo(Sport::class, 'sport_id', 'id');
     }
+
+   
 }
