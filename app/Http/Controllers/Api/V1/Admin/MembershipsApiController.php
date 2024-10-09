@@ -105,9 +105,11 @@ class MembershipsApiController extends Controller
         
 
             return response()->json([
-                'status'              => true ,
-                'inbody_count'        => $counter .'/'. $total_inbody_numer,
-                'invitations_counter' => $main_membership->invitations_count .'/'. $main_membership->service_pricelist->invitation ,
+                'status'                  => true ,
+                'inbody_count'            => $counter,
+                'total_inbody_count'      => $total_inbody_numer ,
+                'invitations_count'       => $main_membership->invitations_count ,
+                'total_invitations_count' => $main_membership->service_pricelist->invitation,
             ],200);
         }
     
