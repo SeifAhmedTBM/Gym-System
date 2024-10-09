@@ -25,6 +25,7 @@ use Symfony\Component\HttpFoundation\Response;
 class ClassesServicesApiController extends Controller
 {
     private $mobile_setting;
+
     public function __construct(){
         $this->mobile_setting = MobileSetting::all()->first();
     }
@@ -113,23 +114,22 @@ class ClassesServicesApiController extends Controller
             ], 403);
         }
 
-        // Fetch the authenticated member
+
         $member = auth('sanctum')->user()->lead;
 
-        // Get active memberships based on service type
         $memberships = $member->memberships()
             ->whereHas('service_pricelist.service', function ($query) {
-                $query->where('service_type_id', $this->mobile_setting->classes_service_type);
+                $query->where('service_type_id', $this->mobile_setting?->classes_service_type);
             })
             ->whereIn('status', ['current','pending'])
             ->latest()->get();
 
-        // Adjust memberships
+      
         foreach ($memberships as $membership) {
             $this->adjustMembership($membership);
         }
 
-        // Fetch the latest note for the member
+    
         $last_note = $member->notes()->latest()->first();
 
 //         Get today's schedules with related session, timeslot, and trainer
