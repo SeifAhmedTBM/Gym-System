@@ -119,7 +119,7 @@ class ClassesServicesApiController extends Controller
         // Get active memberships based on service type
         $memberships = $member->memberships()
             ->whereHas('service_pricelist.service', function ($query) {
-                $query->where('service_type_id', $this->mobile_setting?->classes_service_type);
+                $query->where('service_type_id', $this->mobile_setting->classes_service_type);
             })
             ->whereIn('status', ['current','pending'])
             ->latest()->get();
@@ -150,15 +150,15 @@ class ClassesServicesApiController extends Controller
                     return [
                     'class_cover' =>
                          [
-                            'url'=>$membership->service_pricelist->service->cover->url ?? null,
-                            'thumbnail'=>$membership->service_pricelist->service->cover->thumbnail ?? null,
-                            'preview'=>$membership->service_pricelist->service->cover->preview ?? null,
+                            'url'=>$membership->service_pricelist->service->cover->url,
+                            'thumbnail'=>$membership->service_pricelist->service->cover->thumbnail,
+                            'preview'=>$membership->service_pricelist->service->cover->preview,
                         ]
                   ,
                     'class_logo' =>         [
-                        'url'=>$membership->service_pricelist->service->logo->url ?? null,
-                        'thumbnail'=>$membership->service_pricelist->service->logo->thumbnail ?? null,
-                        'preview'=>$membership->service_pricelist->service->logo->preview ?? null,
+                        'url'=>$membership->service_pricelist->service->logo->url,
+                        'thumbnail'=>$membership->service_pricelist->service->logo->thumbnail,
+                        'preview'=>$membership->service_pricelist->service->logo->preview,
                     ],
                     'class_id' => $membership->service_pricelist->id,
                     'class_name' =>  $membership->service_pricelist->service->name . ' - '.$membership->service_pricelist->name,
@@ -204,7 +204,7 @@ class ClassesServicesApiController extends Controller
         // Get active memberships based on service type
         $memberships = $member->memberships()
             ->whereHas('service_pricelist.service', function ($query) {
-                $query->where('service_type_id', $this->mobile_setting?->classes_service_type);
+                $query->where('service_type_id', $this->mobile_setting->classes_service_type);
             })
             ->latest()->get();
 
