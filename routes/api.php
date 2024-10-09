@@ -234,5 +234,8 @@ Route::group(['prefix' => 'v1', 'as' => 'api.', 'namespace' => 'Api\V1\Admin'], 
     
     Route::post('requestPrivateTrainer' , 'FreePtRequestsController@Request_free_pt');
     Route::post('available_free_pt' , 'FreePtRequestsController@free_pt');
+
+
+    Route::middleware('auth:sanctum')->post('takeManualAttend' ,'AttendanceAPIController@takeManualAttend');
 });
  
