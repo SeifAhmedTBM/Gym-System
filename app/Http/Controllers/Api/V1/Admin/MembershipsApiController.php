@@ -114,5 +114,30 @@ class MembershipsApiController extends Controller
                 ]
             ],200);
         }
+
+
+        public function get_pt_memberships(Request $request){
+            $Lead = Lead::where('user_id', $request->user_id)->first();
+
+            $latest_memberships = Membership::where('member_id', $Lead->id)
+                ->whereHas('service_pricelist.service.service_type', function ($query) {
+                    $query->where('main_service', 0);
+                })
+                ->with('service_pricelist')
+                ->latest()
+                ->get();
+            foreach($latest_memberships as $membership){
+                $membership->attendance_count = $membership->attendances->count();
+                $membership->session_count = $membership->service_pricelist->session_count;
+            }
+        
+                return response()->json([
+                    'status'                  => true ,
+                    'data'                    =>  $latest_memberships
+                ],200);
+        }
+
+
+        
     
 }
