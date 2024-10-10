@@ -56,13 +56,13 @@
   // Your web app's Firebase configuration
   // For Firebase JS SDK v7.20.0 and later, measurementId is optional
   const firebaseConfig = {
-    apiKey: "AIzaSyBNQi_ZZJFn7EcGw0iZnl98sdGwTpbRVlU",
-    authDomain: "zfitnessnotifications.firebaseapp.com",
-    projectId: "zfitnessnotifications",
-    storageBucket: "zfitnessnotifications.appspot.com",
-    messagingSenderId: "455938280707",
-    appId: "1:455938280707:web:48f691218c82d1b943ad36",
-    measurementId: "G-C9BNZTNP9X"
+    apiKey: "{{ env('FCM_API_KEY') }}",
+    authDomain: "{{ env('FCM_AUTH_DOMAIN') }}",
+    projectId: "{{ env('FCM_PROJECT_ID') }}",
+    storageBucket: "{{ env('FCM_STORAGE_BUCKET') }}",
+    messagingSenderId: "{{ env('FCM_MESSAGING_SENDER_ID') }}",
+    appId: "{{ env('FCM_APP_ID') }}",
+    measurementId: "{{ env('FCM_MEASUREMENT_ID') }}",
   };
 
   // Initialize Firebase
