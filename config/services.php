@@ -29,5 +29,15 @@ return [
         'secret' => env('AWS_SECRET_ACCESS_KEY'),
         'region' => env('AWS_DEFAULT_REGION', 'us-east-1'),
     ],
+    
+    'firebase' => [
+        'api_key' => env('FCM_API_KEY'),
+        'auth_domain' => env('FCM_AUTH_DOMAIN'),
+        'project_id' => env('FCM_PROJECT_ID'),
+        'storage_bucket' => env('FCM_STORAGE_BUCKET'),
+        'messaging_sender_id' => env('FCM_MESSAGING_SENDER_ID'),
+        'app_id' => env('FCM_APP_ID'),
+        'measurement_id' => env('FCM_MEASUREMENT_ID'),
+    ],
 
 ];
