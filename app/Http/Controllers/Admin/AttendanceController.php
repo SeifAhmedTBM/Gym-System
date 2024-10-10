@@ -674,7 +674,6 @@ class AttendanceController extends Controller
                     'branch_id'             => 'required',
                     // 'sales_by_id'           => 'required',
                 ]);
-
                 $lead = Lead::create([
                     'name'              => $request['name'],
                     'phone'             => $request['phone'],
@@ -684,21 +683,13 @@ class AttendanceController extends Controller
                     'type'              => 'lead',
                     'source_id'         => Source::whereName('invitation')->first()->id ?? Source::firstOrCreate(['name' => 'invitation'])->id,
                 ]);
-                $lead_id=$lead->id;
-
-                $invitation = Invitation::create([
-                    'member_id'         => $membership->member->id,
-                    'lead_id'           => $lead->id,
-                    'membership_id'     => $request['membership_id']
-                ]);
-        }else{
-
-            $invitation = Invitation::create([
-                'member_id'             => $membership->member->id,
-                'lead_id'               => $request['lead_id'],
-                'membership_id'         => $request['membership_id']
-            ]);
+                $lead_id = $lead->id;
         }
+        $invitation = Invitation::create([
+            'member_id'             => $membership->member->id,
+            'lead_id'               => $lead_id,
+            'membership_id'         => $request['membership_id']
+        ]);
 
         $reminder = Reminder::create([
             'type'              => 'sales',
