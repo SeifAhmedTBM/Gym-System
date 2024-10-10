@@ -34,6 +34,9 @@ class AuthController extends Controller
                         ->where('phone', $request['phone'])
                         ->where('member_code', $request['member_code'])
                         ->first();
+        $lead->fcm_token = $request->fcm_token;
+        $lead->save();
+        
         if (!$lead) 
         {
             return response()->json([

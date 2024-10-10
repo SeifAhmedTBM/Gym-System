@@ -67,7 +67,7 @@ class MembershipsApiController extends Controller
 
 
     public function member_ship_statistics(Request $request){
-        $Lead = Lead::where('user_id' , $request->user_id)->first();
+        $Lead = Lead::where('user_id' , $request->user()->id)->first();
 
         $latest_membership = Membership::where('member_id', $Lead->id)->latest()->first();
 
@@ -117,13 +117,14 @@ class MembershipsApiController extends Controller
 
 
         public function get_pt_memberships(Request $request){
-            $Lead = Lead::where('user_id', $request->user_id)->first();
+            
+            $Lead = Lead::where('user_id', $request->user()->id)->first();
 
             $latest_memberships = Membership::where('member_id', $Lead->id)
                 ->whereHas('service_pricelist.service.service_type', function ($query) {
                     $query->where('main_service', 0);
                 })
-                ->with('service_pricelist')
+                ->with(['service_pricelist','trainer'])
                 ->latest()
                 ->get();
             foreach($latest_memberships as $membership){

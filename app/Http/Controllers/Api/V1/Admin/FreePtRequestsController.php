@@ -13,12 +13,12 @@ class FreePtRequestsController extends Controller
 {
 
     public function free_pt(Request $request){
-        $Lead = Lead::where('user_id' , $request->user_id)->first();
+        $Lead = Lead::where('user_id' , $request->user()->id)->first();
 
         $latest_membership = Membership::where('member_id', $Lead->id)->latest()->first();
 
         $previous_request = free_pt_requests::where([
-            ['user_id' , $request->user_id],
+            ['user_id' , $request->user()->id],
             ['membership_id' , $latest_membership->id] 
         ])->first();
          
@@ -37,12 +37,12 @@ class FreePtRequestsController extends Controller
     }
      public function Request_free_pt(Request $request){
 
-        $Lead = Lead::where('user_id' , $request->user_id)->first();
+        $Lead = Lead::where('user_id' , $request->user()->id)->first();
 
         $latest_membership = Membership::where('member_id', $Lead->id)->latest()->first();
 
         $previous_request = free_pt_requests::where([
-            ['user_id' , $request->user_id],
+            ['user_id' , $request->user()->id],
             ['membership_id' , $latest_membership->id]
         ])->first();
          
