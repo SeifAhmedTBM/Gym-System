@@ -251,7 +251,8 @@ return [
         'minor'                         => false,
         'short_reports'                 => false,
         'add_to_class_in_invoice'       => false,
-        'settlement_invoices'           => false
+        'settlement_invoices'           => false,
+        'transactions_date'             => true
     ],
     "http://localhost" => [
         "employees_schedule"            => false,
@@ -293,7 +294,8 @@ return [
         'minor'                         => false,
         'short_reports'                 => false,
         'add_to_class_in_invoice'       => false,
-        'settlement_invoices'           => false
+        'settlement_invoices'           => false,
+        'transactions_date'             => true
     ],
     "https://test.fitclubeg.com" => [
         "employees_schedule"            => false,
@@ -440,25 +442,25 @@ return [
         'settlement_invoices'           => false
     ],
     "http://127.0.0.1:8000" => [
-        "employees_schedule"            => true,
+        "employees_schedule"            => false,
         "timeline_schedule"             => true,
         "due_payment"                   => true,
-        "sessions_count"                => true,
+        "sessions_count"                => false,
         "national_id"                   => false,
         "email"                         => false,
         "vat"                           => false,
-        'profile_attendance'            => false,
-        'profile_attendance_dashboard'  => false,
+        'profile_attendance'            => true,
+        'profile_attendance_dashboard'  => true,
         'sales_by'                      => false,
         'show_schedule_dashboard'       => false,
         'member_code_enabled'           => false,
         'is_reviewed_invoices'          => false,
         'trainer_services_option'       => false,
-        'sports_option'                 => true,
-        'minor'                         => true,
+        'sports_option'                 => false,
+        'minor'                         => false,
         'short_reports'                 => false,
-        'add_to_class_in_invoice'       => true,
-        'transactions_date'             => true
+        'add_to_class_in_invoice'       => false,
+        'settlement_invoices'           => false
     ], // For mini
     "https://minigym.dotapps.net" => [
         "employees_schedule"            => false,

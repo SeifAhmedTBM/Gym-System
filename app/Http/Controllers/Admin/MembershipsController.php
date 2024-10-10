@@ -647,8 +647,8 @@ class MembershipsController extends Controller
 
     public function storeRenew(Request $request)
     {
-        $selected_branch = Auth()->user()->employee->branch ?? $request['branch_id'];
-
+        $selected_branch_id = Auth()->user()->employee->branch ? Auth()->user()->employee->branch : (int)$request['branch_id'];
+//        dd($selected_branch_id);
         try {
             DB::beginTransaction();
             $service_type_id = Pricelist::find($request->service_pricelist_id)->service->service_type_id;
@@ -685,7 +685,7 @@ class MembershipsController extends Controller
                 'service_fee'       => $request['membership_fee'],
                 'net_amount'        => $request->membership_fee - $request->discount_amount,
                 'membership_id'     => $membership->id,
-                'branch_id'         => $selected_branch->id,
+                'branch_id'         => $selected_branch_id,
                 'sales_by_id'       => $request['sales_by_id'],
                 'status'            => ($request->membership_fee - $request->discount_amount) == $request->received_amount ? 'fullpayment' : 'partial',
                 'created_by_id'     => Auth()->user()->id,
@@ -801,7 +801,7 @@ class MembershipsController extends Controller
 
             DB::commit();
         } catch (\Exception $e) {
-            dd($e->getMessage());
+            dd($e);
             DB::rollback();
         }
 
@@ -1534,6 +1534,13 @@ class MembershipsController extends Controller
 
     public function assigned_memberships(Request $request)
     {
+        if (isset($request->q)){
+           $results = Lead::whereType('member')->where('name', 'LIKE', "{$request->q}%")->orWhere('member_code','LIKE',"{$request->q}%")->limit(10)->get();
+            return response()->json($results->map(function($item) {
+                return ['id' => $item->id, 'name' => $item->name,'member_code'=>$item->branch->member_prefix.$item->member_code];
+            }));
+        }
+
         abort_if(Gate::denies('membership_access'), Response::HTTP_FORBIDDEN, '403 Forbidden');
         $data = $request->except(['draw', 'columns', 'order', 'start', 'length', 'search', 'change_language', '_']);
 
@@ -1701,7 +1708,7 @@ class MembershipsController extends Controller
 
         $lockers = Locker::pluck('code', 'id');
 
-        $members = Lead::whereType('member')->whereHas('memberships')->pluck('name', 'id');
+//        $members = Lead::whereType('member')->whereHas('memberships')->pluck('name', 'id');
 
         $sales = User::whereHas('roles', function ($q) {
             $q = $q->whereTitle('sales');
@@ -1719,10 +1726,10 @@ class MembershipsController extends Controller
 
         $memberStatuses = MemberStatus::pluck('name', 'id');
 
-        $members = Lead::whereType('member')->pluck('name', 'id');
+        $members = Lead::whereType('member')->limit(20)->pluck('name', 'id');
 
         $branches = Branch::pluck('name', 'id');
 
-        return view('admin.memberships.assigned_memberships', compact('members', 'locker_statuses', 'lockers', 'members', 'sales', 'services', 'trainers', 'memberStatuses', 'counter', 'service_types', 'branches'));
+        return view('admin.memberships.assigned_memberships', compact( 'locker_statuses', 'lockers', 'members', 'sales', 'services', 'trainers', 'memberStatuses', 'counter', 'service_types', 'branches'));
     }
 }

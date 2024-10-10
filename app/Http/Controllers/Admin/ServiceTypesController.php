@@ -33,12 +33,14 @@ class ServiceTypesController extends Controller
                 $editGate = 'service_type_edit';
                 $deleteGate = 'service_type_delete';
                 $crudRoutePart = 'service-types';
+                $St = true;
 
                 return view('partials.datatablesActions', compact(
                     'viewGate',
                     'editGate',
                     'deleteGate',
                     'crudRoutePart',
+                    'St',
                     'row'
                 ));
             });

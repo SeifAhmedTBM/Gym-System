@@ -31,17 +31,13 @@
                         <th>
                             {{ trans('cruds.expensesCategory.fields.id') }}
                         </th>
-                        <th>
-                            {{trans('cruds.expensesCategory.fields.branch_id')}}
-                        </th>
-                        <th>
-                            {{trans('cruds.expensesCategory.fields.created_at')}}
-                        </th>
-                        <th>
-                            {{trans('cruds.expensesCategory.fields.created')}}
-                        </th>
+                       
+                       
                         <th>
                             {{ trans('cruds.expensesCategory.fields.name') }}
+                        </th>
+                        <th>
+                            Date
                         </th>
                         <th>
                             &nbsp;
@@ -106,6 +102,10 @@
                     {
                         data: 'name',
                         name: 'name'
+                    },
+                    {
+                        data: 'created_at',
+                        name: 'created_at'
                     },
                     {
                         data: 'actions',

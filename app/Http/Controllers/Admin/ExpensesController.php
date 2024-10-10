@@ -29,111 +29,91 @@ class ExpensesController extends Controller
     {
         abort_if(Gate::denies('expense_access'), Response::HTTP_FORBIDDEN, '403 Forbidden');
 
-        $data = $request->except(['draw', 'columns', 'order', 'start', 'length', 'search', 'change_language','_']);
-
+        $data = $request->except(['draw', 'columns', 'order', 'start', 'length', 'search', 'change_language', '_', 'month']);
         $employee = Auth()->user()->employee;
 
         $startOfMonth = Carbon::now()->startOfMonth();
         $endOfMonth = Carbon::now()->endOfMonth();
-        $data['date']['from'] = isset($data['date']['from']) ? $data['date']['from'] : $startOfMonth;
-        $data['date']['to'] = isset($data['date']['to']) ? $data['date']['to'] : $endOfMonth ;
-        
-        if (isset($request->date_1) && $request->date_1 !== '') {
-         
-            $data['date']['from'] = Carbon::createFromFormat('Y-m', $request->date_1)->startOfMonth()->format('Y-m-d');
-            $data['date']['to'] = Carbon::createFromFormat('Y-m', $request->date_1)->endOfMonth()->format('Y-m-d');
+
+        if ($request->has('month')) {
+            $data['date']['from'] = Carbon::createFromFormat('Y-m', $request->month)->startOfMonth()->format('Y-m-d');
+            $data['date']['to'] = Carbon::createFromFormat('Y-m', $request->month)->endOfMonth()->format('Y-m-d');
+        } else {
+            $data['date']['from'] = $data['date']['from'] ?? $startOfMonth->format('Y-m-d');
+            $data['date']['to'] = $data['date']['to'] ?? $endOfMonth->format('Y-m-d');
+        }
+
+        $query = Expense::with(['expenses_category', 'created_by', 'account']);
+
+        if ($request->filled('branch_id')) {
+            $query->whereHas('account', fn($q) => $q->whereBranchId($request->branch_id));
+        }
+
+        $query->whereBetween('date', [$data['date']['from'], $data['date']['to']]);
+
+// dd(isset($request->relations['expenses_category']));
+        if (isset($request->relations['expenses_category']['expenses_category_id'])) {
+            $query->whereIn('expenses_category_id', $request->relations['expenses_category']['expenses_category_id']);
+        }
+        if($request->filled('expenses_category')){
+            $query->where('expenses_category_id', $request->expenses_category);
+        }
+
+        if ($employee && $employee->branch_id) {
+            $query->whereHas('account', fn($q) => $q->whereBranchId($employee->branch_id));
+        }
+        if ($request->filled('account_id')) {
+            $query->whereIn('account_id', $request->account_id);
+        }
+        if ($request->filled('created_by_id')) {
+            $query->whereIn('created_by_id', $request->created_by_id);
+        }
+        if ($request->filled('amount')) {
+            $query->where('amount', $request->amount);
         }
 
         if ($request->ajax()) {
-            if ($employee && $employee->branch_id != NULL) 
-            {
-                $query = Expense::index($data)
-                                    ->with(['expenses_category', 'created_by','account'])
-                                    ->whereHas('account',fn($q) => $q->whereBranchId($employee->branch_id))
-                                    ->select(sprintf('%s.*', (new Expense())->table));
-            }else{
-                $query = Expense::index($data)
-                                    ->with(['expenses_category', 'created_by','account.branch'])
-                                    ->select(sprintf('%s.*', (new Expense())->table));
-            }
-
-            $table = Datatables::eloquent($query);
-
-            $table->addColumn('placeholder', '&nbsp;');
-            $table->addColumn('actions', '&nbsp;');
+            $table = Datatables::eloquent($query)
+                ->addColumn('placeholder', '&nbsp;')
+                ->addColumn('actions', '&nbsp;');
 
             $table->editColumn('actions', function ($row) {
-                $viewGate = 'expense_show';
-                $editGate = 'expense_edit';
-                $deleteGate = 'expense_delete';
-                $crudRoutePart = 'expenses';
-
-                return view('partials.datatablesActions', compact(
-                'viewGate',
-                'editGate',
-                'deleteGate',
-                'crudRoutePart',
-                'row'
-            ));
+                return view('partials.datatablesActions', [
+                    'viewGate' => 'expense_show',
+                    'editGate' => 'expense_edit',
+                    'deleteGate' => 'expense_delete',
+                    'crudRoutePart' => 'expenses',
+                    'row' => $row
+                ]);
             });
 
-            $table->editColumn('id', function ($row) {
-                return $row->id ? $row->id : '';
-            });
+            $table->editColumn('id', fn($row) => $row->id ?? '');
+            $table->editColumn('name', fn($row) => $row->name ?? '');
+            $table->addColumn('account_name', fn($row) => $row->account ? $row->account->name : '');
+            $table->editColumn('amount', fn($row) => $row->amount ?? '');
+            $table->addColumn('expenses_category_name', fn($row) => $row->expenses_category ? $row->expenses_category->name : '');
+            $table->addColumn('created_by_name', fn($row) => $row->created_by ? $row->created_by->name : '');
+            $table->addColumn('branch_name', fn($row) => $row->account && $row->account->branch ? $row->account->branch->name : '-');
+            $table->editColumn('created_at', fn($row) => $row->created_at ? $row->created_at->toFormattedDateString() . ' , ' . $row->created_at->format('g:i A') : '');
 
-            $table->editColumn('name', function ($row) {
-                return $row->name ? $row->name : '';
-            });
-
-            $table->addColumn('account_name', function ($row) {
-                return $row->account_id ? $row->account->name : '';
-            });
-
-            $table->editColumn('amount', function ($row) {
-                return $row->amount ? $row->amount : '';
-            });
-
-            $table->addColumn('expenses_category_name', function ($row) {
-                return $row->expenses_category ? $row->expenses_category->name : '';
-            });
-
-            $table->addColumn('created_by_name', function ($row) {
-                return $row->created_by ? $row->created_by->name : '';
-            });
-
-            $table->addColumn('branch_name', function ($row) {
-                return $row->account && $row->account->branch ? $row->account->branch->name : '-';
-            });
-
-            $table->editColumn('created_at', function ($row) {
-                return $row->created_at ? $row->created_at->toFormattedDateString() . ' , ' . $row->created_at->format('g:i A') : '';
-            });
-
-            $table->rawColumns(['actions', 'placeholder', 'expenses_category', 'created_by','account_name','branch_name']);
+            $table->rawColumns(['actions', 'placeholder', 'expenses_category', 'created_by', 'account_name', 'branch_name']);
 
             return $table->make(true);
         }
-
-        $expenses_categories = ExpensesCategory::pluck('name','id');
-
-        $accounts = Account::orderBy('name')->pluck('name','id');
-
-        $users = User::whereHas('employee')->orderBy('name')->pluck('name','id');
-
-        $branches = Branch::pluck('name','id');
-
-
-        
-        if ($employee && $employee->branch_id != NULL) 
-        {
-            $expenses = Expense::index($data)->whereHas('account',fn($q) => $q->whereBranchId($employee->branch_id));
-          
+        $status = false;
+        if($request->filled('expenses_category')) {
+        $expenses_categories = ExpensesCategory::where('id',$request->expenses_category)->pluck('name', 'id');
+        $status = true;
         }else{
-            $expenses = Expense::index($data);
-
+        $expenses_categories = ExpensesCategory::pluck('name', 'id');
         }
-    
-        return view('admin.expenses.index',compact('expenses_categories','users','accounts','expenses','branches'));
+        $accounts = Account::orderBy('name')->pluck('name', 'id');
+        $users = User::whereHas('employee')->orderBy('name')->pluck('name', 'id');
+        $branches = Branch::pluck('name', 'id');
+
+        $expenses = $query->get();
+
+        return view('admin.expenses.index', compact('status','expenses_categories', 'users', 'accounts', 'expenses', 'branches'));
     }
 
 
@@ -146,28 +126,51 @@ class ExpensesController extends Controller
     public function expenses_categories(Request $request)
     {
         $branches = Branch::get();
- 
+
         $branchId = $request->input('branch_id');
-        $account = Account::where('branch_id' , $branchId)->first();
-        
-        if($request->input('date')){
-            $date = $request->input('date');
-        }
-        else{
-            $date = date('Y-m');
-        }
+        $selectedCategoryId = $request->input('expenses_category_id');
+        $account = Account::where('branch_id', $branchId)->first();
+        $date = $request->input('date') ?? date('Y-m');
+
+        $expenses_categories_list = ExpensesCategory::with('expenses.account.branch')
+            ->where('name', '!=', 'Salary')->get();
+
+
         $expenses_categories = ExpensesCategory::with('expenses.account.branch')
-            ->get();
-    
+            ->where('name', '!=', 'Salary');
+
+        $expenses = Expense::query();
+
+        if ($branchId) {
+            $expenses->whereHas('account', function ($query) use ($branchId) {
+                $query->where('branch_id', $branchId);
+            });
+        }
+
+        if ($selectedCategoryId) {
+            $expenses->where('expenses_category_id', $selectedCategoryId);
+        }
+
+        if ($date) {
+            $expenses->whereMonth('created_at', date('m', strtotime($date)))
+                ->whereYear('created_at', date('Y', strtotime($date)));
+        }
+
+        $filtered_expenses = $expenses->get();
+        if($selectedCategoryId){
+            $expenses_categories->where('id'  , $selectedCategoryId);
+        }
+        $expenses_categories = $expenses_categories->get();
+
         foreach ($expenses_categories as $category) {
-            $category->total_amount = $category->expensesCount($category->id, $branchId, $date);
+            $category->total_amount = $category->expensesCount($category->id, $branchId, $date );
         }
 
         $total_expenses = $expenses_categories->sum('total_amount');
 
-        return view('admin.expenses.categories',compact('expenses_categories' ,'branches' , 'branchId' ,'account' ,'date' ,'total_expenses'));
-  
+        return view('admin.expenses.categories', compact('expenses_categories_list','expenses_categories', 'branches', 'branchId', 'account', 'date', 'total_expenses', 'selectedCategoryId', 'filtered_expenses'));
     }
+
 
 
     public function expenses_categories_show_by_filter(Request $request){
@@ -182,13 +185,11 @@ class ExpensesController extends Controller
         if ($request->account_id) {
             $query->whereHas('account', fn($q) => $q->whereBranchId($request->account_id));
         }
-    
+
         $expenses = $query
             ->whereBetween('created_at', [$data['date']['from'], $data['date']['to']])
             ->where('expenses_category_id', $request->expenses_category_id)
             ->get();
-    
-       
 
         $expenses_categories = ExpensesCategory::pluck('name','id');
 
@@ -197,10 +198,8 @@ class ExpensesController extends Controller
         $users = User::whereHas('employee')->orderBy('name')->pluck('name','id');
 
         $branches = Branch::pluck('name','id');
-        
-        return view('admin.expenses.categories_filter',compact('expenses_categories' ,'branches' , 'users' ,'accounts' ,'expenses'));
 
-        
+        return view('admin.expenses.categories_filter',compact('expenses_categories' ,'branches' , 'users' ,'accounts' ,'expenses'));
 
     }
 

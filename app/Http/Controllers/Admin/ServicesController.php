@@ -26,9 +26,14 @@ class ServicesController extends Controller
     public function index(Request $request)
     {
         abort_if(Gate::denies('service_access'), Response::HTTP_FORBIDDEN, '403 Forbidden');
-
         if ($request->ajax()) {
-            $query = Service::with(['service_type'])->select(sprintf('%s.*', (new Service())->table));
+            $query = Service::with(['service_type']);
+            if ($request->St){
+            $query = $query->whereHas('service_type', function ($query) use ($request) {
+                $query->where('id', $request->St);
+            });
+            }
+            $query = $query->select(sprintf('%s.*', (new Service())->getTable()));
             $table = Datatables::of($query);
 
             $table->addColumn('placeholder', '&nbsp;');

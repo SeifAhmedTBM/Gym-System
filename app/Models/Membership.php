@@ -95,6 +95,7 @@ class Membership extends Model
     {
         return $this->belongsTo(User::class, 'trainer_id');
     }
+    
 
     public function service_pricelist()
     {
@@ -222,4 +223,6 @@ class Membership extends Model
     {
         return $this->belongsTo(Sport::class, 'sport_id', 'id');
     }
+
+   
 }

@@ -144,7 +144,7 @@
                 retrieve: true,
                 searching:true,
                 aaSorting: [],
-                ajax: "{{ route('admin.refunds.index',request()->all()) }}",
+                ajax: "{!! route('admin.refunds.index',request()->all()) !!}",
                 columns: [{
                         data: 'placeholder',
                         name: 'placeholder'

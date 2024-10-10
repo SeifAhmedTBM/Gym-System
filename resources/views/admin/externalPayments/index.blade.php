@@ -19,7 +19,7 @@
                         'account_id'    => ['label' => 'Account', 'type' => 'select' , 'data' => $accounts , 'related_to' => 'account'],
                         'branch_id'     => ['label' => 'Branch', 'type' => 'select', 'data' => $branches,'related_to' => 'account'],
                         'external_payment_category_id'    => ['label' => 'External Payment Category', 'type' => 'select' , 'data' => $external_payment_categories , 'related_to' => 'external_payment_category'],
-                        'invoice_id'    => ['label' => 'Invoice', 'type' => 'number'],
+//                        'invoice_id'    => ['label' => 'Invoice', 'type' => 'number'],
                         'created_by_id' => ['label' => 'Created By', 'type' => 'select' , 'data' => $created_bies],
                         'created_at'    => ['label' => 'Created at', 'type' => 'date', 'from_and_to' => true]
                     ],

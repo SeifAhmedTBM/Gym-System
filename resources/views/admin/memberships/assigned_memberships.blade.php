@@ -16,7 +16,7 @@
                         'phone'             => ['label' => 'Member Phone', 'type' => 'number', 'related_to' => 'member'],
                         'member_code'       => ['label' => 'Member Code', 'type' => 'text', 'related_to' => 'member'],
                         // 'email' => ['label' => 'Member Email', 'type' => 'email', 'related_to' => 'member.user'],
-                        'member_id'         => ['label' => 'Member', 'type' => 'select', 'data' => $members],
+                        'member_id'         => ['label' => 'Select Member', 'type' => 'select', 'data' => $members],
                         'sales_by_id'       => ['label' => 'Sales By', 'type' => 'select', 'data' => $sales],
                         'trainer_id'        => ['label' => 'Trainer', 'type' => 'select', 'data' => $trainers],
                         'service_pricelist_id' => ['label' => 'Service', 'type' => 'select', 'data' => $services],
@@ -39,8 +39,12 @@
                     </a>
                 @endcan
 
-                <button type="button" data-toggle="modal" data-target="#sendReminder" class="btn btn-dark"><i
-                        class="fa fa-plus-circle"></i> Reminder</button>
+                    @if (auth()->user()->roles[0]->title != 'Sales' || auth()->user()->roles[0]->title != 'Sales Manager')
+                        <a class="btn btn-dark" href="javascript:void(0)" data-toggle="modal"
+                           data-target="#trainer_reminder">
+                            <i class="fa fa-phone"></i> &nbsp; Add Trainer Reminder
+                        </a>
+                    @endif
             </div>
             @can('membership_counter')
                 <div class="col-lg-3 col-md-3 col-sm-12 col-xs-12">
@@ -53,7 +57,7 @@
                 </div>
             @endcan
         </div>
-    
+
     <div class="card">
         <div class="card-header">
             {{ trans('cruds.membership.title_singular') }} {{ trans('global.list') }}
@@ -126,66 +130,203 @@
         </div>
     </div>
 
-    {{-- <div class="modal fade" id="sendReminder" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-        <form action="{{ route('admin.reminder.expiredMemberships') }}" method="post" enctype="multipart/form-data">
-            @csrf
-            <div class="modal-dialog">
+{{--    --}}{{-- <div class="modal fade" id="sendReminder" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">--}}
+{{--        <form action="{{ route('admin.reminder.expiredMemberships') }}" method="post" enctype="multipart/form-data">--}}
+{{--            @csrf--}}
+{{--            <div class="modal-dialog">--}}
+{{--                <div class="modal-content">--}}
+{{--                    <div class="modal-header">--}}
+{{--                        <h5 class="modal-title" id="exampleModalLabel">{{ trans('cruds.reminder.fields.action') . ' ' }}--}}
+{{--                        </h5>--}}
+{{--                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">--}}
+{{--                            <span aria-hidden="true">&times;</span>--}}
+{{--                        </button>--}}
+{{--                    </div>--}}
+{{--                    <div class="modal-body">--}}
+{{--                        <div class="form-group">--}}
+{{--                            <label for="member_status_id">{{ trans('cruds.status.title_singular') }}</label>--}}
+{{--                            <select name="member_status_id" id="member_status_id" class="form-control">--}}
+{{--                                <option>Select</option>--}}
+{{--                                @foreach ($memberStatuses as $id => $name)--}}
+{{--                                    <option value="{{ $id }}">{{ $name }}</option>--}}
+{{--                                @endforeach--}}
+{{--                            </select>--}}
+{{--                        </div>--}}
+{{--                        <div class="form-group">--}}
+{{--                            <label for="due_date">{{ trans('global.due_date') }}</label>--}}
+{{--                            <input type="date" name="due_date" id="due_date" class="form-control" value="">--}}
+{{--                        </div>--}}
+
+{{--                        <div class="form-group">--}}
+{{--                            <label for="member_ids">{{ trans('cruds.member.title_singular') }}</label>--}}
+{{--                            <div style="padding-bottom: 4px">--}}
+{{--                                <span class="btn btn-info btn-xs select-all"--}}
+{{--                                    style="border-radius: 0">{{ trans('global.select_all') }}</span>--}}
+{{--                                <span class="btn btn-info btn-xs deselect-all"--}}
+{{--                                    style="border-radius: 0">{{ trans('global.deselect_all') }}</span>--}}
+{{--                            </div>--}}
+{{--                            <select name="member_ids[]" id="member_ids" class="form-control select2" multiple="">--}}
+{{--                                @foreach ($members as $member_id => $member_name)--}}
+{{--                                    <option value="{{ $member_id }}">{{ $member_name }}</option>--}}
+{{--                                @endforeach--}}
+{{--                            </select>--}}
+{{--                        </div>--}}
+
+{{--                        <div class="form-group">--}}
+{{--                            <label for="notes">{{ trans('cruds.lead.fields.notes') }}</label>--}}
+{{--                            <textarea name="notes" id="notes" rows="7" class="form-control"></textarea>--}}
+{{--                        </div>--}}
+{{--                    </div>--}}
+{{--                    <div class="modal-footer">--}}
+{{--                        <button type="button" class="btn btn-danger" data-dismiss="modal"><i class="fa fa-times-circle"></i>--}}
+{{--                            Close</button>--}}
+{{--                        <button type="submit" class="btn btn-success"><i class="fa fa-check-circle"></i> Confirm</button>--}}
+{{--                    </div>--}}
+{{--                </div>--}}
+{{--            </div>--}}
+{{--        </form>--}}
+{{--    </div> --}}
+
+        <div class="modal fade" id="trainer_reminder" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-lg" role="document">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h5 class="modal-title" id="exampleModalLabel">{{ trans('cruds.reminder.fields.action') . ' ' }}
-                        </h5>
+                        <h5 class="modal-title">Trainer Reminder</h5>
                         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                             <span aria-hidden="true">&times;</span>
                         </button>
                     </div>
-                    <div class="modal-body">
-                        <div class="form-group">
-                            <label for="member_status_id">{{ trans('cruds.status.title_singular') }}</label>
-                            <select name="member_status_id" id="member_status_id" class="form-control">
-                                <option>Select</option>
-                                @foreach ($memberStatuses as $id => $name)
-                                    <option value="{{ $id }}">{{ $name }}</option>
-                                @endforeach
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label for="due_date">{{ trans('global.due_date') }}</label>
-                            <input type="date" name="due_date" id="due_date" class="form-control" value="">
-                        </div>
-
-                        <div class="form-group">
-                            <label for="member_ids">{{ trans('cruds.member.title_singular') }}</label>
-                            <div style="padding-bottom: 4px">
-                                <span class="btn btn-info btn-xs select-all"
-                                    style="border-radius: 0">{{ trans('global.select_all') }}</span>
-                                <span class="btn btn-info btn-xs deselect-all"
-                                    style="border-radius: 0">{{ trans('global.deselect_all') }}</span>
+                    <form id="trainer-reminder-form" action="" method="post" class="trainer_reminder_form">
+                        @csrf
+                        <div class="modal-body">
+                            <div class="alert alert-info font-weight-bold">
+                                <i class="fa fa-exclamation-circle"></i> {{ trans('global.if_empty_due_date') }} .
                             </div>
-                            <select name="member_ids[]" id="member_ids" class="form-control select2" multiple="">
-                                @foreach ($members as $member_id => $member_name)
-                                    <option value="{{ $member_id }}">{{ $member_name }}</option>
-                                @endforeach
-                            </select>
+                            <div>
+                                @if (Auth()->user()->roles[0]->title == 'Trainer')
+                                    <input type="hidden" name="trainer_id" value="{{ auth()->id() }}">
+                                @else
+                                    <div class="form-group">
+                                        <label for="trainer_id">Trainer</label>
+                                        <select name="trainer_id" class="form-control" required>
+                                            <option value="{{ null }}">Select Trainer</option>
+                                            @foreach (App\Models\User::whereRelation('roles', 'title', 'Trainer')->orderBy('name')->pluck('name', 'id') as $trainer_id => $trainer_name)
+                                                <option value="{{ $trainer_id }}">{{ $trainer_name }}</option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+                                @endif
+                                <div class="form-group">
+                                    <label for="member_id">Member</label>
+                                    <input type="text" id="member-search" class="form-control" placeholder="Search Member" autocomplete="off" required>
+                                    <input type="hidden" name="member_id" id="member_id" value="">
+                                    <div id="search-results" class="mt-2"></div>
+                                </div>
+                                <div class="form-group">
+                                    <label for="action">Action</label>
+                                    <select name="action" id="action" class="form-control" required>
+                                        <option value="{{ null }}">Select Action</option>
+                                        @foreach (App\Models\Reminder::ACTION as $key => $value)
+                                            @if($key!='not_interested'&&$key!='done')
+                                            <option value="{{ $key }}">{{ $value }}</option>
+                                            @endif
+                                        @endforeach
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-group d-none" id="due_con">
+                                <label for="due_date">{{ trans('cruds.reminder.fields.next_due_date') }}</label>
+                                <input type="date" name="due_date" id="due_date" class="form-control" value="{{ date('Y-m-d') }}">
+                            </div>
+                            <div class="form-group">
+                                <label for="notes">{{ trans('cruds.lead.fields.notes') }}</label>
+                                <textarea name="notes" id="notes" rows="7" class="form-control"></textarea>
+                            </div>
                         </div>
-
-                        <div class="form-group">
-                            <label for="notes">{{ trans('cruds.lead.fields.notes') }}</label>
-                            <textarea name="notes" id="notes" rows="7" class="form-control"></textarea>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+                            <button type="submit" class="btn btn-primary">Save changes</button>
                         </div>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-danger" data-dismiss="modal"><i class="fa fa-times-circle"></i>
-                            Close</button>
-                        <button type="submit" class="btn btn-success"><i class="fa fa-check-circle"></i> Confirm</button>
-                    </div>
+                    </form>
                 </div>
             </div>
-        </form>
-    </div> --}}
-
+        </div>
 @endsection
 @section('scripts')
     @parent
+
+    <script>
+        const action = document.getElementById('action');
+        action.onchange = () => {
+            const dueDateInput = document.getElementById('due_date');
+            const dueDateCon = document.getElementById('due_con');
+            if (action.value != 'not_interested' && action.value != 'done' && action.value != '') {
+                if (action.value == 'no_answer') {
+                    dueDateInput.value = "{{ date('Y-m-d', strtotime('+1 Day')) }}";
+                } else {
+                    dueDateInput.value = "{{ date('Y-m-d') }}";
+                }
+                dueDateCon.classList.remove('d-none');
+            }else{
+                dueDateInput.value='';
+                dueDateCon.classList.add('d-none');
+            }
+        };
+        $(document).ready(function() {
+            $('#member-search').on('input', function() {
+                let query = $(this).val();
+                if (query.length > 1) {
+                    $.ajax({
+                        url: `/admin/assigned-memberships?q=${query}`,
+                        method: 'GET',
+                        data: { query: query },
+                        success: function(data) {
+                            let resultsHtml = '';
+                            if (data.length > 0) {
+                                resultsHtml = '<ul class="list-group" style="cursor: pointer">';
+                                data.forEach(function(member) {
+                                    resultsHtml += `<li class="list-group-item result-item" data-id="${member.id}">${member.name} <span class="font-sm text-primary">${member.member_code}</span></li>`;
+                                });
+                                resultsHtml += '</ul>';
+                            } else {
+                                resultsHtml = '<p>No results found</p>';
+                            }
+
+                            $('#search-results').html(resultsHtml);
+                        },
+                        error: function() {
+                            $('#search-results').html('<p>No results found</p>');
+                        }
+                    });
+                } else {
+                    $('#search-results').empty();
+                }
+            });
+            $('#member-search').on('click', function() {
+                $('#member-search').val('');
+                $('#member_id').val('');
+                $('#search-results').empty();
+            });
+
+            $(document).on('click', '.result-item', function() {
+                let memberId = $(this).data('id');
+                let memberName = $(this).text();
+                $('#member-search').val(memberName);
+                $('#member_id').val(memberId);
+                $('#search-results').empty();
+            });
+        });
+        $(document).ready(function() {
+            $('#trainer-reminder-form').on('submit', function(event) {
+                event.preventDefault();
+                let memberId = $('#member_id').val();
+                    let actionUrl = `{{ route('admin.take-trainer-reminder', ['member' => ':memberId']) }}`.replace(':memberId', memberId);
+                    $(this).attr('action', actionUrl);
+                    this.submit();
+
+            });
+        });
+    </script>
     <script>
         $(function() {
             $("#lockers").css('display', 'none');
@@ -200,13 +341,13 @@
             //     var ids = $.map(dt.rows({ selected: true }).data(), function (entry) {
             //     return entry.id
             //     });
-            
+
             //     if (ids.length === 0) {
             //     alert('{{ trans('global.datatables.zero_selected') }}')
-            
+
             //     return
             //     }
-            
+
             //     if (confirm('{{ trans('global.areYouSure') }}')) {
             //     $.ajax({
             //     headers: {'x-csrf-token': _token},
@@ -324,4 +465,34 @@
 
         });
     </script>
+        <script>
+
+            $(document).ready(function() {
+                $('#Select-Member').select2({
+                    ajax: {
+                        url: '{{ route("admin.assigned-memberships") }}',
+                        dataType: 'json',
+                        delay: 150,
+                        data: function (params) {
+                            return {
+                                q: params.term
+                            };
+                        },
+                        processResults: function (data) {
+                            return {
+                                results: $.map(data, function (item) {
+                                    return {
+                                        id: item.id,
+                                        text: item.name
+                                    };
+                                })
+                            };
+                        },
+                        cache: true
+                    },
+                    placeholder: 'Select an option',
+                    minimumInputLength: 1
+                });
+            });
+        </script>
 @endsection

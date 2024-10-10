@@ -6,12 +6,17 @@ use App\Models\Lead;
 use App\Models\User;
 use App\Models\Setting;
 use App\Models\Membership;
+use App\Models\MobileSetting;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Validator;
 
 class AuthController extends Controller
 {
+    private $setting;
+    public function __construct(){
+        $this->setting = MobileSetting::all()->first();
+    }
     public function login(Request $request)
     {
         $validatedData = Validator::make($request->all(), [
@@ -111,16 +116,19 @@ class AuthController extends Controller
             ],403);
         }
 
-        $memberships = Membership::with(['service_pricelist'])
+        $memberships_query = Membership::with(['service_pricelist','invoice'])
                         ->withCount('attendances')
                         ->withSum('freezeRequests','freeze')
-                        ->whereMemberId($member->id)
-                        ->get();
+                        ->whereMemberId($member->id);
+                        //->get();
+        $memberships = $memberships_query->get();
+        $current_membership =$memberships_query->whereIn('status',['current','pending'])->first();
     
         return response()->json([
             'message'=>'Successfully',
             'data'=>[
                 'member'        => $member,
+                'current_membership'=>$current_membership,
                 'memberships'   => $memberships,
             ]
         ],200);
@@ -207,17 +215,20 @@ class AuthController extends Controller
         $member = auth('sanctum')->user()->lead;
 
         $membership = $member->memberships()
+            ->whereHas('service_pricelist.service', function ($query) {
+                $query->where('service_type_id', $this->setting->pt_service_type);
+            })
             ->with(['trainer' => function ($query) {
                 $query->withSum('ratings', 'rate')->withCount('ratings');
             }])
+            ->whereIn('status', ['current','pending'])
             ->latest()
             ->first();
-
         if (!$membership) {
-            return response()->json(['message' => 'Current membership is expired'], 402);
+            return response()->json(['message' => 'Current membership is expired','data'=>null], 402);
         }
 
-        return response()->json(['message'=>'completed','data'=>['trainer' => $membership->trainer]], 200);
+        return response()->json(['message'=>'completed','data'=>['trainer' => $membership->trainer,'membership'=>$membership    ]], 200);
     }
 
     public function contact()

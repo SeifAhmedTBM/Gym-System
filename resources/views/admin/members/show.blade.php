@@ -173,6 +173,7 @@
                 </div>
             @endif
         @endcan
+        
 
         @isset($main_membership)
             @foreach ($main_membership->service_pricelist->serviceOptionsPricelist as $service_option)

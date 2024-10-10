@@ -48,7 +48,6 @@ table.dataTable thead th {
     /* width: 100% !important; */
     display: inline!important;
 }
-
 .select2-container{
     z-index:100000;
 }
@@ -222,3 +221,4 @@ select.form-control {
 select.form-control option {
     color: black !important;
 }
+

@@ -14,11 +14,29 @@ use Symfony\Component\HttpFoundation\Response;
 class ScheduleApiController extends Controller
 {
     public function index()
-    {
-        abort_if(Gate::denies('schedule_access'), Response::HTTP_FORBIDDEN, '403 Forbidden');
+{
+    try {
+       
+        $schedules = Schedule::with(['session', 'timeslot', 'trainer'])->get();
 
-        return new ScheduleResource(Schedule::with(['session', 'timeslot', 'trainer'])->get());
+ 
+        return response()->json([
+            'success' => "successfully",
+            'data' => new ScheduleResource($schedules),
+        ], Response::HTTP_OK);
+
+    } catch (\Exception $e) {
+        
+        \Log::error($e->getMessage());
+
+      
+        return response()->json([
+            'success' => "Failed",
+            'message' => 'Failed to retrieve schedules.',
+            'error' => $e->getMessage(),
+        ], Response::HTTP_INTERNAL_SERVER_ERROR);
     }
+}
 
     public function store(StoreScheduleRequest $request)
     {

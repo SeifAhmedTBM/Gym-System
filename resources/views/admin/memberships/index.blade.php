@@ -198,7 +198,7 @@
                 retrieve: true,
                 searching:true,
                 aaSorting: [],
-                ajax: "{{ route('admin.memberships.index', request()->all()) }}",
+                ajax: "{!! route('admin.memberships.index', request()->all()) !!}",
                 columns: [{
                         data: 'placeholder',
                         name: 'placeholder'

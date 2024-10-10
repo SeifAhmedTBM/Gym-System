@@ -58,8 +58,12 @@ class AttendanceController extends Controller
                                         ])
                                         ->latest()
                                     ])
-                            ->where('member_code',$request['membership_id'])
-                            ->orWhere('card_number',$request['membership_id'])
+                            ->where('branch_id',$request['member_branch_id'])
+                            ->where(function($q) use ($request){
+
+                                return $q->where('member_code',$request['membership_id'])
+                                ->orWhere('card_number',$request['membership_id']);
+                            })
                             ->firstOr(function(){
                                     session()->flash('user_invalid', trans('global.member_is_not_found'));
                                     return back();
@@ -103,30 +107,35 @@ class AttendanceController extends Controller
                 ->first(); 
             }
             
-            $active_memberships = $member->memberships()->whereNotIn('status',['expired','refunded'])->orderBy('start_date','asc')->get();
-            $group_session_flag = 0;
-            $sessions_flag = 0;
-            $non_sessions_flag = 0;
-            $membership_array = [];
-            foreach($active_memberships as $active_membership){
-                if($active_membership->service_pricelist->service->service_type->session_type == 'non_sessions'){
-                    if($non_sessions_flag == 0){
-                        array_push($membership_array,$active_membership->id);
-                        $non_sessions_flag = 1;
-                    }
-                }elseif($active_membership->service_pricelist->service->service_type->session_type == 'group_sessions'){
-                    if($group_session_flag == 0){
-                        array_push($membership_array,$active_membership->id);
-                        $group_session_flag = 1;
-                    }
-                }else{
-                    if($sessions_flag == 0){
-                        array_push($membership_array,$active_membership->id);
-                        $sessions_flag = 1;
-                    }
-                }  
-            }
-            $active_memberships = Membership::whereIn('id',$membership_array)->get();
+            $active_memberships = $member->memberships()
+                ->whereNotIn('status',['expired','refunded'])
+                ->orderBy('start_date','asc')->get();
+
+
+
+            // $group_session_flag = 0;
+            // $sessions_flag = 0;
+            // $non_sessions_flag = 0;
+            // $membership_array = [];
+            // foreach($active_memberships as $active_membership){
+            //     if($active_membership->service_pricelist->service->service_type->session_type == 'non_sessions'){
+            //         if($non_sessions_flag == 0){
+            //             array_push($membership_array,$active_membership->id);
+            //             $non_sessions_flag = 1;
+            //         }
+            //     }elseif($active_membership->service_pricelist->service->service_type->session_type == 'group_sessions'){
+            //         if($group_session_flag == 0){
+            //             array_push($membership_array,$active_membership->id);
+            //             $group_session_flag = 1;
+            //         }
+            //     }else{
+            //         if($sessions_flag == 0){
+            //             array_push($membership_array,$active_membership->id);
+            //             $sessions_flag = 1;
+            //         }
+            //     }  
+            // }
+            // $active_memberships = Membership::whereIn('id',$membership_array)->get();
 
             $last_note = $member->notes()->latest()->first();
 
@@ -735,6 +744,7 @@ class AttendanceController extends Controller
 
     public function takeManualAttend(Request $request,$id)
     {
+        
         $membership = Membership::with('attendances')->findOrFail($id);
 
         $last_attend    = $membership->attendances()->whereDate('created_at',date('Y-m-d'))->latest()->first();
@@ -756,7 +766,8 @@ class AttendanceController extends Controller
                     'membership_status' => $membership->status
                 ]);
             }
-        }else{
+        }
+        else{
             $attend = MembershipAttendance::create([
                 'sign_in'                   => $request['time'],
                 'sign_out'                  => $request['time'],

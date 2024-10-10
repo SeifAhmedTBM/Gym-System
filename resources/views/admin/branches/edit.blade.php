@@ -89,6 +89,15 @@
                         </div>
                     </div>
                 </div>
+                <div class="col-md-6">
+                    <label for="online_account_id">Online Account</label>
+                    <select name="online_account_id" id="online_account_id" class="form-control select2">
+                        <option value="{{ NULL }}"  selected>{{ trans('global.pleaseSelect') }}</option>
+                        @foreach ($branch->accounts as $account)
+                            <option value="{{ $account->id }}" {{ $branch->online_account_id == $account->id ? 'selected' : '' }}>{{ $account->name }}</option>
+                        @endforeach
+                    </select>
+                </div>
             </div>
             
             <div class="form-group">

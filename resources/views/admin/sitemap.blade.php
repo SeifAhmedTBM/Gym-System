@@ -127,9 +127,8 @@
                             <ul class="list-unstyled mt-3">
                                 <li>
                                     <a href="{{ route('admin.reports.sales-daily-report') }}">
-                                        Daily Sales Report
+                                        Sales Branch Report
                                     </a>
-                                    <span class="badge badge-danger">NEW</span>
                                 </li>
                                 @can('view_sales_report')
                                     <li>
@@ -139,9 +138,8 @@
                                 @endcan
                                 @can('view_sales_report')
                                     <li>
-                                        <a href="{{ route('admin.reports.previous-month-reports') }}">{{ trans('global.previous_month_report') }}
+                                        <a href="{{ route('admin.reports.previous-month-reports') }}">{{ trans('global.analysis_report') }}
                                         </a>
-                                        <span class="badge badge-danger">NEW</span>
                                     </li>
                                 @endcan
                                 @can('view_guest_log_report')
@@ -152,7 +150,7 @@
 
                                 @can('view_daily_task_report')
                                     <li>
-                                        <a href="{{ route('admin.reports.daily-task-report') }}">Daily Task Report</a>
+                                        <a href="{{ route('admin.reports.daily-task-report') }}">Sales Task Report</a>
                                     </li>
                                 @endcan
 
@@ -272,14 +270,12 @@
                                         <li>
                                             <a href="{{ route('admin.reports.sales_due_payments') }}">Sales Due Payments</a>
 
-                                            <span class="badge badge-danger">NEW</span>
                                         </li>
                                     @endcan
                                     @can('due_payments_report')
 
                                         <li>
                                             <a href="{{ route('admin.reports.trainer_due_payments') }}">Trainer Due Payments</a>
-                                        <span class="badge badge-danger">NEW</span>
                                         </li>
                                     @endcan
 
@@ -317,7 +313,6 @@
                                 @can('expense_access')
                                     <li>
                                         <a href="{{ route('admin.expenses_categories') }}">Expenses Categories</a>
-                                        <span class="badge badge-danger">NEW</span>
                                     </li>
                                 @endcan 
                             </ul>
@@ -329,9 +324,8 @@
                                 @can('view_daily_trainer_report')
                                     <li>
                                         <a href="{{ route('admin.reports.trainer-daily-report') }}">
-                                            Daily Trainer Report
+                                            Branch Trainer Report
                                         </a>
-                                        <span class="badge badge-danger">NEW</span>
                                     </li>
                                 @endcan
 
@@ -340,7 +334,6 @@
                                         <a href="{{ route('admin.reports.fitness-manager-report') }}">
                                             Fitness Managers Report
                                         </a>
-                                        <span class="badge badge-danger">NEW</span>
                                     </li>
                                 @endcan
 
@@ -387,7 +380,6 @@
                                         <a href="{{ route('admin.reports.pt-attendances-report') }}">
                                             PT Attendances Report
                                         </a>
-                                        <span class="badge badge-danger">NEW</span>
                                     </li>
                                 @endcan
                             </ul>

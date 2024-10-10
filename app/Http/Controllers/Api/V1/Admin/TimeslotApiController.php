@@ -15,9 +15,25 @@ class TimeslotApiController extends Controller
 {
     public function index()
     {
-        abort_if(Gate::denies('timeslot_access'), Response::HTTP_FORBIDDEN, '403 Forbidden');
-
-        return new TimeslotResource(Timeslot::all());
+        
+        try {
+           
+            $timeslots = Timeslot::all();
+    
+            return response()->json([
+                'success' => "successfully",
+                'data' => new TimeslotResource($timeslots),
+            ], Response::HTTP_OK);
+    
+        } catch (\Exception $e) {
+            \Log::error($e->getMessage());
+    
+            return response()->json([
+                'success' => "Failed",
+                'message' => 'Failed to retrieve timeslots.',
+                'error' => $e->getMessage(),
+            ], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
     }
 
     public function store(StoreTimeslotRequest $request)

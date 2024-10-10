@@ -174,7 +174,7 @@
                 retrieve: true,
                 searching:true,
                 aaSorting: [],
-                ajax: "{{ route('admin.membership-attendances.index',request()->all()) }}",
+                ajax: "{!! route('admin.membership-attendances.index',request()->all()) !!}",
                 columns: [{
                         data: 'placeholder',
                         name: 'placeholder'

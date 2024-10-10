@@ -59,6 +59,13 @@
                     'type' => '',
                 ],
                 [
+                    'can' => 'membership_attendance_create',
+                    'title' => 'Take sessions/clasess Attendance',
+                    'imageUrl' => 'attendance.png',
+                    'linkUrl' => 'attendance_take.index',
+                    'type' => '',
+                ],
+                [
                     'can' => 'refund_create',
                     'title' => 'Add Refund Request',
                     'imageUrl' => 'refund_icon.png',
@@ -122,12 +129,20 @@
                     'type' => '',
                 ],
                 [
-                    'can' => 'view_transfer_sales_data',
-                    'title' => 'My Tasks',
+                    'can' => 'all_tasks_access',
+                    'title' => 'Tasks List',
                     'imageUrl' => 'tasks_icons.png',
                     'linkUrl' => 'admin.tasks.index',
                     'type' => '',
                 ],
+                [
+                    'can' => 'task_access',
+                    'title' => 'My Tasks',
+                    'imageUrl' => 'tasks_icons.png',
+                    'linkUrl' => 'admin.tasks.my-tasks',
+                    'type' => '',
+                ],
+
             ],
         ],
     ];

@@ -12,7 +12,6 @@ class ModelScope {
     {
         $query = $model_name::query();
         foreach($data as $field => $value) {
-            // dd(request()->all());
             if($value != NULL) {
                 $field = str_replace('amp;', '', $field);
                 if($field == 'relations'){
@@ -37,11 +36,11 @@ class ModelScope {
                                 }else{
                                     $query->whereHas($relations[0], function($q) use($relations, $field_name , $field_value) {
                                         $q = $q->whereHas($relations[1], function($rq) use($field_name , $field_value) {
-                                            // $rq = $rq->where($field_name ,'LIKE', '%'. $field_value .'%');
-                                            if (!is_null($field_value)) 
-                                            {
-                                                $rq = $rq->whereIn($field_name ,$field_value);
-                                            }
+                                             $rq = $rq->where($field_name ,'LIKE', '%'. $field_value .'%');
+//                                            if (!is_null($field_value))
+//                                            {
+//                                                $rq = $rq->whereIn($field_name ,$field_value);
+//                                            }
                                         });
                                     });
                                 }

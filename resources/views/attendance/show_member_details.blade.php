@@ -197,28 +197,7 @@
                                     {{-- Session  --}}
                                     @foreach ($active_memberships as $membership)
                                         @switch($membership->service_pricelist->service->service_type->session_type)
-                                            @case('non_sessions')
-                                                <div class="">
-                                                    <h5>Memberships ( Non Session)</h5>
-                                                    <div class="form-group row">
-                                                        <div class="col-md-3 form-group">
-                                                            <form action="{{ route('attendance.take') }}" method="post" id="form{{ $membership->id }}">
-                                                                @csrf
-                                                                @method('POST')
-                                                                <input type="hidden" name="membership_id" value="{{ $membership->id }}">
-                                                                <input type="hidden" name="member_id" value="{{ $membership->member->id }}">
-                                                                <button class="btn btn-success font-weight-bold btn-block" type="button" onclick="letMeIn();checkFreeze(this)"  data-membership-id="{{ $membership->id }}"
-                                                                    {{ $membership->status == 'expired' || $membership->status == 'refunded' ? 'disabled' : '' }}>
-                                                                    {{ $membership->service_pricelist->name }} <br>
-                                                                    End : {{ date('Y-m-d', strtotime($membership->end_date)) }}
-                                                                    <br>
-                                                                    Status : {{ $membership->status }} <br>
-                                                                </button>
-                                                            </form>
-                                                        </div>
-                                                    </div>
-                                                  </div>
-                                                @break
+                                 
                                             @case('sessions')
                                                 <div class="">
                                                     <h5>Memberships ( Sessions )</h5>

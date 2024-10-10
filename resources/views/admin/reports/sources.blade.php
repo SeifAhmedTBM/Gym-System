@@ -11,7 +11,7 @@
                                 value="{{ request('from') ?? date('Y-m-d') }}">
                             <input type="date" class="form-control" name="to"
                                 value="{{ request('to') ?? date('Y-m-d') }}">
-                            <select name="branch_id" id="branch_id" class="form-control">
+                            <select name="branch_id" id="branch_id" class="form-control" {{ $employee && $employee->branch_id != NULL ? 'readonly' : ''}}>
                                 <option value="{{ null }}" selected>All Branches</option>
                                 @foreach (App\Models\Branch::pluck('name', 'id') as $id => $name)
                                     <option value="{{ $id }}" {{ request('branch_id') == $id ? 'selected' : '' }}>
@@ -25,12 +25,19 @@
                                         {{ request('source_id') == $id ? 'selected' : '' }}>{{ $name }}</option>
                                 @endforeach
                             </select>
-                            <select name="sales_by_id" id="sales_by_id" class="form-control">
+                            <select name="sales_by_id" id="sales_by_id" class="form-control" {{ $employee && Auth()->user()->roles[0]->title == 'Sales' ? 'readonly' : '' }}>
                                 <option value="{{ null }}" selected>Sales By</option>
-                                @foreach (App\Models\User::whereRelation('roles','title','Sales')->pluck('name', 'id') as $id => $name)
+                            @if($employee && $employee->branch_id != NULL)
+                                @foreach (App\Models\User::whereRelation('roles','title','Sales')->whereRelation('employee','branch_id',$employee->branch_id)->pluck('name', 'id') as $id => $name)
                                     <option value="{{ $id }}"
                                         {{ request('sales_by_id') == $id ? 'selected' : '' }}>{{ $name }}</option>
                                 @endforeach
+                            @else
+                                    @foreach (App\Models\User::whereRelation('roles','title','Sales')->pluck('name', 'id') as $id => $name)
+                                        <option value="{{ $id }}"
+                                                {{ request('sales_by_id') == $id ? 'selected' : '' }}>{{ $name }}</option>
+                                    @endforeach
+                            @endif
                             </select>
                             <select name="type" id="type" class="form-control">
                                 <option value="{{ null }}" selected>Type</option>

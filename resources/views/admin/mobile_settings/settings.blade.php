@@ -11,6 +11,38 @@
         </div>
         <div class="card-body">
             <div class="form-row">
+                <div class="col-md-3">
+                    <div class="form-group">
+                        {!! Form::label('phone_number', 'Phone Number' )!!}
+                        {!! Form::text('phone_number', $settings->phone_number ?? null, ['class' => 'form-control', 'placeholder' => 'phone']) !!}
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="form-group">
+                        {!! Form::label('whatsapp_number', 'whatsapp number') !!}
+                        {!! Form::text('whatsapp_number', $settings->whatsapp_number ?? null, ['class' => 'form-control', 'placeholder' => 'whatsapp number']) !!}
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="form-group">
+                        {!! Form::label('facebook_url', 'facebook url') !!}
+                        {!! Form::text('facebook_url', $settings->facebook_url ?? null, ['class' => 'form-control', 'placeholder' => 'facebook url']) !!}
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="form-group">
+                        {!! Form::label('instagram_url', 'instagram url') !!}
+                        {!! Form::text('instagram_url', $settings->instagram_url ?? null, ['class' => 'form-control', 'placeholder' => 'instagram url']) !!}
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="form-group">
+                        {!! Form::label('tiktok_url', 'tiktok url') !!}
+                        {!! Form::text('tiktok_url', $settings->tiktok_url ?? null, ['class' => 'form-control', 'placeholder' => 'tiktok url']) !!}
+                    </div>
+                </div>
+            </div>
+            <div class="form-row">
                 <div class="col-md-12">
                     <div class="form-group">
                         {!! Form::label('privacy_setting', trans('global.privacy_setting')) !!}
@@ -54,10 +86,28 @@
                 </div>
                 <div class="col-md-6">
                     <div class="form-group">
-                        {!! Form::label('classes_service_type', trans('global.classes_service_type')) !!}
+                        {!! Form::label('classes_service_type', 'classes service type') !!}
                         {!! Form::select('classes_service_type',
                             ['service1' => \App\Models\ServiceType::pluck('name','id')],
                             $settings->classes_service_type ?? null,
+                        ['class' => 'form-control']) !!}
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group">
+                        {!! Form::label('membership_service_type', 'membership service type') !!}
+                        {!! Form::select('membership_service_type',
+                            ['service1' => \App\Models\ServiceType::pluck('name','id')],
+                            $settings->membership_service_type ?? null,
+                        ['class' => 'form-control']) !!}
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group">
+                        {!! Form::label('payment_account_id', 'Payment Account') !!}
+                        {!! Form::select('payment_account_id',
+                            ['service1' => \App\Models\Account::pluck('name','id')],
+                            $settings->account_id ?? null,
                         ['class' => 'form-control']) !!}
                     </div>
                 </div>
