@@ -24,7 +24,7 @@ class Kernel extends ConsoleKernel
      * @var array
      */
     protected $commands = [
-        //
+        Commands\UpdateMemberShipesStauts::class,
     ];
 
     /**
@@ -45,6 +45,7 @@ class Kernel extends ConsoleKernel
         $schedule->job(new UpdateExpiringMembershipsJob)->daily();
         $schedule->job(new LogOutEmployees())->dailyAt('00:01');
         $schedule->command('queue:work --stop-when-empty')->daily();
+        $schedule->command('app:update-member-shipes-stauts')->daily();
     }
 
     /**
