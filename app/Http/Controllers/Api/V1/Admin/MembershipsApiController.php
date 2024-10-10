@@ -101,13 +101,17 @@ class MembershipsApiController extends Controller
         
 
         if($main_membership) {
-            $pricelist_inbody = ServiceOptionsPricelist::where('pricelist_id' , $main_membership->service_pricelist_id)->where('service_option_id',1)->first();
-            $total_inbody_numer = $pricelist_inbody->count;
+            $pricelist_inbody        = ServiceOptionsPricelist::where('pricelist_id' , $main_membership->service_pricelist_id)->where('service_option_id',1)->first();
+            $total_inbody_numer      = $pricelist_inbody->count;
+            $invitations_count       = $main_membership->invitations_count ;
+            $total_invitations_count = $main_membership->service_pricelist->invitation;
         }
 
        else
        {
-            $total_inbody_numer = 0 ;
+            $invitations_count       = 0;
+            $total_invitations_count = 0;
+            $total_inbody_numer      = 0 ;
        }
   
 
@@ -118,8 +122,8 @@ class MembershipsApiController extends Controller
                 'data'                    => [
                     'inbody_count'            => $counter,
                     'total_inbody_count'      => $total_inbody_numer ,
-                    'invitations_count'       => $main_membership->invitations_count ,
-                    'total_invitations_count' => $main_membership->service_pricelist->invitation,
+                    'invitations_count'       => $invitations_count ,
+                    'total_invitations_count' => $total_invitations_count,
                 ]
             ],200);
         }
