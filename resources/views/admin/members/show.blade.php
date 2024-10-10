@@ -582,7 +582,7 @@
             })
         }
 
-        function assignReminder(id, user_id) 
+        function assignReminder(id, user_id)
         {
             var id = id;
             var user_id = user_id;
