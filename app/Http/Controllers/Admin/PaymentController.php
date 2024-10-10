@@ -27,184 +27,184 @@ class PaymentController extends Controller
 {
     use CsvImportTrait;
 
-    public function index(Request $request)
-    {
-        // $transactions = Transaction::where('transactionable_type','App\\Models\\Payment')
-        //                                 ->whereDoesntHave('transactionable')
-        //                                 // ->get();
-        //                                 ->delete();
+        public function index(Request $request)
+        {
+            // $transactions = Transaction::where('transactionable_type','App\\Models\\Payment')
+            //                                 ->whereDoesntHave('transactionable')
+            //                                 // ->get();
+            //                                 ->delete();
 
-        // $payments = Payment::with(['transaction','invoice'])->whereHas('invoice')->get();
-        // foreach ($payments as $key => $payment) 
-        // {
-        //     if ($payment->transaction) 
-        //     {
-        //         $payment->transaction->update([
-        //             'amount'        => $payment->amount,
-        //             'account_id'    => $payment->account_id,
-        //             'created_at'    => $payment->created_at,
-        //         ]);
-        //     }else{
-        //         Transaction::create([
-        //             'transactionable_type'  => 'App\\Models\\Payment',
-        //             'transactionable_id'    => $payment->id,
-        //             'amount'                => $payment->amount,
-        //             'account_id'            => $payment->account_id,
-        //             'created_by'            => $payment->created_by_id ?? $payment->sales_by_id,
-        //             'created_at'            => $payment->created_at
-        //         ]);
-        //     }
+            // $payments = Payment::with(['transaction','invoice'])->whereHas('invoice')->get();
+            // foreach ($payments as $key => $payment)
+            // {
+            //     if ($payment->transaction)
+            //     {
+            //         $payment->transaction->update([
+            //             'amount'        => $payment->amount,
+            //             'account_id'    => $payment->account_id,
+            //             'created_at'    => $payment->created_at,
+            //         ]);
+            //     }else{
+            //         Transaction::create([
+            //             'transactionable_type'  => 'App\\Models\\Payment',
+            //             'transactionable_id'    => $payment->id,
+            //             'amount'                => $payment->amount,
+            //             'account_id'            => $payment->account_id,
+            //             'created_by'            => $payment->created_by_id ?? $payment->sales_by_id,
+            //             'created_at'            => $payment->created_at
+            //         ]);
+            //     }
 
-        //     $payment->created_by_id = $payment->invoice->created_by_id ?? $payment->sales_by_id;
-        //     $payment->save();
-        // }
+            //     $payment->created_by_id = $payment->invoice->created_by_id ?? $payment->sales_by_id;
+            //     $payment->save();
+            // }
 
-        abort_if(Gate::denies('payment_access'), Response::HTTP_FORBIDDEN, '403 Forbidden');
+            abort_if(Gate::denies('payment_access'), Response::HTTP_FORBIDDEN, '403 Forbidden');
 
-        $data = $request->except(['draw', 'columns', 'order', 'start', 'length', 'search', 'change_language','_']);
+            $data = $request->except(['draw', 'columns', 'order', 'start', 'length', 'search', 'change_language','_']);
 
-        $invoice_prefix = Setting::first()->invoice_prefix;
+            $invoice_prefix = Setting::first()->invoice_prefix;
 
-        $employee = Auth()->user()->employee;
+            $employee = Auth()->user()->employee;
 
-        if ($request->ajax()) {
-            if ($employee && $employee->branch_id != NULL) 
-            {
-                $query = Payment::index($data)
-                                    ->with(['invoice','invoice.membership','invoice.membership.member','invoice.membership.service_pricelist','account', 'sales_by','created_by'])
-                                    ->whereHas('invoice',function($q){
-                                        $q->whereHas('membership');
-                                    })
-                                    ->whereHas('account',fn($q) => $q->whereBranchId($employee->branch_id))
-                                    ->latest()
-                                    ->select(sprintf('%s.*', (new Payment())->table));
-            }else{
-                $query = Payment::index($data)
-                                    ->with(['invoice','invoice.membership','invoice.membership.member','invoice.membership.service_pricelist','account', 'sales_by','created_by'])
-                                    ->whereHas('invoice',function($q){
-                                        $q->whereHas('membership');
-                                    })
-                                    ->latest()
-                                    ->select(sprintf('%s.*', (new Payment())->table));
+            if ($request->ajax()) {
+                if ($employee && $employee->branch_id != NULL)
+                {
+                    $query = Payment::index($data)
+                                        ->with(['invoice','invoice.membership','invoice.membership.member','invoice.membership.service_pricelist','account', 'sales_by','created_by'])
+                                        ->whereHas('invoice',function($q){
+                                            $q->whereHas('membership');
+                                        })
+                                        ->whereHas('account',fn($q) => $q->whereBranchId($employee->branch_id))
+                                        ->latest()
+                                        ->select(sprintf('%s.*', (new Payment())->table));
+                }else{
+                    $query = Payment::index($data)
+                                        ->with(['invoice','invoice.membership','invoice.membership.member','invoice.membership.service_pricelist','account', 'sales_by','created_by'])
+                                        ->whereHas('invoice',function($q){
+                                            $q->whereHas('membership');
+                                        })
+                                        ->latest()
+                                        ->select(sprintf('%s.*', (new Payment())->table));
+                }
+
+                $table = Datatables::eloquent($query);
+
+                $table->addColumn('placeholder', '&nbsp;');
+                $table->addColumn('actions', '&nbsp;');
+
+                $table->editColumn('actions', function ($row) {
+                    $viewGate = 'payment_show';
+                    $editGate = 'payment_edit';
+                    $deleteGate = 'payment_delete';
+                    $crudRoutePart = 'payments';
+
+                    return view('partials.datatablesActions', compact(
+                    'viewGate',
+                    'editGate',
+                    'deleteGate',
+                    'crudRoutePart',
+                    'row'
+                ));
+                });
+
+                $table->editColumn('id', function ($row) {
+                    return $row->id ? $row->id : '';
+                });
+
+                $table->addColumn('account', function ($row) {
+                    return $row->account ? $row->account->name : '';
+                });
+
+                $table->editColumn('amount', function ($row) {
+                    return $row->amount ? $row->amount : '';
+                });
+
+                $table->editColumn('notes', function ($row) {
+                    return $row->notes ? $row->notes : 'No Notes';
+                });
+
+                $table->addColumn('member_name', function ($row) {
+                    return $row->invoice && $row->invoice->membership ? '<a href="'.route("admin.members.show",$row->invoice->membership->member_id).'">'.$row->invoice->membership->member->name.'<br>'.$row->invoice->membership->member->memberPrefix().$row->invoice->membership->member->member_code.'<br>'.$row->invoice->membership->member->phone.'</a>' : '';
+                });
+
+                $table->addColumn('invoice', function ($row) use($invoice_prefix) {
+                    return $row->invoice && $row->invoice->membership ? '<a href="'.route("admin.invoices.show",$row->invoice_id).'">'.$invoice_prefix.$row->invoice->id.'</a>' : '';
+                });
+
+                $table->addColumn('transaction', function ($row) use($invoice_prefix) {
+                    return $row->transaction ? $row->transaction->amount : '';
+                });
+
+                $table->addColumn('status',function($row){
+                    return $row->invoice ? ($row->invoice->status == 'fullpayment' ? '<span class="badge badge-success p-2">'.Invoice::STATUS_SELECT[$row->invoice->status].'</span>' : '<span class="badge badge-danger p-2">'.Invoice::STATUS_SELECT[$row->invoice->status].'</span>') : '';
+                });
+
+                $table->addColumn('sales_by_name', function ($row) {
+                    return $row->sales_by ? $row->sales_by->name : '';
+                });
+
+                $table->addColumn('created_by', function ($row) {
+                    return $row->created_by ? $row->created_by->name : '';
+                });
+
+                $table->addColumn('branch_name', function ($row) {
+                    return $row->account && $row->account->branch ? $row->account->branch->name : '-';
+                });
+
+                $table->addColumn('membership', function ($row) {
+                    return $row->invoice && $row->invoice->membership->service_pricelist && $row->invoice->membership->service_pricelist ? $row->invoice->membership->service_pricelist->name.'<br>'.'<span class="badge p-2 badge-'.Membership::MEMBERSHIP_STATUS_COLOR[$row->invoice->membership->membership_status].'"">'.Membership::MEMBERSHIP_STATUS[$row->invoice->membership->membership_status].'</span>': '';
+                });
+
+                $table->editColumn('created_at', function ($row) {
+                    return $row->created_at ? $row->created_at->toFormattedDateString() . ' , ' . $row->created_at->format('g:i A') : '';
+                });
+
+                $table->rawColumns(['actions', 'placeholder', 'invoice', 'sales_by','member_name','status','membership','transaction','created_by','branch_name']);
+
+                return $table->make(true);
             }
 
-            $table = Datatables::eloquent($query);
+            $accounts = [
+                ''=>'All',
+                'instapay' => 'Instapay',
+                'cash' => 'Cash',
+                'visa' => 'Visa',
+                'vodafone' => 'Vodafone',
+                'valu' => 'Valu',
+                'premium' => 'Premium',
+                'sympl' => 'Sympl'
+            ];
 
-            $table->addColumn('placeholder', '&nbsp;');
-            $table->addColumn('actions', '&nbsp;');
+            $accounts = $accounts + Account::pluck('name', 'id')->toArray();
+            $branches = Branch::pluck('name','id');
 
-            $table->editColumn('actions', function ($row) {
-                $viewGate = 'payment_show';
-                $editGate = 'payment_edit';
-                $deleteGate = 'payment_delete';
-                $crudRoutePart = 'payments';
+            $sales_bies = User::whereHas('roles',function($q){
+                $q->where('title','Sales');
+            })->pluck('name', 'id');
 
-                return view('partials.datatablesActions', compact(
-                'viewGate',
-                'editGate',
-                'deleteGate',
-                'crudRoutePart',
-                'row'
-            ));
-            });
+            if ($employee && $employee->branch_id != NULL)
+            {
+                $payments = Payment::index($data)
+                                ->with(['invoice' => fn($q) => $q->where('status','=','refund')])
+                                ->whereHas('invoice',function($q){
+                                    $q->where('status','!=','refund')
+                                    ->whereHas('membership');
+                                })
+                                ->whereHas('account',fn($q) => $q->whereBranchId($employee->branch_id))
+                                ->get();
+            }else{
+                $payments = Payment::index($data)
+                                ->with(['invoice' => fn($q) => $q->where('status','=','refund')])
+                                ->whereHas('invoice',function($q){
+                                    $q->where('status','!=','refund')
+                                    ->whereHas('membership');
+                                })
+                                ->get();
+            }
 
-            $table->editColumn('id', function ($row) {
-                return $row->id ? $row->id : '';
-            });
-
-            $table->addColumn('account', function ($row) {
-                return $row->account ? $row->account->name : '';
-            });
-
-            $table->editColumn('amount', function ($row) {
-                return $row->amount ? $row->amount : '';
-            });
-
-            $table->editColumn('notes', function ($row) {
-                return $row->notes ? $row->notes : 'No Notes';
-            });
-
-            $table->addColumn('member_name', function ($row) {
-                return $row->invoice && $row->invoice->membership ? '<a href="'.route("admin.members.show",$row->invoice->membership->member_id).'">'.$row->invoice->membership->member->name.'<br>'.$row->invoice->membership->member->memberPrefix().$row->invoice->membership->member->member_code.'<br>'.$row->invoice->membership->member->phone.'</a>' : '';
-            });
-
-            $table->addColumn('invoice', function ($row) use($invoice_prefix) {
-                return $row->invoice && $row->invoice->membership ? '<a href="'.route("admin.invoices.show",$row->invoice_id).'">'.$invoice_prefix.$row->invoice->id.'</a>' : '';
-            });
-
-            $table->addColumn('transaction', function ($row) use($invoice_prefix) {
-                return $row->transaction ? $row->transaction->amount : '';
-            });
-
-            $table->addColumn('status',function($row){
-                return $row->invoice ? ($row->invoice->status == 'fullpayment' ? '<span class="badge badge-success p-2">'.Invoice::STATUS_SELECT[$row->invoice->status].'</span>' : '<span class="badge badge-danger p-2">'.Invoice::STATUS_SELECT[$row->invoice->status].'</span>') : '';
-            });
-
-            $table->addColumn('sales_by_name', function ($row) {
-                return $row->sales_by ? $row->sales_by->name : '';
-            });
-
-            $table->addColumn('created_by', function ($row) {
-                return $row->created_by ? $row->created_by->name : '';
-            });
-
-            $table->addColumn('branch_name', function ($row) {
-                return $row->account && $row->account->branch ? $row->account->branch->name : '-';
-            });
-            
-            $table->addColumn('membership', function ($row) {
-                return $row->invoice && $row->invoice->membership->service_pricelist && $row->invoice->membership->service_pricelist ? $row->invoice->membership->service_pricelist->name.'<br>'.'<span class="badge p-2 badge-'.Membership::MEMBERSHIP_STATUS_COLOR[$row->invoice->membership->membership_status].'"">'.Membership::MEMBERSHIP_STATUS[$row->invoice->membership->membership_status].'</span>': '';
-            });
-
-            $table->editColumn('created_at', function ($row) {
-                return $row->created_at ? $row->created_at->toFormattedDateString() . ' , ' . $row->created_at->format('g:i A') : '';
-            });
-
-            $table->rawColumns(['actions', 'placeholder', 'invoice', 'sales_by','member_name','status','membership','transaction','created_by','branch_name']);
-
-            return $table->make(true);
+            return view('admin.payments.index',compact('sales_bies','accounts','payments','branches'));
         }
-
-        $accounts = [
-            ''=>'All',
-            'instapay' => 'Instapay',
-            'cash' => 'Cash',
-            'visa' => 'Visa',
-            'vodafone' => 'Vodafone',
-            'valu' => 'Valu',
-            'premium' => 'Premium',
-            'sympl' => 'Sympl'
-        ];
-        
-        $accounts = $accounts + Account::pluck('name', 'id')->toArray();
-        $branches = Branch::pluck('name','id');
-
-        $sales_bies = User::whereHas('roles',function($q){
-            $q->where('title','Sales');
-        })->pluck('name', 'id');
-
-        if ($employee && $employee->branch_id != NULL) 
-        {
-            $payments = Payment::index($data)
-                            ->with(['invoice' => fn($q) => $q->where('status','=','refund')])
-                            ->whereHas('invoice',function($q){
-                                $q->where('status','!=','refund')
-                                ->whereHas('membership');
-                            })
-                            ->whereHas('account',fn($q) => $q->whereBranchId($employee->branch_id))
-                            ->get();
-        }else{
-            $payments = Payment::index($data)
-                            ->with(['invoice' => fn($q) => $q->where('status','=','refund')])
-                            ->whereHas('invoice',function($q){
-                                $q->where('status','!=','refund')
-                                ->whereHas('membership');
-                            })
-                            ->get();
-        }
-
-        return view('admin.payments.index',compact('sales_bies','accounts','payments','branches'));
-    }
 
     public function create()
     {
