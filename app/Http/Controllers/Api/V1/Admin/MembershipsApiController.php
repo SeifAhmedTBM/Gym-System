@@ -99,8 +99,17 @@ class MembershipsApiController extends Controller
 
         $invitation_counter = Invitation::where('membership_id' , $latest_membership->id)->count();
         
-        $pricelist_inbody = ServiceOptionsPricelist::where('pricelist_id' , $main_membership->service_pricelist_id)->where('service_option_id',1)->first();
-        $total_inbody_numer = $pricelist_inbody->count;
+
+        if($main_membership) {
+            $pricelist_inbody = ServiceOptionsPricelist::where('pricelist_id' , $main_membership->service_pricelist_id)->where('service_option_id',1)->first();
+            $total_inbody_numer = $pricelist_inbody->count;
+        }
+
+       else
+       {
+            $total_inbody_numer = 0 ;
+       }
+  
 
         
 
