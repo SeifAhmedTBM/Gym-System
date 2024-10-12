@@ -21,7 +21,7 @@
                 </select>
                 <select name="sales_by_id" id="sales_by_id" class="form-control">
                     <option value="{{ NULL }}" selected>Select Sales By</option>
-                    @foreach (\App\Models\User::whereRelation('roles','title','Sales')->pluck('name','id') as $sales_by_id => $sales_by_name)
+                    @foreach (\App\Models\User::whereRelation('roles','title','Sales')->whereRelation('employee','status','active')->pluck('name','id') as $sales_by_id => $sales_by_name)
                         <option value="{{ $sales_by_id }}" {{ request('sales_by_id') == $sales_by_id ? 'selected' : '' }}>{{ $sales_by_name }}</option>
                     @endforeach
                 </select>
