@@ -86,7 +86,8 @@ class FreezeRequestApiController extends Controller
                     'data' => null
                 ], 403);
             }
-        } catch (\Illuminate\Validation\ValidationException $e) {
+        } 
+        catch (\Illuminate\Validation\ValidationException $e) {
             return response()->json([
                 'message' => 'Validation Failed',
                 'data'=>[
