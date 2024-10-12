@@ -209,6 +209,7 @@ Route::group(['prefix' => 'v1', 'as' => 'api.', 'namespace' => 'Api\V1\Admin'], 
 
     // Schedule
     Route::middleware('auth:sanctum')->apiResource('schedules', 'ScheduleApiController');
+    Route::middleware('auth:sanctum')->post('attend_session' , 'ScheduleApiController@attend_session');
     
 
 

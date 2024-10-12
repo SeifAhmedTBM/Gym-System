@@ -11,9 +11,10 @@ use Illuminate\Support\Facades\Gate;
 use Illuminate\Http\Request;
 use App\Models\Lead;
 use App\Models\Membership;
-
+use App\Models\SessionList;
 use Symfony\Component\HttpFoundation\Response;
-
+use Carbon\Carbon;
+use App\Models\Session_attendance;
 class ScheduleApiController extends Controller
 {
     public function index(Request $request)
@@ -75,5 +76,40 @@ class ScheduleApiController extends Controller
         $schedule->delete();
 
         return response(null, Response::HTTP_NO_CONTENT);
+    }
+
+    public function attend_session(Request $request)
+    {
+      
+        $user_id = $request->user()->id;
+       
+        $session_id = $request->session_id;
+
+        $session = SessionList::where('id',$session_id)->first();
+        $user_session_attendance = Session_attendance::where('user_id' ,$user_id )->where('session_id',$session_id)->first();
+        
+        $today_session_attendance = Session_attendance::where('created_at', '<=', Carbon::now()->endOfDay())
+        ->count();
+        
+        if($today_session_attendance < $session->max_capacity && $user_session_attendance == null){
+            $session_attendance = new Session_attendance();
+            $session_attendance->user_id =  $user_id;
+            $session_attendance->session_id = $session_id;
+            $session_attendance->save();
+
+                return response()->json([
+                'status' =>  true ,
+                'message' => "Success",
+                'Rest In the Session' => $session->max_capacity - $today_session_attendance ,
+                ], 200);
+        }
+        else{
+            return response()->json([
+                'status' =>  false ,
+                'message' => "This Slot Reach Max Capacity Or You Attend Befor",
+                'Rest In the Session' => $session->max_capacity - $today_session_attendance ,
+                ], 442);
+        
+            }
     }
 }
