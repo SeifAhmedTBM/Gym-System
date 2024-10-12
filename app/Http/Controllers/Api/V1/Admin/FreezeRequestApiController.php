@@ -51,15 +51,14 @@ class FreezeRequestApiController extends Controller
                 'number_of_days'   => 'required|integer|min:1', // Validate freeze is a positive integer
                 'start_date'       => 'required|date|after:today', // Start date must be a valid future date
             ]);
+            
+            $user_id = $request->user()->id;
 
-            if (auth('sanctum')->id()) {
-                $member = Lead::whereType('member')->whereUserId(auth('sanctum')->id())->first();
+            if ($user_id) {
+                $member = Lead::whereType('member')->whereUserId($user_id)->first();
                 // Check if a freeze request for the same membership is already pending
-                $existingFreezeRequest = FreezeRequest::
-                    where('membership_id', $validated['membership_id'])
-                    ->where('freeze',$validated['number_of_days'])
-                    ->where('start_date',$validated['start_date'])
-                    ->whereIn('status', ['pending','confirmed'])
+                $existingFreezeRequest = FreezeRequest::where('membership_id', $validated['membership_id'])
+                    ->where('status','pending')
                     ->first();
 
                 if ($existingFreezeRequest) {
