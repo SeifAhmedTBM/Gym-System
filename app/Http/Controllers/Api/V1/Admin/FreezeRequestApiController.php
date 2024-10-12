@@ -58,7 +58,7 @@ class FreezeRequestApiController extends Controller
                 $member = Lead::whereType('member')->whereUserId($user_id)->first();
                 // Check if a freeze request for the same membership is already pending
                 $existingFreezeRequest = FreezeRequest::where('membership_id', $validated['membership_id'])
-                    ->whereIn('status', ['current', 'pending'])
+                    ->whereIn('status', ['confirmed', 'pending'])
                     ->first();
 
                 if ($existingFreezeRequest) {
