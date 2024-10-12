@@ -55,7 +55,7 @@ class FreePtRequestsController extends Controller
         else
         {
             $request_pt = new free_pt_requests();
-            $request_pt->user_id = $request->user_id;
+            $request_pt->user_id = $request->user()->id;
             $request_pt->membership_id = $latest_membership->id;
             $request_pt->save();
 
