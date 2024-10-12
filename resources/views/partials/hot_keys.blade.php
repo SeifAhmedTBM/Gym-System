@@ -142,14 +142,6 @@
                     'linkUrl' => 'admin.tasks.my-tasks',
                     'type' => '',
                 ],
-                [
-                    'can' => 'view_transfer_sales_data',
-                    'title' => 'Notifications',
-                    'imageUrl' => 'smartphone.png',
-                    'linkUrl' => 'admin.notification.index',
-                    'type' => '',
-                ],
-               
 
             ],
         ],

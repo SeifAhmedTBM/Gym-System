@@ -1009,10 +1009,6 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.', 'namespace' => 'Admin', 'mi
     //Free Pt Requests
     Route::resource('free-requests', 'FreePtRequestsController');
     Route::post('assign_free_pt_coaches' , 'FreePtRequestsController@assign_free_pt_coache')->name('assign_free_pt_coache');
-
-
-    Route::resource('notification', 'NotificationController');
-    Route::post('sendNotification' , 'NotificationController@sendNotification')->name('sendNotification');
 });
 
 Route::group(['prefix' => 'profile', 'as' => 'profile.', 'namespace' => 'Auth', 'middleware' => ['auth']], function () {
