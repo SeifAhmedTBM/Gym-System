@@ -61,6 +61,10 @@ class ServiceTypesController extends Controller
                 return  $row->is_pt == true ? '<span class="badge badge-success p-2">' . ServiceType::IS_PT[$row->is_pt] . '</span>' : '<span class="badge badge-danger p-2">' . ServiceType::IS_PT[$row->is_pt] . '</span>';
             });
 
+            $table->addColumn('isClass', function ($row) {
+                return  $row->isClass == true ? '<span class="badge badge-success p-2">' . ServiceType::IS_CLASS[$row->isClass] . '</span>' : '<span class="badge badge-danger p-2">' . ServiceType::IS_CLASS[$row->isClass] . '</span>';
+            });
+
             $table->editColumn('description', function ($row) {
                 return $row->description ? $row->description : '';
             });
@@ -73,7 +77,7 @@ class ServiceTypesController extends Controller
                 return $row->created_at ? $row->created_at->toFormattedDateString() . ' , ' . $row->created_at->format('g:i A') : '';
             });
 
-            $table->rawColumns(['actions', 'placeholder', 'is_pt']);
+            $table->rawColumns(['actions', 'placeholder', 'is_pt' ,'isClass']);
 
             return $table->make(true);
         }
@@ -83,6 +87,7 @@ class ServiceTypesController extends Controller
 
     public function create()
     {
+       
         abort_if(Gate::denies('service_type_create'), Response::HTTP_FORBIDDEN, '403 Forbidden');
 
         return view('admin.serviceTypes.create');
@@ -96,7 +101,8 @@ class ServiceTypesController extends Controller
             'description'   => $request['description'],
             'session_type'  => $request['session_type'],
             'main_service'  => isset($request['main_service']) ? true : false,
-            'is_pt'  => isset($request['is_pt']) ? true : false
+            'is_pt'  => isset($request['is_pt']) ? true : false ,
+            'isClass'  => isset($request['isClass']) ? true : false ,
         ]);
 
         return redirect()->route('admin.service-types.index');
@@ -116,7 +122,8 @@ class ServiceTypesController extends Controller
             'description'   => $request['description'],
             'session_type'  => $request['session_type'],
             'main_service'  => isset($request['main_service']) ? true : false,
-            'is_pt'  => isset($request['is_pt']) ? true : false
+            'is_pt'  => isset($request['is_pt']) ? true : false ,
+            'isClass'  => isset($request['isClass']) ? true : false ,
         ]);
 
         return redirect()->route('admin.service-types.index');

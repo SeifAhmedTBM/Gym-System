@@ -69,24 +69,32 @@ class MembershipsApiController extends Controller
     public function member_ship_statistics(Request $request){
         $Lead = Lead::where('user_id' , $request->user()->id)->first();
 
-        $latest_membership = Membership::where('member_id', $Lead->id)->latest()->first();
+        $latest_membership = Membership::where('member_id', $Lead->id)->whereHas('service_pricelist', function ($q) {
+            $q->whereHas('service', function ($x) {
+                $x->whereHas('service_type', function ($i) {
+                    $i->where('isClass' , false);
+                });
+            });
+        })
+        ->withCount('invitations')
+        ->first();
 
 
         $main_membership = Membership::with([
             'member',
             'invitations',
-        ])->whereId($latest_membership->id)->whereIn('status', ['current', 'expiring'])
+        ])->whereIn('status', ['current', 'expiring'])
             ->with([
                 'service_pricelist' => fn($q) => $q
                     ->with([
                         'service' => fn($x) => $x->with([
-                            'service_type' => fn($i) => $i->whereMainService(true)
+                            'service_type' => fn($i) => $i->where('isClass' , false)
                         ])
                     ])
             ])->whereHas('service_pricelist', function ($q) {
                 $q->whereHas('service', function ($x) {
                     $x->whereHas('service_type', function ($i) {
-                        $i->whereMainService(true);
+                        $i->where('isClass' , false);
                     });
                 });
             })
