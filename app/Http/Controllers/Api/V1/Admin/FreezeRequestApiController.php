@@ -66,7 +66,7 @@ class FreezeRequestApiController extends Controller
                     return response()->json([
                         'message' => 'A freeze request for this membership is already pending or confirmed.',
                         'data' => null
-                    ], 442); // Conflict response
+                    ], 422); // Conflict response
                 }
                 else{
                     $freezeRequest = FreezeRequest::create([
