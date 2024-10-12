@@ -74,7 +74,7 @@ class FreezeRequestApiController extends Controller
                         'start_date'        => $validated['start_date'],
                         'end_date'          => date('Y-m-d', strtotime($validated['start_date']. ' + '.$validated['number_of_days'].' days')),
                         'status'            => 'pending',
-                        'created_by_id'     => auth('sanctum')->id(),
+                        'created_by_id'     => $request->user()->id,
                     ]);
 
                     return response()->json(['message' => 'Created successfully','data'=>$freezeRequest], 200);
