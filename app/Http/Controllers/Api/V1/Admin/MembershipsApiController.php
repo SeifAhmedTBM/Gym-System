@@ -77,13 +77,14 @@ class MembershipsApiController extends Controller
             });
         })
         ->withCount('invitations')
+        ->latest()
         ->first();
 
 
         $main_membership = Membership::with([
             'member',
             'invitations',
-        ])->whereIn('status', ['current', 'expiring'])
+        ])->whereId($latest_membership->id)->whereIn('status', ['current'])
             ->with([
                 'service_pricelist' => fn($q) => $q
                     ->with([
@@ -98,9 +99,10 @@ class MembershipsApiController extends Controller
                     });
                 });
             })
-            ->withCount('invitations')
+            ->latest()
+            
             ->first();
-
+     
             
         $counter = MembershipServiceOptions::where('service_option_pricelist_id', 1)->where('membership_id', $latest_membership->id)->count();
         
