@@ -24,6 +24,11 @@ class ServiceType extends Model
         true => 'Yes',
         false => 'No',
     ];
+
+    public const IS_CLASS = [
+        true => 'Yes',
+        false => 'No',
+    ];
    
     public const SESSION_TYPE = [
         'non_sessions'      => 'Non Sessions',
@@ -45,6 +50,7 @@ class ServiceType extends Model
         'session_type',
         'main_service',
         'is_pt',
+        'isClass',
         'created_at',
         'updated_at',
         'deleted_at',
