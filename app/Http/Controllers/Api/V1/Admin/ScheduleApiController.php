@@ -9,34 +9,39 @@ use App\Http\Resources\Admin\ScheduleResource;
 use App\Models\Schedule;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Http\Request;
+use App\Models\Lead;
+use App\Models\Membership;
+
 use Symfony\Component\HttpFoundation\Response;
 
 class ScheduleApiController extends Controller
 {
-    public function index()
-{
-    try {
-       
-        $schedules = Schedule::with(['session', 'timeslot', 'trainer'])->get();
+    public function index(Request $request)
+    {
+        try {
+            
+            $user_id = $request->user()->id;
+            $lead = Lead::where('user_id' , $request->user()->id)->first();
+            $schedules = Schedule::where('branch_id' , $lead->branch_id)->with(['session', 'timeslot', 'trainer'])->get();
 
- 
-        return response()->json([
-            'success' => "successfully",
-            'data' => new ScheduleResource($schedules),
-        ], Response::HTTP_OK);
+    
+            return response()->json([
+                'success' => "successfully",
+                'data' => new ScheduleResource($schedules),
+            ], Response::HTTP_OK);
 
-    } catch (\Exception $e) {
+        } catch (\Exception $e) {
+            
+            \Log::error($e->getMessage());
+
         
-        \Log::error($e->getMessage());
-
-      
-        return response()->json([
-            'success' => "Failed",
-            'message' => 'Failed to retrieve schedules.',
-            'error' => $e->getMessage(),
-        ], Response::HTTP_INTERNAL_SERVER_ERROR);
+            return response()->json([
+                'success' => "Failed",
+                'message' => 'Failed to retrieve schedules.',
+                'error' => $e->getMessage(),
+            ], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
     }
-}
 
     public function store(StoreScheduleRequest $request)
     {

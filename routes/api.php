@@ -208,8 +208,8 @@ Route::group(['prefix' => 'v1', 'as' => 'api.', 'namespace' => 'Api\V1\Admin'], 
     Route::apiResource('session-lists', 'SessionListApiController');
 
     // Schedule
-    Route::apiResource('schedules', 'ScheduleApiController');
-
+    Route::middleware('auth:sanctum')->apiResource('schedules', 'ScheduleApiController');
+    
 
 
     // Ratings
