@@ -69,10 +69,11 @@ class MembershipsApiController extends Controller
     public function member_ship_statistics(Request $request){
         $Lead = Lead::where('user_id' , $request->user()->id)->first();
 
-        $latest_membership = Membership::where('member_id', $Lead->id)->whereHas('service_pricelist', function ($q) {
+        $latest_membership = Membership::where('member_id', $Lead->id)
+        ->whereHas('service_pricelist', function ($q) {
             $q->whereHas('service', function ($x) {
                 $x->whereHas('service_type', function ($i) {
-                    $i->where('isClass' , false);
+                    $i->where('isClass', false); // Ensure this is the correct column name
                 });
             });
         })
@@ -99,6 +100,7 @@ class MembershipsApiController extends Controller
                     });
                 });
             })
+            ->withCount('invitations')
             ->latest()
             
             ->first();
