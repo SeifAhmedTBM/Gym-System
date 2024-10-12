@@ -41,14 +41,14 @@ class SalesService
                             $x->whereHas('service',fn($x) => $x->whereSalesCommission(true));
                         })
                         ->when($branch_id,fn($y) => $y->whereBranchId($branch_id))
-                    )->where('sales_by_id',Auth()->user()->id)
+                    )
                     ->whereDate('created_at','>=',$from)
                     ->whereDate('created_at','<=',$to)
                     ->latest();
-        if ($type == 'Sales'){
-            $payments = $payments->where('sales_by_id',Auth()->user()->id);
-        }
-        $payments=$payments->get();
+            if ($type=="Sales"){
+                $payments->where('sales_by_id',Auth()->user()->id);
+            }
+            $payments =$payments->get();
 
         return $payments;
     }
