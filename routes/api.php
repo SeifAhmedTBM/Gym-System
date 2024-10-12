@@ -182,7 +182,7 @@ Route::group(['prefix' => 'v1', 'as' => 'api.', 'namespace' => 'Api\V1\Admin'], 
     Route::apiResource('service-options-pricelists', 'ServiceOptionsPricelistApiController');
 
     // Freeze Request
-    Route::apiResource('freeze-requests', 'FreezeRequestApiController');
+    Route::middleware('auth:sanctum')->apiResource('freeze-requests', 'FreezeRequestApiController');
 
     // Refund Reasons
     Route::apiResource('refund-reasons', 'RefundReasonsApiController');
