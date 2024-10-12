@@ -32,7 +32,8 @@ class NotificationController extends Controller
         $users = $request->branch 
             ? Lead::where('branch_id', $request->branch)->whereNotNull('fcm_token')->get() 
             : Lead::whereNotNull('branch_id')->whereNotNull('fcm_token')->get();
-    
+
+        $notificationStatus = [];
         // Send notifications
         foreach ($users as $user) {
             try {
