@@ -738,27 +738,13 @@ class AttendanceAPIController extends Controller
 
         if (isset($last_attend) && $last_attend) 
         {
-            $now            = Carbon::parse(now());
-            $sign_in        = Carbon::parse($last_attend->sign_in);
-            $diffTime       = $now->diffInMinutes($sign_in);
-
-            if($diffTime <= 15) 
-            {
-                return response()->json([
-                    'status'                     => false ,
-                    'message'                    =>  "Cannot attend you are attending less that 15 min ago"
-                ],422);
-            }
-            else
-            {
-                $attend = MembershipAttendance::create([
-                    'sign_in'                   => $request['time'],
-                    'sign_out'                  => $request['time'],
-                    'membership_id'             => $membership->id,
-                    //'created_at'                => $request['date'].$request['time'],
-                    'membership_status' => $membership->status
-                ]);
-            }
+            $attend = MembershipAttendance::create([
+                'sign_in'                   => $request['time'],
+                'sign_out'                  => $request['time'],
+                'membership_id'             => $membership->id,
+                //'created_at'                => $request['date'].$request['time'],
+                'membership_status' => $membership->status
+            ]);
         }else{
             $attend = MembershipAttendance::create([
                 'sign_in'                   => $request['time'],
