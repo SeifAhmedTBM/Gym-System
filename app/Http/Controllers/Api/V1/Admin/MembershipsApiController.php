@@ -73,7 +73,10 @@ class MembershipsApiController extends Controller
         ->whereHas('service_pricelist', function ($q) {
             $q->whereHas('service', function ($x) {
                 $x->whereHas('service_type', function ($i) {
-                    $i->where('isClass', false); // Ensure this is the correct column name
+                    $i->where([
+                        ['isClass', false],
+                        ['is_pt', false],
+                    ]); // Ensure this is the correct column name
                 });
             });
         })
@@ -90,13 +93,19 @@ class MembershipsApiController extends Controller
                 'service_pricelist' => fn($q) => $q
                     ->with([
                         'service' => fn($x) => $x->with([
-                            'service_type' => fn($i) => $i->where('isClass' , false)
+                            'service_type' => fn($i) => $i->where([
+                                ['isClass' , false],
+                                ['is_pt' , false]
+                                ])
                         ])
                     ])
             ])->whereHas('service_pricelist', function ($q) {
                 $q->whereHas('service', function ($x) {
                     $x->whereHas('service_type', function ($i) {
-                        $i->where('isClass' , false);
+                        $i->where([
+                            ['isClass', false],
+                            ['is_pt', false],
+                        ]);
                     });
                 });
             })
