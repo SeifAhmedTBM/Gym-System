@@ -215,7 +215,7 @@ Route::group(['prefix' => 'v1', 'as' => 'api.', 'namespace' => 'Api\V1\Admin'], 
 
     // Ratings
     Route::apiResource('rate', 'RatingsApiController')->middleware('auth:sanctum');
-
+ 
     // Reasons
     Route::post('reasons/media', 'ReasonsApiController@storeMedia')->name('reasons.storeMedia');
     Route::apiResource('reasons', 'ReasonsApiController');
@@ -241,5 +241,6 @@ Route::group(['prefix' => 'v1', 'as' => 'api.', 'namespace' => 'Api\V1\Admin'], 
 
 
     Route::middleware('auth:sanctum')->post('takeManualAttend' ,'AttendanceAPIController@takeManualAttend');
+    Route::middleware('auth:sanctum')->post('takePtAttend', 'AttendanceAPIController@takePtAttend');
 });
  
