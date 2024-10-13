@@ -12,11 +12,17 @@
                             <option value="{{ $id }}" {{ request('branch_id') == $id ? 'selected' : '' }}>{{ $name }}</option>
                         @endforeach
                     </select>
-                    <select name="sales_by_id" class="form-control">
+                    <select name="sales_by_id" class="form-control" {{ $employee && Auth()->user()->roles[0]->title == 'Sales' ? 'readonly' : '' }}>
                         <option value="{{ NULL }}" selected>Sales By</option>
-                        @foreach (\App\Models\User::whereRelation('roles','title','Sales')->pluck('name','id') as $sales_by_id => $sales_by_name)
+                        @if($employee && $employee->branch_id != NULL)
+                        @foreach (\App\Models\User::whereRelation('roles','title','Sales')->whereRelation('employee','branch_id',$employee->branch_id)->whereRelation('employee','status','active')->pluck('name','id') as $sales_by_id => $sales_by_name)
                             <option value="{{ $sales_by_id }}" {{ request('sales_by_id') == $sales_by_id ? 'selected' : '' }}>{{ $sales_by_name }}</option>
                         @endforeach
+                        @else
+                            @foreach (\App\Models\User::whereRelation('roles','title','Sales')->whereRelation('employee','status','active')->pluck('name','id') as $sales_by_id => $sales_by_name)
+                                <option value="{{ $sales_by_id }}" {{ request('sales_by_id') == $sales_by_id ? 'selected' : '' }}>{{ $sales_by_name }}</option>
+                            @endforeach
+                        @endif
                     </select>
 
                     <input type="month" class="form-control" name="date" value="{{ request('date') ?? date('Y-m') }}">

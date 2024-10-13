@@ -8,7 +8,7 @@
                     'name'          => ['label' => 'Name', 'type'         => 'text', 'related_to'   => 'membership.member'],
                     'member_code'   => ['label' => 'Member Code', 'type'  => 'text', 'related_to'   => 'membership.member'],
                     'phone'         => ['label' => 'Phone', 'type'        => 'number', 'related_to' => 'membership.member'],
-                    'branch_id'     => ['label' => 'Branch', 'type' => 'select', 'data' => $branches,'related_to' => 'membership.member'],
+                    'branch_id'     => ['label' => 'Branch', 'type' => 'select', 'data' => $branches],
                     'status'        => ['label' => 'Status', 'type'        => 'select', 'data'       =>  App\Models\FreezeRequest::STATUS_SELECT ],
                     'created_at'    => ['label' => 'Created at', 'type'   => 'date', 'from_and_to'  => true]
                 ],
@@ -121,7 +121,7 @@
                 retrieve: true,
                 searching:true,
                 aaSorting: [],
-                ajax: "{{ route('admin.freeze-requests.index',request()->all()) }}",
+                ajax: "{!! route('admin.freeze-requests.index',request()->all()) !!}",
                 columns: [{
                         data: 'placeholder',
                         name: 'placeholder'

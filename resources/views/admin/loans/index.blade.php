@@ -135,7 +135,7 @@
                 retrieve: true,
                 searching:true,
                 aaSorting: [],
-                ajax: "{{ route('admin.loans.index',request()->all()) }}",
+                ajax: "{!! route('admin.loans.index',request()->all()) !!}",
                 columns: [{
                         data: 'placeholder',
                         name: 'placeholder'

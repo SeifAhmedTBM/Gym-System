@@ -27,7 +27,7 @@
                     <input type="hidden" name="_method" value="PUT">
                     <input type="hidden" name="_token" value="{{ csrf_token() }}">
                     <button type="submit" class="dropdown-item">
-                            <i class="fa fa-check-circle"></i> &nbsp; {{ trans('global.confirm') }} 
+                            <i class="fa fa-check-circle"></i> &nbsp; {{ trans('global.confirm') }}
                     </button>
                 </form>
             @endif
@@ -117,6 +117,13 @@
             </a>
         @endif
 
+            @isset($St)
+                @can($viewGate)
+                    <a class="dropdown-item" href="/admin/services?St={{$row->id}}">
+                        <i class="fa fa-arrow-left"></i> &nbsp; services
+                    </a>
+                @endcan
+            @endisset
 
         @isset($viewGate)
             @can($viewGate)
@@ -125,6 +132,8 @@
                 </a>
             @endcan
         @endisset
+
+
 
         @if (request()->route()->getName() == 'admin.members.index')
             <a class="dropdown-item" data-member-id="{{ $row->id }}" data-toggle="modal"

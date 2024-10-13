@@ -129,12 +129,20 @@
                     'type' => '',
                 ],
                 [
-                    'can' => 'view_transfer_sales_data',
-                    'title' => 'My Tasks',
+                    'can' => 'all_tasks_access',
+                    'title' => 'Tasks List',
                     'imageUrl' => 'tasks_icons.png',
                     'linkUrl' => 'admin.tasks.index',
                     'type' => '',
                 ],
+                [
+                    'can' => 'task_access',
+                    'title' => 'My Tasks',
+                    'imageUrl' => 'tasks_icons.png',
+                    'linkUrl' => 'admin.tasks.my-tasks',
+                    'type' => '',
+                ],
+
             ],
         ],
     ];

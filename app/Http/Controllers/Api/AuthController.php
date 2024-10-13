@@ -34,6 +34,9 @@ class AuthController extends Controller
                         ->where('phone', $request['phone'])
                         ->where('member_code', $request['member_code'])
                         ->first();
+        $lead->fcm_token = $request->fcm_token;
+        $lead->save();
+        
         if (!$lead) 
         {
             return response()->json([
@@ -116,16 +119,19 @@ class AuthController extends Controller
             ],403);
         }
 
-        $memberships = Membership::with(['service_pricelist'])
+        $memberships_query = Membership::with(['service_pricelist','invoice'])
                         ->withCount('attendances')
                         ->withSum('freezeRequests','freeze')
-                        ->whereMemberId($member->id)
-                        ->get();
+                        ->whereMemberId($member->id);
+                        //->get();
+        $memberships = $memberships_query->get();
+        $current_membership =$memberships_query->whereIn('status',['current','pending'])->first();
     
         return response()->json([
             'message'=>'Successfully',
             'data'=>[
                 'member'        => $member,
+                'current_membership'=>$current_membership,
                 'memberships'   => $memberships,
             ]
         ],200);
@@ -218,15 +224,14 @@ class AuthController extends Controller
             ->with(['trainer' => function ($query) {
                 $query->withSum('ratings', 'rate')->withCount('ratings');
             }])
-            ->where('status', 'current')
+            ->whereIn('status', ['current','pending'])
             ->latest()
             ->first();
-
         if (!$membership) {
-            return response()->json(['message' => 'Current membership is expired'], 402);
+            return response()->json(['message' => 'Current membership is expired','data'=>null], 402);
         }
 
-        return response()->json(['message'=>'completed','data'=>['trainer' => $membership->trainer]], 200);
+        return response()->json(['message'=>'completed','data'=>['trainer' => $membership->trainer,'membership'=>$membership    ]], 200);
     }
 
     public function contact()

@@ -626,6 +626,7 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.', 'namespace' => 'Admin', 'mi
 
     Route::get('payment-invoice/{id}', 'InvoiceController@payment')->name('invoice.payment');
     Route::post('payment-invoice/{id}', 'InvoiceController@storePayment')->name('invoice.storePayment');
+    Route::get('paymentDuePayments-invoice/{id}', 'InvoiceController@paymentDuePayments')->name('invoice.paymentDuePayments');
 
     // Payment
     Route::delete('payments/destroy', 'PaymentController@massDestroy')->name('payments.massDestroy');
@@ -1003,6 +1004,11 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.', 'namespace' => 'Admin', 'mi
     // zoom 
     Route::resource('zoom','Marketing\ZoomController');
     Route::put('zoom-end/{meeting_id}','Marketing\ZoomController@end_meeting')->name('zoom.end');
+
+
+    //Free Pt Requests
+    Route::resource('free-requests', 'FreePtRequestsController');
+    Route::post('assign_free_pt_coaches' , 'FreePtRequestsController@assign_free_pt_coache')->name('assign_free_pt_coache');
 });
 
 Route::group(['prefix' => 'profile', 'as' => 'profile.', 'namespace' => 'Auth', 'middleware' => ['auth']], function () {

@@ -29,38 +29,75 @@ class FreezeRequestApiController extends Controller
                                         ->get();
 
             return response()->json([
-                'freeze_requests' => $freeze_requests
+                'message'=>"success",
+                'data' =>[
+                    'freeze'=> $freeze_requests
+                ]
             ],200);
         }else{
             return response()->json([
-                'message' => "Please Login First !"
-            ],200);
+                'message' => "Please Login First !",
+                'data'=>null
+            ],403);
         }
     }
 
     public function store(Request $request)
     {
-        if (auth('sanctum')->id()) 
-        {
-            $member = Lead::whereType('member')->whereUserId(auth('sanctum')->id())->first();
-    
-            // $membership = Membership::whereMemberId($member->id)->latest()->first();
-    
-            $freezeRequest = FreezeRequest::create([
-                'membership_id'         => $request['membership_id'],
-                'freeze'                => $request->freeze,
-                'start_date'            => $request->start_date,
-                'end_date'              => date('Y-m-d', strtotime($request->start_date. ' + '.$request->freeze.' days')),
-                'status'                => 'pending',
-                'created_by_id'         => Auth('sanctum')->id(),
+        try {
+            // Validate request data
+            $validated = $request->validate([
+                'membership_id'    => 'required|exists:memberships,id', // Ensure the membership ID exists in the memberships table
+                'number_of_days'   => 'required|integer|min:1', // Validate freeze is a positive integer
+                'start_date'       => 'required|date|after:today', // Start date must be a valid future date
             ]);
-    
-            // return response()->json(['data' => $freezeRequest], 201);
-            return response()->json(['message' => 'Created successfully'], 201);
-        }else{
-            return response()->json(['message'  => 'Please Login First !'],201);
+            
+            $user_id = $request->user()->id;
+
+            if ($user_id) {
+                $member = Lead::whereType('member')->whereUserId($user_id)->first();
+                // Check if a freeze request for the same membership is already pending
+                $existingFreezeRequest = FreezeRequest::where('membership_id', $validated['membership_id'])
+                    ->whereIn('status', ['confirmed', 'pending'])
+                    ->first();
+
+                if ($existingFreezeRequest) {
+                    return response()->json([
+                        'message' => 'A freeze request for this membership is already pending or confirmed.',
+                        'data' => null
+                    ], 422); // Conflict response
+                }
+                else{
+                    $freezeRequest = FreezeRequest::create([
+                        'membership_id'     => $validated['membership_id'],
+                        'freeze'            => $validated['number_of_days'],
+                        'start_date'        => $validated['start_date'],
+                        'end_date'          => date('Y-m-d', strtotime($validated['start_date']. ' + '.$validated['number_of_days'].' days')),
+                        'status'            => 'pending',
+                        'created_by_id'     => $request->user()->id,
+                    ]);
+
+                    return response()->json(['message' => 'Created successfully','data'=>$freezeRequest], 200);
+                }
+               
+            } else {
+                return response()->json([
+                    'message' => "Please Login First!",
+                    'data' => null
+                ], 403);
+            }
+        } 
+        catch (\Illuminate\Validation\ValidationException $e) {
+            return response()->json([
+                'message' => 'Validation Failed',
+                'data'=>[
+
+                'errors' => $e->errors() // Return detailed validation errors
+                ]
+            ], 422);
         }
     }
+
 
     public function show(FreezeRequest $freezeRequest)
     {

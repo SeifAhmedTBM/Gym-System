@@ -98,11 +98,9 @@ return [
     'reply'                          => 'Reply',
     'body'                           => 'Body',
     'discard'                        => 'Discard',
-    'branches'                       => 'branches' ,
+    'branches'                       => 'Branches' ,
     'branch'                         => 'Branch',
-    'previous_month_report'          => 'Previous Month Reports' ,
-    'previous_month_report'          =>  'Previous Month Reports' ,
-    'branches'                       => 'branches' ,
+    'analysis_report'          => 'Analysis Report' ,
     'employee'                       => 'Employee' ,
     'select_employee'                => 'Select Employee' ,
     'datatables'                     => [

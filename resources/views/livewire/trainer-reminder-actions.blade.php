@@ -1,3 +1,13 @@
+@php
+    $trainers = Auth::user()->employee->branch
+        ? App\Models\User::whereRelation('roles', 'title', 'Trainer')
+            ->whereHas('employee', fn($i) => $i->whereHas('branch', fn($x) => $x->where('id', Auth::user()->employee->branch->id)))
+            ->orderBy('name')
+            ->pluck('name', 'id')
+        : App\Models\User::whereRelation('roles', 'title', 'Trainer')
+            ->orderBy('name')
+            ->pluck('name', 'id');
+@endphp
 <div>
     @if (Auth()->user()->roles[0]->title == 'Trainer')
         <input type="hidden" name="trainer_id" value="{{ auth()->id() }}">
@@ -6,7 +16,8 @@
             <label for="trainer_id">Trainer</label>
             <select name="trainer_id"  class="form-control">
                 <option value="{{ null }}">Select Trainer</option>
-                @foreach (App\Models\User::whereRelation('roles','title','Trainer')->orderBy('name')->pluck('name','id') as $trainer_id => $trainer_name)
+
+            @foreach ($trainers as $trainer_id => $trainer_name)
                     <option value="{{ $trainer_id }}">{{ $trainer_name }}</option>
                 @endforeach
             </select>
@@ -23,7 +34,10 @@
 {{--                    @endif--}}
 {{--                @else--}}
 {{--                @endif--}}
+                @if ($key != 'done' && $key != 'not_interested')
                     <option value="{{ $key }}">{{ $value }}</option>
+                @endif
+{{--                    <option value="{{ $key }}">{{ $value }}</option>--}}
             @endforeach
 
         </select>

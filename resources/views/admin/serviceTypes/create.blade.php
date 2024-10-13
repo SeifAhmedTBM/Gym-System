@@ -80,6 +80,21 @@
                             </div>
                         </div>
                     </div>
+
+                    <div class="col-md-6">
+                        <div class="row">
+                            <div class="col-md-4 mt-4">
+                                <h5>IS CLASS  </h5>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="c-switch c-switch-3d c-switch-success my-4">
+                                    <input  type="checkbox" name="isClass" id="isClass" value="true"
+                                        class="c-switch-input">
+                                    <span class="c-switch-slider shadow-none"></span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
 

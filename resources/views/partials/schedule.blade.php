@@ -56,6 +56,22 @@
                                     }
                                 @endphp
                                 @forelse ($timeslots as $timeslot)
+                                    @php
+                                        $hasSchedule = false;
+                                        foreach (App\Models\Schedule::DAY_SELECT as $k => $d) {
+                                            if ($branch_id != NULL) {
+                                                $sch_day = $timeslot->schedules()->where('branch_id', $branch_id)->where('day', $k)->get();
+                                            } else {
+                                                $sch_day = $timeslot->schedules()->where('day', $k)->get();
+                                            }
+
+                                            if ($sch_day->isNotEmpty()) {
+                                                $hasSchedule = true;
+                                                break;
+                                            }
+                                        }
+                                    @endphp
+                                    @if($hasSchedule)
                                     <tr>
                                         <td class="font-weight-bold">
                                             {{ date('g:i A', strtotime($timeslot->from)) }}  - {{ date('g:i A', strtotime($timeslot->to))}}
@@ -99,6 +115,7 @@
                                             
                                         @endforeach
                                     </tr>
+                                    @endif
                                 @empty
                                     <tr>
                                         <td colspan="8" class="text-center">{{ trans('global.no_data_available') }}

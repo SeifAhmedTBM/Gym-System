@@ -17,6 +17,13 @@ class InvoiceApiController extends Controller
 {
     public function index()
     {
+        if(! auth('sanctum')->id())
+        {
+            return response()->json([
+                'message' =>'unauthorized!',
+                'data' => null
+            ],403);
+        }
         // abort_if(Gate::denies('invoice_access'), Response::HTTP_FORBIDDEN, '403 Forbidden');
 
         // $memberships = Membership::with([
@@ -35,7 +42,7 @@ class InvoiceApiController extends Controller
                                         'id'                        => $invoice->id,
                                         'start_date'                => $invoice->membership->start_date ?? '-',
                                         'end_date'                  => $invoice->membership->end_date ?? '-',
-                                        'service_pricelist_name'    => $invoice->membership->service_pricelist->name ?? '-',
+                                        'service_pricelist_name'    => $invoice->membership->service_pricelist->service->name .' - ' .$invoice->membership->service_pricelist->name ?? '-',
                                         'service_pricelist_amount'  => $invoice->membership->service_pricelist->amount ?? '0',
                                         'discount'                  => $invoice->discount ?? '0',
                                         'net_amount'                => $invoice->net_amount ?? '0',
@@ -48,7 +55,10 @@ class InvoiceApiController extends Controller
                                 });
 
         return response()->json([
-            'invoices' => $invoices
+            'message' =>'successfully',
+            'data'=> [
+                'invoices' => $invoices
+            ]
         ],200);
     }
 

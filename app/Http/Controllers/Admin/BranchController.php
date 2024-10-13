@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Models\Account;
 use App\Models\User;
 use App\Models\Branch;
 use App\Models\Doctor;
@@ -52,6 +53,9 @@ class BranchController extends Controller
         
         $fitness_managers = User::whereRelation('roles','title','Fitness Manager')->pluck('name','id');
 
+//        dd($branch->accounts);
+
+
         return view('admin.branches.edit', compact('branch','sales_managers','fitness_managers'));
     }
 
@@ -87,11 +91,12 @@ class BranchController extends Controller
 
     public function getBranchAccounts($id)
     {
-        $branch = Branch::with('accounts')->findOrFail($id);
+        $branch = Branch::with(['accounts','online_account'])->findOrFail($id);
 
         return response()->json([
             'branch'        => $branch,
-            'accounts'      => $branch->accounts
+            'accounts'      => $branch->accounts,
+            'online_account'      => $branch->online_account,
         ]);
     }
 }

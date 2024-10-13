@@ -11,6 +11,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class Pricelist extends Model
 {
+
     use SoftDeletes;
     use Auditable;
     use HasFactory;
@@ -56,6 +57,7 @@ class Pricelist extends Model
         'deleted_at',
         'max_count',
     ];
+    
 
     public function service()
     {
