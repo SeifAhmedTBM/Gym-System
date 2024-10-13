@@ -24,7 +24,7 @@ class Kernel extends ConsoleKernel
      * @var array
      */
     protected $commands = [
-        Commands\UpdateMemberShipesStauts::class,
+        //
     ];
 
     /**
