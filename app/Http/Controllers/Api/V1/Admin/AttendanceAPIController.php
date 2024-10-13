@@ -813,12 +813,13 @@ class AttendanceAPIController extends Controller
         $last_pt_attend                     = $pt_membership->attendances()->whereDate('created_at',date('Y-m-d'))->latest()->first();
         $last_main_membership_attendnace    = $main_membership->attendances()->whereDate('created_at',date('Y-m-d'))->latest()->first();
 
-        $last_pt_created_at = $last_pt_attend->created_at;
+        
      
         if($last_main_membership_attendnace)
         {
             if ($last_pt_attend) 
             {
+                $last_pt_created_at = $last_pt_attend->created_at;
                 if($last_pt_created_at->lt($current_time->subHours(12))){
                     $attend = MembershipAttendance::create([
                         'sign_in'                   => $request['time'],
