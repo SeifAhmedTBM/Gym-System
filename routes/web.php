@@ -79,6 +79,31 @@ Route::get('update-membership-status', function () {
     return $memberships_data;
 });
 
+Route::get('updatemembershipstatus', function () {
+    $today = now()->format('Y-m-d');
+    Membership::whereHas('service_pricelist.service.service_type', function ($q) {
+        $q->where('main_service', true);
+    })->whereDate('start_date', $today)
+        ->whereNot('status','!=','refunded')
+        ->update(['status' => 'current']);
+    Membership::whereHas('service_pricelist.service.service_type', function ($q) {
+        $q->where('main_service', true);
+    })->whereDate('end_date', $today)
+        ->whereNot('status','refunded')
+        ->update(['status' => 'expired']);
+    return $today;
+});
+
+Route::get('updat-all-emembershipstatus', function () {
+    $today = now()->format('Y-m-d');
+    Membership::whereHas('service_pricelist.service.service_type', function ($q) {
+        $q->where('main_service', true);
+    })->whereDate('end_date','<', $today)
+        ->whereNotIn('status', ['refunded', 'expired'])
+        ->update(['status' => 'expired']);
+    return $today;
+});
+
 
 Route::get('update-trainer-attendants', function () {
 
