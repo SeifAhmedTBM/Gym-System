@@ -111,6 +111,7 @@ class Membership extends Model
     {
         return $this->hasMany(MembershipAttendance::class, 'membership_id');
     }
+    
 
     public function freezeRequests()
     {

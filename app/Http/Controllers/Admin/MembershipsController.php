@@ -164,7 +164,7 @@ class MembershipsController extends Controller
             });
 
             $table->addColumn('remaining_sessions', function ($row) {
-                return $row->member && $row->service_pricelist && $row->service_pricelist->service && $row->service_pricelist->service->service_type && $row->service_pricelist->service->service_type->session_type == 'non_sessions' ? ($row->attendances_count . ' \\ ' . $row->service_pricelist->session_count) : ($row->trainer_attendances_count . ' \\ ' . $row->service_pricelist->session_count);
+                return $row->member && $row->service_pricelist && $row->service_pricelist->service && $row->service_pricelist->service->service_type ? ($row->attendances_count . ' \\ ' . $row->service_pricelist->session_count) : ($row->trainer_attendances_count . ' \\ ' . $row->service_pricelist->session_count);
             });
 
             $table->addColumn('trainer_name', function ($row) {

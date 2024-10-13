@@ -28,6 +28,8 @@ class MembershipsServicesApiController extends Controller
     public function __construct(){
         $this->mobile_setting = MobileSetting::all()->first();
     }
+
+    
     public function memberships()
     {
         $service_type_id = $this->mobile_setting->membership_service_type;
