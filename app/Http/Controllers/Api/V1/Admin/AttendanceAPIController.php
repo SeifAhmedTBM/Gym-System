@@ -712,6 +712,7 @@ class AttendanceAPIController extends Controller
 
     public function takeManualAttend(Request $request)
     {
+     
         $user_id = $request->user()->id;
 
         $Lead = Lead::where('user_id' , $user_id)->latest()->first();
@@ -745,8 +746,8 @@ class AttendanceAPIController extends Controller
             {
                 return response()->json([
                     'status'                  => false ,
-                    'Message'                    =>  "Cannot attend you are attending less that 15 min ago"
-                ],442);
+                    'message'                    =>  "Cannot attend you are attending less that 15 min ago"
+                ],422);
             }
             else
             {
@@ -777,7 +778,7 @@ class AttendanceAPIController extends Controller
 
         return response()->json([
             'status'                  => true ,
-            'Message'                    =>  "attended successfully"
+            'message'                    =>  "attended successfully"
         ],200);
 
         // $this->sent_successfully();
