@@ -712,9 +712,26 @@ class AttendanceAPIController extends Controller
 
     public function takeManualAttend(Request $request)
     {
+        $user_id = $request->user()->id;
+
+        $Lead = Lead::where('user_id' , $request->user_id)->first();
+
+        $membership = Membership::where('member_id', $Lead->id)
+        ->whereHas('service_pricelist', function ($q) {
+            $q->whereHas('service', function ($x) {
+                $x->whereHas('service_type', function ($i) {
+                    $i->where([
+                        ['isClass', false],
+                        ['is_pt', false],
+                    ]); // Ensure this is the correct column name
+                });
+            });
+        })
+        ->with('attendances')
+        ->latest()
+        ->first();
 
        
-        $membership = Membership::with('attendances')->findOrFail($request->id);
 
         $last_attend    = $membership->attendances()->whereDate('created_at',date('Y-m-d'))->latest()->first();
 
@@ -724,12 +741,15 @@ class AttendanceAPIController extends Controller
             $sign_in        = Carbon::parse($last_attend->sign_in);
             $diffTime       = $now->diffInMinutes($sign_in);
 
-            if ($diffTime <= 15) {
+            if($diffTime <= 15) 
+            {
                 return response()->json([
                     'status'                  => false ,
                     'Message'                    =>  "Cannot attend you are attending less that 15 min ago"
                 ],442);
-            }else{
+            }
+            else
+            {
                 $attend = MembershipAttendance::create([
                     'sign_in'                   => $request['time'],
                     'sign_out'                  => $request['time'],
