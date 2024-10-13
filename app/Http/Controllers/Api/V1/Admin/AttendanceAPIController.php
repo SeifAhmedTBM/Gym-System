@@ -745,7 +745,7 @@ class AttendanceAPIController extends Controller
             if($diffTime <= 15) 
             {
                 return response()->json([
-                    'status'                  => false ,
+                    'status'                     => false ,
                     'message'                    =>  "Cannot attend you are attending less that 15 min ago"
                 ],422);
             }
@@ -777,11 +777,111 @@ class AttendanceAPIController extends Controller
         }
 
         return response()->json([
-            'status'                  => true ,
+            'status'                     =>  true ,
             'message'                    =>  "attended successfully"
         ],200);
 
         // $this->sent_successfully();
         // return back();
+    }
+
+
+    public function takePtAttend(Request $request)
+    {
+     
+        $user_id = $request->user()->id;
+
+        $Lead = Lead::where('user_id' , $user_id)->latest()->first();
+        $main_membership = Membership::where('member_id', $Lead->id)
+        ->whereHas('service_pricelist', function ($q) {
+            $q->whereHas('service', function ($x) {
+                $x->whereHas('service_type', function ($i) {
+                    $i->where([
+                        ['isClass', false],
+                        ['is_pt', false],
+                    ]); // Ensure this is the correct column name
+                });
+            });
+        })
+        ->with('attendances')
+        ->latest()
+        ->first();
+      
+        $pt_membership = Membership::where('member_id', $Lead->id)
+        ->whereHas('service_pricelist', function ($q) {
+            $q->whereHas('service', function ($x) {
+                $x->whereHas('service_type', function ($i) {
+                    $i->where([
+                        ['isClass', false],
+                        ['is_pt', true],
+                    ]); // Ensure this is the correct column name
+                });
+            });
+        })
+        ->with('attendances')
+        ->latest()
+        ->first();
+      
+       
+        $current_time = now();
+        $last_pt_attend                     = $pt_membership->attendances()->whereDate('created_at',date('Y-m-d'))->latest()->first();
+        $last_main_membership_attendnace    = $main_membership->attendances()->whereDate('created_at',date('Y-m-d'))->latest()->first();
+
+        $last_pt_created_at = $last_pt_attend->created_at;
+     
+        if($last_main_membership_attendnace)
+        {
+            if ($last_pt_attend) 
+            {
+                if($last_pt_created_at->lt($current_time->subHours(12))){
+                    $attend = MembershipAttendance::create([
+                        'sign_in'                   => $request['time'],
+                        'sign_out'                  => $request['time'],
+                        'membership_id'             => $pt_membership->id,
+                        //'created_at'                => $request['date'].$request['time'],
+                        'membership_status'         => $pt_membership->status
+                    ]); 
+                }
+               
+                else
+                {
+                    return response()->json([
+                        'status'                     => false ,
+                        'message'                    =>  "You are signed in less than 12 hours ago."
+                    ],422);
+                }
+            }
+            else
+            {
+                $attend = MembershipAttendance::create([
+                    'sign_in'                   => $request['time'],
+                    'sign_out'                  => $request['time'],
+                    'membership_id'             => $pt_membership->id,
+                    //'created_at'                => $request['date'].$request['time'],
+                    'membership_status'         => $pt_membership->status
+                ]);
+             
+            }
+        }
+        else
+        {
+            return response()->json([
+                'status'                     => false ,
+                'message'                    =>  "You Must Attend In Gym Firstly"
+            ],422);
+        }
+        if (isset($attend)) 
+        {
+            $pt_membership->update([
+                'last_attendance'      => $attend->created_at
+            ]);
+        }
+
+        return response()->json([
+            'status'                     =>  true ,
+            'message'                    =>  "You Attend Succefully"
+        ],200);
+
+     
     }
 }
