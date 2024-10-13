@@ -714,8 +714,8 @@ class AttendanceAPIController extends Controller
     {
         $user_id = $request->user()->id;
 
-        $Lead = Lead::where('user_id' , $request->user_id)->first();
-
+        $Lead = Lead::where('user_id' , $user_id)->latest()->first();
+    
         $membership = Membership::where('member_id', $Lead->id)
         ->whereHas('service_pricelist', function ($q) {
             $q->whereHas('service', function ($x) {
@@ -730,7 +730,7 @@ class AttendanceAPIController extends Controller
         ->with('attendances')
         ->latest()
         ->first();
-
+      
        
 
         $last_attend    = $membership->attendances()->whereDate('created_at',date('Y-m-d'))->latest()->first();
