@@ -127,7 +127,8 @@ Route::group(['prefix' => 'v1', 'as' => 'api.', 'namespace' => 'Api\V1\Admin'], 
 
     // Hotdeals
     Route::post('hotdeals/media', 'HotdealsApiController@storeMedia')->name('hotdeals.storeMedia');
-    Route::middleware('auth:sanctum')->apiResource('hotdeals', 'HotdealsApiController');
+    Route::apiResource('hotdeals', 'HotdealsApiController');
+    Route::post('all-hotdeals', 'HotdealsApiController@index');
 
     // Gallery Section
     Route::apiResource('gallery-sections', 'GallerySectionApiController');
