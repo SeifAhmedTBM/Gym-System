@@ -63,7 +63,7 @@ class NotificationController extends Controller
  
         $projectId = config('services.firebase.project_id'); 
 
-        $credentialsFilePath = Storage::path('json/zfitness-7ba5b-firebase-adminsdk-cn1o0-d1e59fea18.json');
+        $credentialsFilePath = Storage::path('json/zfitness-cfd0a-firebase-adminsdk-4rccc-4936322033.json');
         $client = new GoogleClient();
         $client->setAuthConfig($credentialsFilePath);
         $client->addScope('https://www.googleapis.com/auth/firebase.messaging');
