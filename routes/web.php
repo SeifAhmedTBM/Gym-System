@@ -79,7 +79,7 @@ Route::get('update-membership-status', function () {
     return $memberships_data;
 });
 
-Route::get('updatemembershipstatus', function () {
+Route::get('update-memberships-status', function () {
     $today = now()->format('Y-m-d');
     $expiredCount = Membership::whereHas('service_pricelist.service.service_type', function ($q) {
         $q->where('main_service', true);
@@ -100,7 +100,7 @@ Route::get('updatemembershipstatus', function () {
     ]);
 });
 
-Route::get('updat-all-emembershipstatus', function () {
+Route::get('update-all-memberships-status', function () {
     $today = now()->format('Y-m-d');
     $expiredCount = Membership::whereHas('service_pricelist.service.service_type', function ($q) {
         $q->where('main_service', true);
