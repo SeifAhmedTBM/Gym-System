@@ -18,12 +18,12 @@ class HotdealsApiController extends Controller
 
     public function index(Request $request)
     {
-        if($request->user()->id){
-            $hotdeals = Hotdeal::where('type' ,'members')->get();
+        if($request->is_guest == 1 ){
+            $hotdeals = Hotdeal::where('type' ,'all')->get();
         }
         else
         {
-            $hotdeals = Hotdeal::where('type' ,'all')->get();
+            $hotdeals = Hotdeal::where('type' ,'members')->get();
         }
        
         $response = [];
