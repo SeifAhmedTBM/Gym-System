@@ -105,7 +105,7 @@ Route::get('update-all-memberships-status', function () {
     $currentCount = Membership::whereHas('service_pricelist.service.service_type', function ($q) {
         $q->where('main_service', true);
     })->whereDate('start_date','<=', $today)
-        ->whereDate('end_date','>=', $today)
+        ->whereDate('end_date','>', $today)
         ->whereNotIn('status',['refunded','current'])
         ->update(['status' => 'current']);
 
