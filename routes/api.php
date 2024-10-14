@@ -242,6 +242,9 @@ Route::group(['prefix' => 'v1', 'as' => 'api.', 'namespace' => 'Api\V1\Admin'], 
 
 
     Route::middleware('auth:sanctum')->post('takeManualAttend' ,'AttendanceAPIController@takeManualAttend');
+
+    Route::middleware('auth:sanctum')->apiResource('notifications' ,'NotificationController');
+    
     Route::middleware('auth:sanctum')->post('takePtAttend', 'AttendanceAPIController@takePtAttend');
 });
  
