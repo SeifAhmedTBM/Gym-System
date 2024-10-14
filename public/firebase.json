@@ -1,0 +1,12 @@
+{
+    "type": "service_account",
+    "project_id": "zfitness-6853f",
+    "private_key_id": "BPYVX64k6J39xBojV673szDseQmXfDTliukLLYZU2B9Q-swZeKzZKD4dwe9KH1YwU_T_gs1DVJy4hjU1xhge9Qw",
+    "private_key": "-----BEGIN PRIVATE KEY-----\nNg6uxWcAVE88CcUMaN3BRqW0X_WuOT5qktB2lbs6jdo\n-----END PRIVATE KEY-----\n",
+    "client_email": "firebase-adminsdk-2kjge@zfitness-6853f.iam.gserviceaccount.com",
+    "client_id": "102361535290518530786",
+    "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+    "token_uri": "https://oauth2.googleapis.com/token",
+    "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+    "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/firebase-adminsdk-2kjge@zfitness-6853f.iam.gserviceaccount.com"
+  }
