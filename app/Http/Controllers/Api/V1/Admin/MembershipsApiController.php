@@ -88,7 +88,7 @@ class MembershipsApiController extends Controller
         $main_membership = Membership::with([
             'member',
             'invitations',
-        ])->whereId($latest_membership->id)->whereIn('status', ['current'])
+        ])->whereId($latest_membership->id)
             ->with([
                 'service_pricelist' => fn($q) => $q
                     ->with([
