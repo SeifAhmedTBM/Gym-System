@@ -16,9 +16,16 @@ class HotdealsApiController extends Controller
 {
     use MediaUploadingTrait;
 
-    public function index()
+    public function index(Request $request)
     {
-        $hotdeals = Hotdeal::all();
+        if($request->is_guest == 1 ){
+            $hotdeals = Hotdeal::where('type' ,'all')->get();
+        }
+        else
+        {
+            $hotdeals = Hotdeal::where('type' ,'members')->get();
+        }
+       
         $response = [];
         foreach ($hotdeals as $hotdeal) {
             array_push($response, [

@@ -1302,15 +1302,16 @@ class MembershipsController extends Controller
 
         $setting = Setting::firstOrFail();
 
-        // dd($request->all());
-
         $expiring_memberships = Membership::index($request->all())
             ->withCount('attendances')
             ->withCount('trainer_attendances')
             ->with(['service_pricelist.service.service_type','member.branch','assigned_coach','sales_by'])
             ->whereIn('status',['expiring','expired'])
-            ->latest()
-            ->get();
+            ->latest();
+        if(Auth()->user()->employee->branch){
+            $expiring_memberships->whereHas('member',fn($x)=>$x->whereHas('branch',fn($i)=>$i->where('id',Auth()->user()->employee->branch->id)));
+        };
+           $expiring_memberships=$expiring_memberships->get();
 
         return view('admin.memberships.expiring_expired', compact('expiring_memberships', 'sales', 'setting','branches','service_types'));
     }

@@ -28,12 +28,12 @@
                             <select name="sales_by_id" id="sales_by_id" class="form-control" {{ $employee && Auth()->user()->roles[0]->title == 'Sales' ? 'readonly' : '' }}>
                                 <option value="{{ null }}" selected>Sales By</option>
                             @if($employee && $employee->branch_id != NULL)
-                                @foreach (App\Models\User::whereRelation('roles','title','Sales')->whereRelation('employee','branch_id',$employee->branch_id)->pluck('name', 'id') as $id => $name)
+                                @foreach (App\Models\User::whereRelation('roles','title','Sales')->whereRelation('employee','branch_id',$employee->branch_id)->whereRelation('employee','status','active')->pluck('name', 'id') as $id => $name)
                                     <option value="{{ $id }}"
                                         {{ request('sales_by_id') == $id ? 'selected' : '' }}>{{ $name }}</option>
                                 @endforeach
                             @else
-                                    @foreach (App\Models\User::whereRelation('roles','title','Sales')->pluck('name', 'id') as $id => $name)
+                                    @foreach (App\Models\User::whereRelation('roles','title','Sales')->whereRelation('employee','status','active')->pluck('name', 'id') as $id => $name)
                                         <option value="{{ $id }}"
                                                 {{ request('sales_by_id') == $id ? 'selected' : '' }}>{{ $name }}</option>
                                     @endforeach

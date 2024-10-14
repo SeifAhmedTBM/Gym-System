@@ -1,3 +1,16 @@
+@php
+    $branches  = Auth::user()->employee->branch
+        ? App\Models\Branch::where('id',Auth::user()->employee->branch->id)->pluck('name', 'id')
+        : App\Models\Branch::pluck('name', 'id');
+   $trainers = Auth::user()->employee->branch
+        ? App\Models\User::whereRelation('roles', 'title', 'Trainer')
+            ->whereHas('employee', fn($i) => $i->whereHas('branch', fn($x) => $x->where('id', Auth::user()->employee->branch->id)))
+            ->orderBy('name')
+            ->pluck('name', 'id')
+        : App\Models\User::whereRelation('roles', 'title', 'Trainer')
+            ->orderBy('name')
+            ->pluck('name', 'id');
+@endphp
 @extends('layouts.admin')
 @section('content')
     <div class="card">
@@ -13,7 +26,7 @@
                                 value="{{ request('to') ?? date('Y-m-t') }}">
                             <select name="branch_id" id="branch_id" class="form-control">
                                 <option value="{{ null }}" selected>Branch</option>
-                                @foreach (App\Models\Branch::pluck('name', 'id') as $id => $name)
+                                @foreach ($branches as $id => $name)
                                     <option value="{{ $id }}" {{ request('branch_id') == $id ? 'selected' : '' }}>
                                         {{ $name }}</option>
                                 @endforeach
@@ -28,7 +41,7 @@
                             </select>
                             <select name="trainer_id" id="trainer_id" class="form-control">
                                 <option value="{{ null }}" selected>Trainer</option>
-                                @foreach (App\Models\User::whereRelation('roles','title','Trainer')->pluck('name', 'id') as $id => $name)
+                                @foreach ($trainers as $id => $name)
                                     <option value="{{ $id }}"
                                         {{ request('trainer_id') == $id ? 'selected' : '' }}>{{ $name }}</option>
                                 @endforeach

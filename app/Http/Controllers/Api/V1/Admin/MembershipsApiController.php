@@ -69,38 +69,72 @@ class MembershipsApiController extends Controller
     public function member_ship_statistics(Request $request){
         $Lead = Lead::where('user_id' , $request->user()->id)->first();
 
-        $latest_membership = Membership::where('member_id', $Lead->id)->latest()->first();
+        $latest_membership = Membership::where('member_id', $Lead->id)
+        ->whereHas('service_pricelist', function ($q) {
+            $q->whereHas('service', function ($x) {
+                $x->whereHas('service_type', function ($i) {
+                    $i->where([
+                        ['isClass', false],
+                        ['is_pt', false],
+                    ]); // Ensure this is the correct column name
+                });
+            });
+        })
+        ->withCount('invitations')
+        ->latest()
+        ->first();
 
 
         $main_membership = Membership::with([
             'member',
             'invitations',
-        ])->whereId($latest_membership->id)->whereIn('status', ['current', 'expiring'])
+        ])->whereId($latest_membership->id)
             ->with([
                 'service_pricelist' => fn($q) => $q
                     ->with([
                         'service' => fn($x) => $x->with([
-                            'service_type' => fn($i) => $i->whereMainService(true)
+                            'service_type' => fn($i) => $i->where([
+                                ['isClass' , false],
+                                ['is_pt' , false]
+                                ])
                         ])
                     ])
             ])->whereHas('service_pricelist', function ($q) {
                 $q->whereHas('service', function ($x) {
                     $x->whereHas('service_type', function ($i) {
-                        $i->whereMainService(true);
+                        $i->where([
+                            ['isClass', false],
+                            ['is_pt', false],
+                        ]);
                     });
                 });
             })
             ->withCount('invitations')
+            ->latest()
+            
             ->first();
-
+     
             
         $counter = MembershipServiceOptions::where('service_option_pricelist_id', 1)->where('membership_id', $latest_membership->id)->count();
         
 
         $invitation_counter = Invitation::where('membership_id' , $latest_membership->id)->count();
         
-        $pricelist_inbody = ServiceOptionsPricelist::where('pricelist_id' , $main_membership->service_pricelist_id)->where('service_option_id',1)->first();
-        $total_inbody_numer = $pricelist_inbody->count;
+
+        if($main_membership) {
+            $pricelist_inbody        = ServiceOptionsPricelist::where('pricelist_id' , $main_membership->service_pricelist_id)->where('service_option_id',1)->first();
+            $total_inbody_numer      = $pricelist_inbody->count;
+            $invitations_count       = $main_membership->invitations_count ;
+            $total_invitations_count = $main_membership->service_pricelist->invitation;
+        }
+
+       else
+       {
+            $invitations_count       = 0;
+            $total_invitations_count = 0;
+            $total_inbody_numer      = 0 ;
+       }
+  
 
         
 
@@ -109,8 +143,8 @@ class MembershipsApiController extends Controller
                 'data'                    => [
                     'inbody_count'            => $counter,
                     'total_inbody_count'      => $total_inbody_numer ,
-                    'invitations_count'       => $main_membership->invitations_count ,
-                    'total_invitations_count' => $main_membership->service_pricelist->invitation,
+                    'invitations_count'       => $invitations_count ,
+                    'total_invitations_count' => $total_invitations_count,
                 ]
             ],200);
         }

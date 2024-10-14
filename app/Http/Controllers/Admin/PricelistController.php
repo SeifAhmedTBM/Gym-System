@@ -112,6 +112,7 @@ class PricelistController extends Controller
 
     public function create($id)
     {
+        
         abort_if(Gate::denies('pricelist_create'), Response::HTTP_FORBIDDEN, '403 Forbidden');
 
         $service = Service::findOrFail($id);

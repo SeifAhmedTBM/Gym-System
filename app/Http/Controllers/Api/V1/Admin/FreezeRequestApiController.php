@@ -51,40 +51,43 @@ class FreezeRequestApiController extends Controller
                 'number_of_days'   => 'required|integer|min:1', // Validate freeze is a positive integer
                 'start_date'       => 'required|date|after:today', // Start date must be a valid future date
             ]);
+            
+            $user_id = $request->user()->id;
 
-            if (auth('sanctum')->id()) {
-                $member = Lead::whereType('member')->whereUserId(auth('sanctum')->id())->first();
+            if ($user_id) {
+                $member = Lead::whereType('member')->whereUserId($user_id)->first();
                 // Check if a freeze request for the same membership is already pending
-                $existingFreezeRequest = FreezeRequest::
-                    where('membership_id', $validated['membership_id'])
-                    ->where('freeze',$validated['number_of_days'])
-                    ->where('start_date',$validated['start_date'])
-                    ->whereIn('status', ['pending','confirmed'])
+                $existingFreezeRequest = FreezeRequest::where('membership_id', $validated['membership_id'])
+                    ->whereIn('status', ['confirmed', 'pending'])
                     ->first();
 
                 if ($existingFreezeRequest) {
                     return response()->json([
                         'message' => 'A freeze request for this membership is already pending or confirmed.',
                         'data' => null
-                    ], 409); // Conflict response
+                    ], 422); // Conflict response
                 }
-                $freezeRequest = FreezeRequest::create([
-                    'membership_id'     => $validated['membership_id'],
-                    'freeze'            => $validated['number_of_days'],
-                    'start_date'        => $validated['start_date'],
-                    'end_date'          => date('Y-m-d', strtotime($validated['start_date']. ' + '.$validated['number_of_days'].' days')),
-                    'status'            => 'pending',
-                    'created_by_id'     => auth('sanctum')->id(),
-                ]);
+                else{
+                    $freezeRequest = FreezeRequest::create([
+                        'membership_id'     => $validated['membership_id'],
+                        'freeze'            => $validated['number_of_days'],
+                        'start_date'        => $validated['start_date'],
+                        'end_date'          => date('Y-m-d', strtotime($validated['start_date']. ' + '.$validated['number_of_days'].' days')),
+                        'status'            => 'pending',
+                        'created_by_id'     => $request->user()->id,
+                    ]);
 
-                return response()->json(['message' => 'Created successfully','data'=>$freezeRequest], 201);
+                    return response()->json(['message' => 'Created successfully','data'=>$freezeRequest], 200);
+                }
+               
             } else {
                 return response()->json([
                     'message' => "Please Login First!",
                     'data' => null
                 ], 403);
             }
-        } catch (\Illuminate\Validation\ValidationException $e) {
+        } 
+        catch (\Illuminate\Validation\ValidationException $e) {
             return response()->json([
                 'message' => 'Validation Failed',
                 'data'=>[

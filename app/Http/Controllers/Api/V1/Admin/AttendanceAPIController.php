@@ -712,32 +712,39 @@ class AttendanceAPIController extends Controller
 
     public function takeManualAttend(Request $request)
     {
+     
+        $user_id = $request->user()->id;
 
+        $Lead = Lead::where('user_id' , $user_id)->latest()->first();
+    
+        $membership = Membership::where('member_id', $Lead->id)
+        ->whereHas('service_pricelist', function ($q) {
+            $q->whereHas('service', function ($x) {
+                $x->whereHas('service_type', function ($i) {
+                    $i->where([
+                        ['isClass', false],
+                        ['is_pt', false],
+                    ]); // Ensure this is the correct column name
+                });
+            });
+        })
+        ->with('attendances')
+        ->latest()
+        ->first();
+      
        
-        $membership = Membership::with('attendances')->findOrFail($request->id);
 
         $last_attend    = $membership->attendances()->whereDate('created_at',date('Y-m-d'))->latest()->first();
 
         if (isset($last_attend) && $last_attend) 
         {
-            $now            = Carbon::parse(now());
-            $sign_in        = Carbon::parse($last_attend->sign_in);
-            $diffTime       = $now->diffInMinutes($sign_in);
-
-            if ($diffTime <= 15) {
-                return response()->json([
-                    'status'                  => false ,
-                    'Message'                    =>  "Cannot attend you are attending less that 15 min ago"
-                ],442);
-            }else{
-                $attend = MembershipAttendance::create([
-                    'sign_in'                   => $request['time'],
-                    'sign_out'                  => $request['time'],
-                    'membership_id'             => $membership->id,
-                    //'created_at'                => $request['date'].$request['time'],
-                    'membership_status' => $membership->status
-                ]);
-            }
+            $attend = MembershipAttendance::create([
+                'sign_in'                   => $request['time'],
+                'sign_out'                  => $request['time'],
+                'membership_id'             => $membership->id,
+                //'created_at'                => $request['date'].$request['time'],
+                'membership_status' => $membership->status
+            ]);
         }else{
             $attend = MembershipAttendance::create([
                 'sign_in'                   => $request['time'],
@@ -756,11 +763,112 @@ class AttendanceAPIController extends Controller
         }
 
         return response()->json([
-            'status'                  => true ,
-            'Message'                    =>  "attended successfully"
+            'status'                     =>  true ,
+            'message'                    =>  "attended successfully"
         ],200);
 
         // $this->sent_successfully();
         // return back();
+    }
+
+
+    public function takePtAttend(Request $request)
+    {
+     
+        $user_id = $request->user()->id;
+
+        $Lead = Lead::where('user_id' , $user_id)->latest()->first();
+        $main_membership = Membership::where('member_id', $Lead->id)
+        ->whereHas('service_pricelist', function ($q) {
+            $q->whereHas('service', function ($x) {
+                $x->whereHas('service_type', function ($i) {
+                    $i->where([
+                        ['isClass', false],
+                        ['is_pt', false],
+                    ]); // Ensure this is the correct column name
+                });
+            });
+        })
+        ->with('attendances')
+        ->latest()
+        ->first();
+      
+        $pt_membership = Membership::where('member_id', $Lead->id)
+        ->whereHas('service_pricelist', function ($q) {
+            $q->whereHas('service', function ($x) {
+                $x->whereHas('service_type', function ($i) {
+                    $i->where([
+                        ['isClass', false],
+                        ['is_pt', true],
+                    ]); // Ensure this is the correct column name
+                });
+            });
+        })
+        ->with('attendances')
+        ->latest()
+        ->first();
+      
+       
+        $current_time = now();
+        $last_pt_attend                     = $pt_membership->attendances()->whereDate('created_at',date('Y-m-d'))->latest()->first();
+        $last_main_membership_attendnace    = $main_membership->attendances()->whereDate('created_at',date('Y-m-d'))->latest()->first();
+
+        
+     
+        if($last_main_membership_attendnace)
+        {
+            if ($last_pt_attend) 
+            {
+                $last_pt_created_at = $last_pt_attend->created_at;
+                if($last_pt_created_at->lt($current_time->subHours(12))){
+                    $attend = MembershipAttendance::create([
+                        'sign_in'                   => $request['time'],
+                        'sign_out'                  => $request['time'],
+                        'membership_id'             => $pt_membership->id,
+                        //'created_at'                => $request['date'].$request['time'],
+                        'membership_status'         => $pt_membership->status
+                    ]); 
+                }
+               
+                else
+                {
+                    return response()->json([
+                        'status'                     => false ,
+                        'message'                    =>  "You are signed in less than 12 hours ago."
+                    ],422);
+                }
+            }
+            else
+            {
+                $attend = MembershipAttendance::create([
+                    'sign_in'                   => $request['time'],
+                    'sign_out'                  => $request['time'],
+                    'membership_id'             => $pt_membership->id,
+                    //'created_at'                => $request['date'].$request['time'],
+                    'membership_status'         => $pt_membership->status
+                ]);
+             
+            }
+        }
+        else
+        {
+            return response()->json([
+                'status'                     => false ,
+                'message'                    =>  "You Must Attend In Gym Firstly"
+            ],422);
+        }
+        if (isset($attend)) 
+        {
+            $pt_membership->update([
+                'last_attendance'      => $attend->created_at
+            ]);
+        }
+
+        return response()->json([
+            'status'                     =>  true ,
+            'message'                    =>  "You Attend Succefully"
+        ],200);
+
+     
     }
 }

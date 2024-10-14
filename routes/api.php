@@ -128,6 +128,7 @@ Route::group(['prefix' => 'v1', 'as' => 'api.', 'namespace' => 'Api\V1\Admin'], 
     // Hotdeals
     Route::post('hotdeals/media', 'HotdealsApiController@storeMedia')->name('hotdeals.storeMedia');
     Route::apiResource('hotdeals', 'HotdealsApiController');
+    Route::post('all-hotdeals', 'HotdealsApiController@index');
 
     // Gallery Section
     Route::apiResource('gallery-sections', 'GallerySectionApiController');
@@ -182,8 +183,8 @@ Route::group(['prefix' => 'v1', 'as' => 'api.', 'namespace' => 'Api\V1\Admin'], 
     Route::apiResource('service-options-pricelists', 'ServiceOptionsPricelistApiController');
 
     // Freeze Request
-    Route::apiResource('freeze-requests', 'FreezeRequestApiController');
-
+    Route::middleware('auth:sanctum')->apiResource('freeze-requests', 'FreezeRequestApiController');
+    Route::middleware('auth:sanctum')->post('/create_freeze_request', 'FreezeRequestApiController@store');
     // Refund Reasons
     Route::apiResource('refund-reasons', 'RefundReasonsApiController');
 
@@ -208,13 +209,14 @@ Route::group(['prefix' => 'v1', 'as' => 'api.', 'namespace' => 'Api\V1\Admin'], 
     Route::apiResource('session-lists', 'SessionListApiController');
 
     // Schedule
-    Route::apiResource('schedules', 'ScheduleApiController');
-
+    Route::middleware('auth:sanctum')->apiResource('schedules', 'ScheduleApiController');
+    Route::middleware('auth:sanctum')->post('attend_session' , 'ScheduleApiController@attend_session');
+    
 
 
     // Ratings
     Route::apiResource('rate', 'RatingsApiController')->middleware('auth:sanctum');
-
+ 
     // Reasons
     Route::post('reasons/media', 'ReasonsApiController@storeMedia')->name('reasons.storeMedia');
     Route::apiResource('reasons', 'ReasonsApiController');
@@ -243,5 +245,6 @@ Route::group(['prefix' => 'v1', 'as' => 'api.', 'namespace' => 'Api\V1\Admin'], 
 
     Route::middleware('auth:sanctum')->apiResource('notifications' ,'NotificationController');
     
+    Route::middleware('auth:sanctum')->post('takePtAttend', 'AttendanceAPIController@takePtAttend');
 });
  

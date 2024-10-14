@@ -40,8 +40,11 @@
                         <th>
                             Main Service
                         </th>
-                          <th>
+                        <th>
                             IS PT
+                        </th>
+                        <th>
+                            IS CLASS
                         </th>
                         <th>
                             &nbsp;
@@ -125,6 +128,10 @@
                     {
                         data: 'is_pt',
                         name: 'is_pt'
+                    },
+                    {
+                        data: 'isClass',
+                        name: 'isClass'
                     },
                     {
                         data: 'actions',
