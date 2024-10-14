@@ -102,14 +102,22 @@ Route::get('update-memberships-status', function () {
 
 Route::get('update-all-memberships-status', function () {
     $today = now()->format('Y-m-d');
+    $currentCount = Membership::whereHas('service_pricelist.service.service_type', function ($q) {
+        $q->where('main_service', true);
+    })->whereDate('start_date','<=', $today)
+        ->whereDate('end_date','>=', $today)
+        ->whereNotIn('status',['refunded','current'])
+        ->update(['status' => 'current']);
+
     $expiredCount = Membership::whereHas('service_pricelist.service.service_type', function ($q) {
         $q->where('main_service', true);
-    })->whereDate('end_date','<', $today)
+    })->whereDate('end_date','<=', $today)
         ->whereNotIn('status', ['refunded', 'expired'])
         ->update(['status' => 'expired']);
     return response()->json([
         'message' => 'Membership statuses updated successfully.',
         'expired_updated' => $expiredCount,
+        'current_updated' => $currentCount,
     ]);
 });
 
