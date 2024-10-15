@@ -49,7 +49,10 @@ class NotificationController extends Controller
         if ($request->branch_id == null) {
             $fcm_tokens = Lead::whereNotNull('fcm_token')->select('fcm_token','user_id')->get();
         } else {
-            $fcm_tokens = Lead::where('branch_id', $request->branch_id)->whereNotNull('fcm_token')->select('fcm_token','user_id')->get();
+            $fcm_tokens = Lead::where([
+                ['branch_id', $request->branch_id] ,
+                ['fcm_token' , '<>', null],
+                ])->select('fcm_token','user_id')->get();
         }
 
         foreach($fcm_tokens as $fcm_token){
@@ -116,6 +119,7 @@ class NotificationController extends Controller
             }
             
         }
+       
         // return response()->json([
         //     'message' => 'Notifications have been sent',
         //     'responses' => $notificationStatus
