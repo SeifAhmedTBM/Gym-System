@@ -119,10 +119,13 @@ class NotificationController extends Controller
             }
             
         }
-        return response()->json([
-            'message' => 'Notifications have been sent',
-            'responses' => $notificationStatus
-        ]);
+       
+        // return response()->json([
+        //     'message' => 'Notifications have been sent',
+        //     'responses' => $notificationStatus
+        // ]);
+        session()->flash('success','Notification Sent Succefully');
+        return back();
     }
 
     
