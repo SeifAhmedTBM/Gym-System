@@ -10,6 +10,7 @@
         </div>
     @endcan
     <div class="card">
+       
         <div class="card-header">
             <h5>All Notifications</h5>
         </div>
