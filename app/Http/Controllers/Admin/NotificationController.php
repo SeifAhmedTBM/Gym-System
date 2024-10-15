@@ -46,7 +46,7 @@ class NotificationController extends Controller
         $notification->save();
         
         
-        if ($request->branch_id == null) {
+        if ($request->branch_id == 0) {
             $fcm_tokens = Lead::whereNotNull('fcm_token')->select('fcm_token','user_id')->get();
         } else {
             $fcm_tokens = Lead::where([
