@@ -29,7 +29,7 @@
             @csrf
             <div class="form-group">
                 <label class="required" for="section_id">Branches</label>
-                <select class="form-control select2 {{ $errors->has('section') ? 'is-invalid' : '' }}" name="branch" required>
+                <select class="form-control select2 {{ $errors->has('section') ? 'is-invalid' : '' }}" name="branch_id" required>
                         <option value="">All Branches</option> 
                         @foreach($branches as $branch)
                         <option value="{{$branch->id}}">{{$branch->name}}</option> 
