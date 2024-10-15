@@ -21,6 +21,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use App\Models\paymob_transactions;
 
 class SubscriptionApiController extends Controller
 {
@@ -88,6 +89,8 @@ class SubscriptionApiController extends Controller
                 'email' => isset($request->email) && (!is_null($request->email)) ? $request->email : str_replace(' ', '_', $request->name) . $request->member_code . date('Y-m-d h:i:s') . '@zfitness.com',
                 'password' => Hash::make($request->phone)
             ]);
+            $authToken = $user->createToken('auth-token')->plainTextToken;
+
             $last_member_code = Lead::whereType('member') ->when('branch', function ($q) use ($request) {
                 $q->whereBranchId($request->branch_id);
             })->whereDeletedAt(Null)->orderBy('member_code', 'desc')->first()->member_code ?? 1;
@@ -115,7 +118,7 @@ class SubscriptionApiController extends Controller
                 'sport_id'          => $request['sport_id'] ?? NULL,
                 'notes'             => 'Mobile Guest Mode'. $request['notes'],
                 'created_by_id'     => $sales_manager->user->id,
-                'user_id' => $user->id,
+                'user_id' =>        $user->id,
                 'invitation'        => isset($request['invitation']) ? true : false,
             ]);
             $member->leadReminder()->delete();
@@ -189,6 +192,18 @@ class SubscriptionApiController extends Controller
                     'created_at' => now(),
                 ]);
 
+                paymob_transactions::create([
+                    'user_id' => $member->user->id ,
+                    'membership_id' => $membership->id ,
+                    'transaction_amount' => $request->transaction_amount,
+                    'transactionId' => $request->transactionId,
+                    'orderId'       => $request->orderId,
+                    'transaction_createdAt'     => $request->now(),
+                    'paymentMethodType' => $request->paymentMethodType ,
+                    'paymentMethodSubType' => $request->paymentMethodSubType,
+                ]);
+
+
                 // Create follow-up reminder
                 Reminder::create([
                     'type' => 'follow_up',
@@ -226,7 +241,8 @@ class SubscriptionApiController extends Controller
                    'member_code'=>$last_member_code,
                    'membership' => $membership,
                    'invoice' => $invoice
-               ]
+               ] ,
+               'token' => $authToken,
             ]);
 
         } catch (\Illuminate\Validation\ValidationException $validationException) {
@@ -371,6 +387,17 @@ class SubscriptionApiController extends Controller
                     'account_id' => $branch->online_account?$branch->online_account->id : $mobile_settings->account_id,
                     'created_by' => $member->user->id,
                     'created_at' => now(),
+                ]);
+
+                paymob_transactions::create([
+                    'user_id' => $member->user->id ,
+                    'membership_id' => $membership->id ,
+                    'transaction_amount' => $request->transaction_amount,
+                    'transactionId' => $request->transactionId,
+                    'orderId'       => $request->orderId,
+                    'transaction_createdAt'     => $request->now(),
+                    'paymentMethodType' => $request->paymentMethodType ,
+                    'paymentMethodSubType' => $request->paymentMethodSubType,
                 ]);
 
                 // Create follow-up reminder
