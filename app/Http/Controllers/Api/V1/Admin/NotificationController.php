@@ -26,4 +26,27 @@ class NotificationController extends Controller
         ],200);
     }
 
+
+    public function clearUserNotifications(Request $request){
+        $user = $request->user()->id;
+        $notifications = user_notifications::where('user_id', $user)->get();
+
+        if(!$notifications->isEmpty()){
+            user_notifications::where('user_id', $user)->delete();
+            return response()->json([
+                'status'                  => true ,
+                'message'                    =>  'Notification Cleared'      
+            ],200);
+        }
+        else{
+            return response()->json([
+                'status'                  => false ,
+                'message'                    =>  'There is No Notifications To Clear'      
+            ],422);
+        }
+   
+
+   
+    } 
+
 }

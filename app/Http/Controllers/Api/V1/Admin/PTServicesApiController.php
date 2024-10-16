@@ -72,6 +72,7 @@ class PTServicesApiController extends Controller
 
     }
     public function trainers_pricelist(Request $request){
+    
         if (!auth('sanctum')->check()) {
             return response()->json([
                 'message' => 'Please login first!',
@@ -79,16 +80,17 @@ class PTServicesApiController extends Controller
             ], 403);
         }
         $member = auth('sanctum')->user()->lead;
-
+       
         $service_type_id = MobileSetting::first()->pt_service_type;
-        $service_type = ServiceType::with(['service_pricelists' => fn($q) => $q->where('pricelists.status','active')])->findOrFail($service_type_id);
+        $service_type = ServiceType::findOrFail($service_type_id);
+       
         $trainers = User::with(['employee', 'employee.branch'])
             ->whereHas('roles', function ($q) {
                 $q->where('title', 'Trainer');
             })
             ->whereHas('employee', function ($b) use ($member) {
                  // all_branches
-                $b->where('branch_id', $member->branch->id);
+                $b->where('branch_id', $member->branch_id);
             })
             ->whereHas('employee', function ($i) {
                 $i->whereStatus('active')->where('mobile_visibility', true);
