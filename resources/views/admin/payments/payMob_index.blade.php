@@ -108,7 +108,8 @@
                     },
                     {
                         data: 'membership',
-                        name: 'membership'
+                        name: 'membership' ,
+                        searchable: false
                     },
                     {
                         data: 'transaction_amount',

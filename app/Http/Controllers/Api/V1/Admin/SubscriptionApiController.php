@@ -86,8 +86,9 @@ class SubscriptionApiController extends Controller
 
             $user = User::create([
                 'name' => $request->name,
-                'email' => isset($request->email) && (!is_null($request->email)) ? $request->email : str_replace(' ', '_', $request->name) . $request->member_code . date('Y-m-d h:i:s') . '@zfitness.com',
-                'password' => Hash::make($request->phone)
+                'email' => isset($request->email) && (!is_null($request->email)) ? $request->email : $request->phone . '@zfitness.com',
+                'password' => Hash::make($request->phone) ,
+                'phone'    => $request->phone,
             ]);
             $authToken = $user->createToken('auth-token')->plainTextToken;
 
