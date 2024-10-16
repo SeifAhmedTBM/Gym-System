@@ -478,7 +478,7 @@ class AttendanceController extends Controller
                                 
                                 if ($freeze_request) {
                                     
-                                    if ($setting->freeze_duration == 'days') 
+                                    if ($setting->freeze_duration == 'days')
                                     {
                                         $freeze_request_end_date = Carbon::parse($freeze_request->end_date); // end date of freeze request
                                         $now = Carbon::now()->format('Y-m-d');  // today 
@@ -490,6 +490,8 @@ class AttendanceController extends Controller
                                         $freeze_request->update([
                                             'end_date'  => date('Y-m-d', strtotime($freeze_request->end_date. ' -' . $freeze_request_end_date->diffInDays($now) . ' Days')),
                                             'freeze'    => $freeze_request->freeze - $freeze_request_end_date->diffInDays($now),
+                                            'status'    => 'expired'
+
                                         ]);
                                         
                                     }else{
@@ -507,6 +509,7 @@ class AttendanceController extends Controller
                                         $freeze_request->update([
                                             'end_date'  => date('Y-m-d', strtotime($freeze_request->end_date. ' -' . $deducted_days . ' Days')),
                                             'freeze'    => ceil($consumed/7),
+                                            'status'    => 'expired'
                                         ]);
                                     }
                                 }

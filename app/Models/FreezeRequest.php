@@ -21,12 +21,14 @@ class FreezeRequest extends Model
         'confirmed' => 'Confirmed',
         'pending'   => 'Pending',
         'rejected'  => 'Rejected',
+        'expired'   => 'Expired'
     ];
 
     public const STATUS_COLOR = [
         'confirmed' => 'success',
         'pending'   => 'warning',
         'rejected'  => 'danger',
+        'expired'   => 'danger'
     ];
 
     public const IS_RETROACTIVE = [
