@@ -104,7 +104,7 @@
                 </div>
             </div>
             <div class="form-group row">
-                <div id="logo-cover-fields" style="display: none;">
+                <div id="logo-cover-fields" >
               
                     <div class="form-group">
                         <label class="required" for="logo">{{ trans('cruds.gallery.fields.images') }} Logo</label>
@@ -117,7 +117,7 @@
                         @endif
 
                     </div>
-                    <div class="form-group">
+                    <div class="form-group" style="display: none;">
                         <label class="required" for="cover">{{ trans('cruds.gallery.fields.images') }} Cover</label>
                         <div class="needsclick dropzone {{ $errors->has('cover') ? 'is-invalid' : '' }}" id="cover-dropzone">
                         </div>
@@ -256,11 +256,11 @@
         $('#service_type_id').change(function() {
             // console.log($(this).val());
             var selectedType = $(this).val();
-            if (selectedType == {{ $image_service_id }}) {
-                $('#logo-cover-fields').show();
-            } else {
-                $('#logo-cover-fields').hide();
-            }
+            // if (selectedType == {{ $image_service_id }}) {
+            //     $('#logo-cover-fields').show();
+            // } else {
+            //     $('#logo-cover-fields').hide();
+            // }
         });
         
         // Trigger the change event on page load to set the initial state
