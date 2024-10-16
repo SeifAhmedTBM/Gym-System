@@ -196,9 +196,9 @@ class SubscriptionApiController extends Controller
                     'user_id' => $member->user->id ,
                     'membership_id' => $membership->id ,
                     'transaction_amount' => $request->transaction_amount,
-                    'transactionId' => $request->transactionId,
+                    'transaction_id' => $request->transactionId,
                     'orderId'       => $request->orderId,
-                    'transaction_createdAt'     => $request->now(),
+                    'transaction_createdAt'     => now(),
                     'paymentMethodType' => $request->paymentMethodType ,
                     'paymentMethodSubType' => $request->paymentMethodSubType,
                 ]);
@@ -393,9 +393,9 @@ class SubscriptionApiController extends Controller
                     'user_id' => $member->user->id ,
                     'membership_id' => $membership->id ,
                     'transaction_amount' => $request->transaction_amount,
-                    'transactionId' => $request->transactionId,
+                    'transaction_id' => $request->transactionId,
                     'orderId'       => $request->orderId,
-                    'transaction_createdAt'     => $request->now(),
+                    'transaction_createdAt'     => now(),
                     'paymentMethodType' => $request->paymentMethodType ,
                     'paymentMethodSubType' => $request->paymentMethodSubType,
                 ]);
