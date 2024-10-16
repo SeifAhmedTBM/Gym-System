@@ -41,6 +41,24 @@ class SubscriptionApiController extends Controller
         //
     }
 
+    public function validate_user(Request $request){
+         $user = Lead::where('phone' , $request->phone)->first();
+         if($user){
+            return response()->json([
+                'status' => false,
+                'message' => 'This Phone is Already in use',
+            
+            ], 422);
+         }
+         else{
+            return response()->json([
+                'status' => true,
+                'message' => 'Accepted phone number',
+            
+            ], 200);
+         }
+    }
+
     public function guest_subscribe(Request $request)
     {
         //
@@ -87,7 +105,8 @@ class SubscriptionApiController extends Controller
             $user = User::create([
                 'name' => $request->name,
                 'email' => isset($request->email) && (!is_null($request->email)) ? $request->email : str_replace(' ', '_', $request->name) . $request->member_code . date('Y-m-d h:i:s') . '@zfitness.com',
-                'password' => Hash::make($request->phone)
+                'password' => Hash::make($request->phone) ,
+                'phone'    => $request->phone,
             ]);
             $authToken = $user->createToken('auth-token')->plainTextToken;
 
