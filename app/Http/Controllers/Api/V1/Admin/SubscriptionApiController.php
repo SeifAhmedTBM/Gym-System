@@ -41,6 +41,24 @@ class SubscriptionApiController extends Controller
         //
     }
 
+    public function validate_user(Request $request){
+         $user = Lead::where('phone' , $request->phone)->first();
+         if($user){
+            return response()->json([
+                'status' => false,
+                'message' => 'This Phone is Already in use',
+            
+            ], 422);
+         }
+         else{
+            return response()->json([
+                'status' => true,
+                'message' => 'Accepted phone number',
+            
+            ], 200);
+         }
+    }
+
     public function guest_subscribe(Request $request)
     {
         //
@@ -86,7 +104,9 @@ class SubscriptionApiController extends Controller
 
             $user = User::create([
                 'name' => $request->name,
+
                 'email' => isset($request->email) && (!is_null($request->email)) ? $request->email : $request->phone . '@zfitness.com',
+
                 'password' => Hash::make($request->phone) ,
                 'phone'    => $request->phone,
             ]);
@@ -197,7 +217,7 @@ class SubscriptionApiController extends Controller
                     'user_id' => $member->user->id ,
                     'membership_id' => $membership->id ,
                     'transaction_amount' => $request->transaction_amount,
-                    'transactionId' => $request->transactionId,
+                    'transaction_id' => $request->transactionId,
                     'orderId'       => $request->orderId,
                     'transaction_createdAt'     => now(),
                     'paymentMethodType' => $request->paymentMethodType ,
@@ -394,7 +414,7 @@ class SubscriptionApiController extends Controller
                     'user_id' => $member->user->id ,
                     'membership_id' => $membership->id ,
                     'transaction_amount' => $request->transaction_amount,
-                    'transactionId' => $request->transactionId,
+                    'transaction_id' => $request->transactionId,
                     'orderId'       => $request->orderId,
                     'transaction_createdAt'     => now(),
                     'paymentMethodType' => $request->paymentMethodType ,

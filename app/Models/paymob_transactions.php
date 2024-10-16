@@ -9,6 +9,18 @@ class paymob_transactions extends Model
 {
     use HasFactory;
 
+    protected $fillable = [
+        'user_id' ,
+        'membership_id',
+        'transaction_amount',
+        'transaction_id',
+        'orderId',
+        'transaction_createdAt',
+        'paymentMethodType',
+        'paymentMethodSubType',
+    ];
+
+
     public function membership(){
         return $this->belongsTo(Membership::class , 'membership_id' , 'id');
     }

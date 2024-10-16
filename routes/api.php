@@ -68,6 +68,7 @@ Route::group(['prefix' => 'v1', 'as' => 'api.', 'namespace' => 'Api\V1\Admin'], 
         Route::get('memberships', 'MembershipsServicesApiController@memberships');
         Route::post('subscription', 'SubscriptionApiController@subscribe');
         Route::post('subscription/guest', 'SubscriptionApiController@guest_subscribe');
+        Route::post('subscribtion/validation' ,'SubscriptionApiController@validate_user');
     });
 
 
