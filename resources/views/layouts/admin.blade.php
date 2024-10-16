@@ -720,9 +720,9 @@
     </script>
 
     <script>
-        function getMember() {
-            var member_code = $('#member_code').val();
-            var member_branch_id = $('#member_branch_id').val();
+        function getMember(x,y,t) {
+            var member_code = $('#member_code').val()??x;
+            var member_branch_id = $('#member_branch_id').val()??y;
             var url = "{{ route('admin.getMember') }}";
             $.ajax({
                 method: 'POST',
@@ -754,6 +754,10 @@
                         $('#end_date').text(data.freeze.end_date);
                         $('.frozen').removeClass('d-none');
                     }
+                    if (data.freeze == null && t == 'form'){
+                        $("#memberAttendanceForm").submit()
+                    }
+
 
                     if (
                         "{{ isset(\App\Models\Setting::first()->has_lockers) && \App\Models\Setting::first()->has_lockers == true }}") {

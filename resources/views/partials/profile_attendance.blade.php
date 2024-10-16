@@ -61,3 +61,18 @@
         </div>
     </div>
 </div>
+@section('scripts')
+    <script>
+        document.getElementById('member_code').addEventListener('keydown', function (e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                takeThisMemberAttendance();
+            }
+        });
+        function takeThisMemberAttendance() {
+            let member_code = $("#member_code").val();
+            let member_branch_id =$("#member_branch_id").val();
+            getMember(member_code,member_branch_id,'form');
+        }
+    </script>
+@endsection
