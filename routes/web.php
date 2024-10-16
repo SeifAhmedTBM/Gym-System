@@ -1055,6 +1055,10 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.', 'namespace' => 'Admin', 'mi
     //Notification
     Route::resource('notification' , 'NotificationController');
     Route::post('sendNotification' , 'NotificationController@sendNotification')->name('sendNotification');
+
+
+    //Paymon Controller 
+    Route::resource('paymobTransactions', 'PaymobTransactionsController');
 });
 
 Route::group(['prefix' => 'profile', 'as' => 'profile.', 'namespace' => 'Auth', 'middleware' => ['auth']], function () {
