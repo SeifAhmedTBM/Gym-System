@@ -17,7 +17,7 @@ use Yajra\DataTables\Facades\DataTables;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
 use App\Http\Controllers\Traits\MediaUploadingTrait;
 use App\Models\MobileSetting;
-
+use Illuminate\Support\Facades\Storage;
 class ServicesController extends Controller
 {
     use CsvImportTrait;
@@ -43,7 +43,7 @@ class ServicesController extends Controller
                     return sprintf(
                         '<a href="%s" target="_blank"><img src="%s" width="50px" height="50px"></a>',
                         $photo->url,
-                        $photo->thumbnail
+                        $photo->thumbnail ,
                     );
                 }
 
