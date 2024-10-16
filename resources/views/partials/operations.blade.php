@@ -129,6 +129,14 @@
                     'linkUrl' => 'admin.member-suggestion.index',
                     'type' => '',
                 ],
+
+                [
+                    'can' => 'member_access',
+                    'title' => 'Paymob Transactions',
+                    'imageUrl' => 'Payments.png',
+                    'linkUrl' => 'admin.paymobTransactions.index',
+                    'type' => '',
+                ],
             ],
         ],
     ];
