@@ -427,7 +427,6 @@
                                 <input type="hidden" name="member_id" id="member_id">
                                 <input type="hidden" name="membership_id" id="membership_id">
                                 <input type="hidden" name="freeze_id" id="freeze_id">
-                                <input type="hidden" name="member_branch_id" id="member_branch_id">
                                 <div class="col-md-4">
                                     <label for="current_date">Current Date ( Today )</label>
                                     <h4 id="current_date">{{ date('Y-m-d') }}</h4>
@@ -720,9 +719,9 @@
     </script>
 
     <script>
-        function getMember(x,y,t) {
-            var member_code = $('#member_code').val()??x;
-            var member_branch_id = $('#member_branch_id').val()??y;
+        function getMember() {
+            var member_code = $('#member_code').val();
+            var member_branch_id = $('#member_branch_id').val();
             var url = "{{ route('admin.getMember') }}";
             $.ajax({
                 method: 'POST',
@@ -738,7 +737,6 @@
                     $('#MemberName').text(data.member.name + ' - ' + data.membership.service_pricelist.name);
                     $("input[name=membership_id]").val(data.membership.id);
                     $("input[name=member_id]").val(data.member.id);
-                    $("input[name=member_branch_id]").val(data.member.branch_id);
                     $("input[name=card_number]").val(data.member.member_code);
 
                     // if (data.membership.status == 'expired') 
@@ -754,10 +752,6 @@
                         $('#end_date').text(data.freeze.end_date);
                         $('.frozen').removeClass('d-none');
                     }
-                    if (data.freeze == null && t == 'form'){
-                        $("#memberAttendanceForm").submit()
-                    }
-
 
                     if (
                         "{{ isset(\App\Models\Setting::first()->has_lockers) && \App\Models\Setting::first()->has_lockers == true }}") {
