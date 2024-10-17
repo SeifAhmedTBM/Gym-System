@@ -228,10 +228,4 @@
         url = url.replace(':id', id);
         $(".modalForm3").attr('action', url);
     }
-    function takeMemberAction(id) {
-        var id = id;
-        var url = '{{ route('admin.reminders.takeLeadAction', ':id') }}';
-        url = url.replace(':id', id);
-        $(".modalForm2").attr('action', url);
-    }
 </script>
