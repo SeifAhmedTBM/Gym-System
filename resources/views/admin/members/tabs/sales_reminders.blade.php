@@ -228,4 +228,19 @@
         url = url.replace(':id', id);
         $(".modalForm3").attr('action', url);
     }
+    function takeMemberAction(id) {
+        var id = id;
+        var url = '{{ route('admin.reminders.takeLeadAction', ':id') }}';
+        url = url.replace(':id', id);
+        $(".modalForm2").attr('action', url);
+    }
+    function assignReminder(id, user_id)
+    {
+        var id = id;
+        var user_id = user_id;
+        var url = '{{ route('admin.reminder.assign', ':id') }}';
+        url = url.replace(':id', id);
+        $('select[name="user_id"]').val(user_id);
+        $(".assignForm").attr('action', url);
+    }
 </script>
