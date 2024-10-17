@@ -720,6 +720,17 @@
     </script>
 
     <script>
+        document.getElementById('member_code').addEventListener('keydown', function (e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                takeThisMemberAttendance();
+            }
+        });
+        function takeThisMemberAttendance() {
+            let member_code = $("#member_code").val();
+            let member_branch_id =$("#member_branch_id").val();
+            getMember(member_code,member_branch_id,'form');
+        }
         function getMember(x,y,t) {
             var member_code = $('#member_code').val()??x;
             var member_branch_id = $('#member_branch_id').val()??y;
