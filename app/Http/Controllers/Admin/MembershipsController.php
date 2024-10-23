@@ -647,8 +647,7 @@ class MembershipsController extends Controller
 
     public function storeRenew(Request $request)
     {
-        $selected_branch_id = Auth()->user()->employee->branch ? Auth()->user()->employee->branch : (int)$request['branch_id'];
-//        dd($selected_branch_id);
+        $selected_branch_id = Auth()->user()->employee->branch_id ? Auth()->user()->employee->branch_id : (int)$request['branch_id'];
         try {
             DB::beginTransaction();
             $service_type_id = Pricelist::find($request->service_pricelist_id)->service->service_type_id;
