@@ -17,6 +17,7 @@
                             <label for="">{{ trans('global.take_attendance') }}</label>
                             <input type="hidden" name="membership_id" value="">
                             <input type="hidden" name="member_id" value="">
+                            <input type="hidden" name="freeze_id" id="freeze_id">
                             <input type="hidden" name="branch_id" value="{{ Auth()->user()->employee && Auth()->user()->employee->branch_id ? Auth()->user()->employee->branch_id : NULL }}">
                             <div class="input-group">
                                 <div class="input-group-prepend">
@@ -41,6 +42,7 @@
                                 <label for="">{{ trans('global.take_attendance') }}</label>
                                 <input type="hidden" name="membership_id" value="">
                                 <input type="hidden" name="member_id" value="">
+                                <input type="hidden" name="freeze_id" id="freeze_id">
                                 <input type="hidden" name="branch_id" value="{{ Auth()->user()->employee && Auth()->user()->employee->branch_id ? Auth()->user()->employee->branch_id : NULL }}">
                                 <div class="input-group">
                                     <div class="input-group-prepend">
