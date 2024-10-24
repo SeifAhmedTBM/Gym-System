@@ -326,17 +326,20 @@ class AttendanceController extends Controller
     {
         
         $setting = Setting::first();
-
+//    dd($request);
         $member = Lead::whereType('member')
-                        // ->where('id',$request['member_id'])
+                         ->where('id',$request['member_id'])
+                        ->orWhere(function ($query) use ($request){
+                            return $query
+                                    ->where('member_code',$request['card_number'])
+                                    ->whereBranchId($request['member_branch_id']);
+                        })
                         // ->orWhere('card_number',$request['card_number'])
-                        ->where('member_code',$request['card_number'])
-                        ->whereBranchId($request['member_branch_id'])
                         ->first();
 
         // dd($request->all(),$member);
         $branch_id = Auth()->user()->employee ? Auth()->user()->employee->branch_id : $request['member_branch_id'];
-                    
+//        dd($member);
         if (isset($member->id)) 
         {
             $membership = Membership::with(['service_pricelist' => fn($q) => $q->with('pricelist_days'),'member'])

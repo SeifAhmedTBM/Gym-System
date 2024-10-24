@@ -748,6 +748,7 @@
                     if (data.freeze != null) {
                         $('#has_locker').modal('show');
                         $('#freeze_id').val(data.freeze.id);
+                        $("input[name=freeze_id]").val(data.freeze.id);
                         $('#start_date').text(data.freeze.start_date);
                         $('#end_date').text(data.freeze.end_date);
                         $('.frozen').removeClass('d-none');
@@ -780,6 +781,16 @@
         }
     </script>
 
+    <script>
+        document.getElementById("memberAttendanceForm").addEventListener('submit',(e)=>{
+            let freeze_id = document.getElementById("freeze_id").value;
+            console.log(freeze_id)
+            if(freeze_id != null && freeze_id !== ""){
+                e.preventDefault();
+                getMember();
+            }
+        })
+    </script>
 
     @include('sweetalert::alert', ['cdn' => 'https://cdn.jsdelivr.net/npm/sweetalert2@9'])
 
